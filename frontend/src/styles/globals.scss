@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #fdfcfe; // Fallback
+}
+
+// Example of a custom SCSS mixin for the gradient background
+@mixin knotly-gradient {
+    background: linear-gradient(135deg, #eff6ff 0%, #f3e8ff 50%, #fce7f3 100%);
+}
+
+.landing-container {
+    @include knotly-gradient;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

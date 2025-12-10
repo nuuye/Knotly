@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { Button, TextField, Typography, Paper, Stack } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 export const Route = createFileRoute("/")({
     component: LandingPage,
@@ -11,42 +11,73 @@ function LandingPage() {
     const [username, setUsername] = useState("");
     const navigate = useNavigate();
 
-    const handleGuestLogin = async () => {
+    const handleGuestLogin = () => {
         if (!username) return;
 
-        // TODO: Call API /api/auth/guest here
+        // TODO: Connect to Spring Boot API
         console.log("Entering as:", username);
-
-        // Navigate to the chat page
         navigate({ to: "/chat" });
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50">
-            <div className="text-center space-y-6 p-10 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white">
-                <h1 className="text-5xl font-bold text-knotly-primary tracking-tight">Knotly.</h1>
-                <p className="text-gray-500">Chill chat for cool people.</p>
+        // We use the SCSS class for the gradient background
+        <div className="landing-container">
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 5,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    maxWidth: 400,
+                    width: "100%",
+                    border: "1px solid rgba(255,255,255,0.5)",
+                    backgroundColor: "rgba(255, 255, 255, 0.8)", // Glassmorphism-ish
+                    backdropFilter: "blur(10px)",
+                }}
+            >
+                <Typography
+                    variant="h2"
+                    component="h1"
+                    gutterBottom
+                    sx={{ fontWeight: "bold", color: "primary.main", mb: 0 }}
+                >
+                    Knotly.
+                </Typography>
 
-                <div className="flex flex-col gap-4 w-72 mx-auto">
-                    <Input
-                        placeholder="Choose a funky username..."
-                        className="text-center bg-white border-knotly-secondary focus-visible:ring-knotly-primary"
+                <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>
+                    Chill chat for cool people.
+                </Typography>
+
+                <Stack spacing={3} width="100%">
+                    <TextField
+                        label="Choose a pseudo"
+                        variant="outlined"
+                        fullWidth
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        // Customizing the input specifically here if needed
+                        sx={{ backgroundColor: "white" }}
                     />
+
                     <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        fullWidth
+                        endIcon={<ArrowForwardIcon />}
                         onClick={handleGuestLogin}
-                        className="bg-knotly-primary hover:bg-purple-500 text-white font-bold py-2 rounded-full transition-all hover:scale-105"
+                        disabled={!username}
                     >
                         Join as Guest
                     </Button>
 
-                    <div className="text-xs text-gray-400 mt-2">
-                        Or <span className="underline cursor-pointer hover:text-knotly-primary">Login</span> to recover
-                        your account
-                    </div>
-                </div>
-            </div>
+                    <Typography variant="caption" align="center" color="textSecondary">
+                        Or <span style={{ color: "#A78BFA", cursor: "pointer", fontWeight: "bold" }}>Login</span> to
+                        recover account
+                    </Typography>
+                </Stack>
+            </Paper>
         </div>
     );
 }

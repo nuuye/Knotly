@@ -1,12 +1,11 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-// import { TanStackRouterDevtools } from '@tanstack/router-devtools' // Optional
+import { Box } from "@mui/material";
 
 export const Route = createRootRoute({
     component: () => (
-        <div className="bg-knotly-bg min-h-screen text-knotly-dark font-sans">
-            {/* Outlet renders the child routes */}
+        // Uses the default background color from theme
+        <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
             <Outlet />
-            {/* <TanStackRouterDevtools /> */}
-        </div>
+        </Box>
     ),
 });

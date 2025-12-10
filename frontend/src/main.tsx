@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { ThemeProvider, CssBaseline } from "@mui/material";
 import { routeTree } from "./routeTree.gen";
-import "./index.css";
+import theme from "./theme";
+import "./styles/globals.scss";
 
-// Create a new router instance
 const router = createRouter({ routeTree });
 
-// Register the router instance for type safety
 declare module "@tanstack/react-router" {
     interface Register {
         router: typeof router;
@@ -16,6 +16,10 @@ declare module "@tanstack/react-router" {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <ThemeProvider theme={theme}>
+            {/* CssBaseline normalize styles across browsers */}
+            <CssBaseline />
+            <RouterProvider router={router} />
+        </ThemeProvider>
     </React.StrictMode>
 );
