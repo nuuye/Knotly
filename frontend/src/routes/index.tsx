@@ -5,6 +5,8 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import MicIcon from "@mui/icons-material/Mic";
 import HeadsetIcon from "@mui/icons-material/Headset";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+
 import "./index.scss";
 
 export const Route = createFileRoute("/")({
@@ -25,8 +27,49 @@ function LandingPage() {
         <div className="aurora-container">
             <div className="aurora-background" />
 
-            {/* Navbar Section */}
-            <nav className="navbar">
+            {/* --- NEW: Animated Background Elements --- */}
+            <div className="background-elements">
+                {/* 1. Large colorful blobs to fill empty corners */}
+                <Box
+                    className="floating-shape"
+                    sx={{
+                        top: "10%",
+                        left: "-5%",
+                        width: "300px",
+                        height: "300px",
+                        background: "radial-gradient(circle, rgba(167, 139, 250, 0.4) 0%, transparent 70%)",
+                    }}
+                />
+                <Box
+                    className="floating-shape"
+                    sx={{
+                        bottom: "10%",
+                        right: "-5%",
+                        width: "400px",
+                        height: "400px",
+                        background: "radial-gradient(circle, rgba(244, 114, 182, 0.3) 0%, transparent 70%)",
+                        animationDelay: "-5s",
+                    }}
+                />
+
+                <div className="floating-bubble delay-1" style={{ top: "90%", left: "67%" }}>
+                    <span style={{ fontSize: "1.2rem" }}>👋</span>
+                    <span>Hello!</span>
+                </div>
+
+                <div className="floating-bubble delay-2" style={{ top: "15%", left: "77%" }}>
+                    <Avatar sx={{ width: 24, height: 24, bgcolor: "#f472b6" }}>S</Avatar>
+                    <span>What's up</span>
+                </div>
+
+                <div className="floating-bubble delay-3" style={{ top: "65%", right: "43%" }}>
+                    <FavoriteIcon sx={{ color: "#ec4899", fontSize: 20 }} />
+                    <span>124 likes</span>
+                </div>
+            </div>
+
+            {/* Navbar Section (Added zIndex to ensure it's above floating elements) */}
+            <nav className="navbar" style={{ position: "relative", zIndex: 2 }}>
                 <Typography
                     variant="h5"
                     component="div"
@@ -56,10 +99,10 @@ function LandingPage() {
                 </Button>
             </nav>
 
-            {/* Main Hero Section */}
-            <main className="hero-content">
-                {/* LEFT COLUMN: Text and Action */}
-                <Box sx={{ flex: 1, maxWidth: { md: "580px" }, zIndex: 2 }}>
+            {/* Main Hero Section (Added zIndex) */}
+            <main className="hero-content" style={{ position: "relative", zIndex: 2 }}>
+                {/* LEFT COLUMN */}
+                <Box sx={{ flex: 1, maxWidth: { md: "580px" } }}>
                     <Typography
                         variant="h1"
                         sx={{
@@ -91,7 +134,6 @@ function LandingPage() {
                         Your corner of the internet to talk, play, and hang out with communities that share your vibe.
                     </Typography>
 
-                    {/* Action Area: Glassmorphism Input */}
                     <Paper
                         elevation={4}
                         sx={{
@@ -102,7 +144,6 @@ function LandingPage() {
                             maxWidth: "450px",
                             borderRadius: "50px",
                             border: "1px solid rgba(255, 255, 255, 0.6)",
-                            // High transparency to show the aurora background through
                             background: "rgba(255, 255, 255, 0.6)",
                             backdropFilter: "blur(12px)",
                             boxShadow: "0 8px 32px 0 rgba(100, 50, 200, 0.1)",
@@ -144,7 +185,7 @@ function LandingPage() {
                     </Paper>
                 </Box>
 
-                {/* RIGHT COLUMN: Visual (Mock Chat Interface) */}
+                {/* RIGHT COLUMN */}
                 <Box
                     className="floating-mockup"
                     sx={{
@@ -154,7 +195,6 @@ function LandingPage() {
                         position: "relative",
                     }}
                 >
-                    {/* The "App Preview" Card - More Transparent Now */}
                     <Paper
                         elevation={8}
                         sx={{
@@ -162,18 +202,15 @@ function LandingPage() {
                             maxWidth: 380,
                             height: 480,
                             borderRadius: "24px",
-                            // More transparent glass effect
                             background: "rgba(255, 255, 255, 0.55)",
                             backdropFilter: "blur(24px) saturate(180%)",
                             border: "1px solid rgba(255, 255, 255, 0.8)",
                             overflow: "hidden",
                             display: "flex",
                             flexDirection: "column",
-                            zIndex: 1,
                             boxShadow: "0 20px 40px rgba(0,0,0,0.05)",
                         }}
                     >
-                        {/* Fake App Header */}
                         <Box
                             sx={{
                                 p: 2,
@@ -195,9 +232,7 @@ function LandingPage() {
                             </Box>
                         </Box>
 
-                        {/* Chat Area */}
                         <Box sx={{ flex: 1, p: 3, display: "flex", flexDirection: "column", gap: 2.5 }}>
-                            {/* Message 1 */}
                             <Stack direction="row" spacing={1.5}>
                                 <Avatar src="/broken.jpg" sx={{ width: 36, height: 36, bgcolor: "#f472b6" }} />
                                 <Box>
@@ -215,7 +250,6 @@ function LandingPage() {
                                 </Box>
                             </Stack>
 
-                            {/* Message 2 */}
                             <Stack direction="row" spacing={1.5}>
                                 <Avatar sx={{ bgcolor: "#3b82f6", width: 36, height: 36 }}>J</Avatar>
                                 <Box>
@@ -233,7 +267,6 @@ function LandingPage() {
                                 </Box>
                             </Stack>
 
-                            {/* Badge */}
                             <Box sx={{ alignSelf: "center", my: 1 }}>
                                 <Chip
                                     label="New messages"
@@ -248,7 +281,6 @@ function LandingPage() {
                             </Box>
                         </Box>
 
-                        {/* User Control Bar */}
                         <Box
                             sx={{
                                 p: 1.5,

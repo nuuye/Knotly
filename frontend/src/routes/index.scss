@@ -86,3 +86,82 @@ body {
 .floating-mockup {
     animation: float 6s ease-in-out infinite;
 }
+
+// --- New Animated Background Elements ---
+
+.background-elements {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0; // Sits above the gradient background but behind content
+    pointer-events: none; // Makes sure you can click "through" them
+}
+
+.floating-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.6;
+    filter: blur(60px);
+    animation: pulse-float 10s infinite alternate ease-in-out;
+}
+
+.floating-bubble {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4c1d95;
+
+    // Animation defaults
+    animation-name: float-around;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+// Keyframes for organic movement
+@keyframes pulse-float {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    100% {
+        transform: scale(1.1) translate(-20px, 15px);
+    }
+}
+
+@keyframes float-around {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    33% {
+        transform: translate(15px, -25px) rotate(2deg);
+    }
+    66% {
+        transform: translate(-10px, 15px) rotate(-1deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+}
+
+// Utility classes for variation
+.delay-1 {
+    animation-duration: 12s;
+    animation-delay: 0s;
+}
+.delay-2 {
+    animation-duration: 15s;
+    animation-delay: -5s;
+}
+.delay-3 {
+    animation-duration: 18s;
+    animation-delay: -2s;
+}
