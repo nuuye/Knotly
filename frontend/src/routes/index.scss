@@ -1,15 +1,28 @@
 // src/routes/index.scss
 
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+    background-color: transparent;
+}
+
 .aurora-container {
     min-height: 100vh;
     width: 100%;
     position: relative;
-    overflow: hidden; // Prevents scrollbars if the blur goes outside
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
 }
 
 .aurora-background {
-    position: absolute;
-    inset: 0;
+    position: fixed; // Use fixed to cover the whole viewport even when scrolling
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 0;
 
     background:
@@ -20,11 +33,56 @@
         linear-gradient(180deg, #f7eaff 0%, #fde2ea 100%);
 }
 
-.aurora-content {
-    position: relative;
-    z-index: 1; // Ensures content is above the background
-    height: 100vh;
+// Navbar styling
+.navbar {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
+    padding: 1.5rem 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
+
+// Main hero section styling
+.hero-content {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 4rem;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 900px) {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 2rem;
+        gap: 3rem;
+    }
+}
+
+// Floating animation
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.floating-mockup {
+    animation: float 6s ease-in-out infinite;
 }
