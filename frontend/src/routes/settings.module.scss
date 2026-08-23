@@ -1,0 +1,359 @@
+@use "../styles/variables.scss" as *;
+
+.settings {
+    height: 100vh;
+    display: flex;
+    background: $background;
+}
+
+.sidebar {
+    width: 256px;
+    background: $card;
+    border-right: 1px solid $border;
+    padding: $spacing-md;
+}
+
+.backLink {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $muted-foreground;
+    margin-bottom: $spacing-xl;
+    transition: color $transition-base;
+    cursor: pointer;
+
+    &:hover {
+        color: $foreground;
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    span {
+        font-size: $font-size-sm;
+    }
+}
+
+.nav {
+    .navButton {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        padding: $spacing-md;
+        border-radius: $radius-lg;
+        transition: all $transition-base;
+        margin-bottom: 4px;
+        cursor: pointer;
+        color: $foreground;
+        background: transparent;
+
+        &.active {
+            background: $primary;
+            color: white;
+        }
+
+        &:not(.active):hover {
+            background: $muted;
+        }
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        span {
+            font-size: $font-size-sm;
+        }
+
+        &.danger {
+            color: $destructive;
+
+            &:hover {
+                background: rgba($destructive, 0.1);
+            }
+        }
+    }
+
+    .divider {
+        height: 1px;
+        background: $border;
+        margin: $spacing-md 0;
+    }
+}
+
+.main {
+    flex: 1;
+    overflow-y: auto;
+
+    .content {
+        max-width: 48rem;
+        padding: $spacing-2xl;
+
+        h1 {
+            font-size: $font-size-2xl;
+            font-weight: $font-weight-semibold;
+            margin-bottom: $spacing-xl;
+        }
+
+        .card {
+            background: $card;
+            border: 1px solid $border;
+            border-radius: $radius-xl;
+            padding: $spacing-xl;
+            margin-bottom: $spacing-xl;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            h3 {
+                font-weight: $font-weight-semibold;
+                margin-bottom: $spacing-md;
+                font-size: $font-size-base;
+            }
+
+            .avatarSection {
+                display: flex;
+                align-items: center;
+                gap: $spacing-md;
+                margin-bottom: $spacing-xl;
+
+                .avatar {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: $gradient-primary;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: $font-size-2xl;
+                    font-weight: $font-weight-medium;
+                }
+
+                button {
+                    padding: $spacing-sm $spacing-md;
+                    background: $primary;
+                    color: white;
+                    border-radius: $radius-lg;
+                    font-weight: $font-weight-medium;
+                    transition: background $transition-base;
+                    cursor: pointer;
+
+                    &:hover {
+                        background: $accent;
+                    }
+                }
+            }
+
+            .formField {
+                margin-bottom: $spacing-md;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                label {
+                    display: block;
+                    font-size: $font-size-sm;
+                    margin-bottom: $spacing-sm;
+                }
+
+                input,
+                textarea,
+                select {
+                    width: 100%;
+                    padding: $spacing-sm $spacing-md;
+                    background: $input-background;
+                    border: 1px solid $border;
+                    border-radius: $radius-lg;
+                    outline: none;
+                    transition: box-shadow $transition-base;
+
+                    &:focus {
+                        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+                    }
+                }
+
+                textarea {
+                    resize: none;
+                }
+            }
+
+            .actionList {
+                .actionButton {
+                    width: 100%;
+                    padding: $spacing-sm $spacing-md;
+                    background: $muted;
+                    border-radius: $radius-lg;
+                    margin-bottom: $spacing-md;
+                    text-align: left;
+                    transition: background $transition-base;
+                    cursor: pointer;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    &:hover {
+                        background: rgba($muted, 0.8);
+                    }
+
+                    &.danger {
+                        background: rgba($destructive, 0.1);
+                        color: $destructive;
+
+                        &:hover {
+                            background: rgba($destructive, 0.2);
+                        }
+                    }
+                }
+            }
+
+            .settingRow {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: $spacing-md;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .settingInfo {
+                    .settingName {
+                        font-weight: $font-weight-medium;
+                        margin-bottom: 2px;
+                    }
+
+                    .settingDescription {
+                        font-size: $font-size-sm;
+                        color: $muted-foreground;
+                    }
+                }
+
+                .toggle {
+                    position: relative;
+                    display: inline-flex;
+                    align-items: center;
+                    cursor: pointer;
+
+                    input {
+                        position: absolute;
+                        opacity: 0;
+                        width: 0;
+                        height: 0;
+                    }
+
+                    .toggleTrack {
+                        width: 44px;
+                        height: 24px;
+                        background: #ffc18a;
+                        border-radius: 12px;
+                        transition: background $transition-base;
+                        position: relative;
+
+                        &::after {
+                            content: "";
+                            position: absolute;
+                            top: 2px;
+                            left: 2px;
+                            width: 20px;
+                            height: 20px;
+                            background: white;
+                            border-radius: 50%;
+                            transition: transform $transition-base;
+                        }
+                    }
+
+                    input:checked + .toggleTrack {
+                        background: $primary;
+
+                        &::after {
+                            transform: translateX(20px);
+                        }
+                    }
+
+                    input:focus + .toggleTrack {
+                        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+                    }
+                }
+            }
+
+            .themeGrid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: $spacing-md;
+
+                .themeOption {
+                    padding: $spacing-md;
+                    border: 2px solid $border;
+                    background: $background;
+                    border-radius: $radius-lg;
+                    cursor: pointer;
+                    transition: all $transition-base;
+
+                    &.active {
+                        border-color: $primary;
+                    }
+
+                    &:not(.active):hover {
+                        border-color: $primary;
+                    }
+
+                    .themePreview {
+                        aspect-ratio: 16 / 9;
+                        border-radius: $radius-sm;
+                        margin-bottom: $spacing-sm;
+
+                        &.light {
+                            background: linear-gradient(to bottom right, $background, $muted);
+                        }
+
+                        &.dark {
+                            background: linear-gradient(to bottom right, #1f2937, #374151);
+                        }
+
+                        &.auto {
+                            background: linear-gradient(to bottom right, $background, #374151);
+                        }
+                    }
+
+                    .themeName {
+                        font-size: $font-size-sm;
+                        font-weight: $font-weight-medium;
+                    }
+                }
+            }
+
+            .rangeInput {
+                width: 100%;
+                margin-bottom: $spacing-sm;
+            }
+
+            .rangeLabels {
+                display: flex;
+                justify-content: space-between;
+                font-size: $font-size-xs;
+                color: $muted-foreground;
+            }
+        }
+
+        .saveButton {
+            padding: $spacing-sm $spacing-xl;
+            background: $primary;
+            color: white;
+            border-radius: $radius-lg;
+            font-weight: $font-weight-medium;
+            transition: background $transition-base;
+            cursor: pointer;
+
+            &:hover {
+                background: $accent;
+            }
+        }
+    }
+}
