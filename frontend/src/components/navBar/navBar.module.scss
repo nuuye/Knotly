@@ -1,0 +1,73 @@
+@use "../../styles/variables.scss" as *;
+
+.root {
+    border-bottom: 2px solid $border;
+    background: rgb(235 167 99 / 18%);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: $spacing-md $spacing-xl;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+
+            .logo {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }
+            }
+
+            .title {
+                font-weight: $font-weight-semibold;
+                font-size: $font-size-xl;
+                color: $foreground;
+            }
+        }
+
+        .buttonContainter {
+            display: flex;
+            align-items: center;
+            gap: $spacing-md;
+
+            a {
+                padding: $spacing-sm $spacing-md;
+                transition: all $transition-base;
+                color: $foreground;
+                border-radius: $radius-lg;
+
+                &:hover {
+                    color: $primary;
+                }
+
+                &:last-child {
+                    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+                    color: white;
+
+                    &:hover {
+                        transform: translateY(-2px);
+                        box-shadow: $shadow-md;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,193 @@
+@use "../../styles/variables" as *;
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: $spacing-xl;
+    animation: fadeInOverlay 0.3s ease-out forwards;
+}
+
+.modal {
+    background: $card;
+    border-radius: $radius-xl;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid $border;
+
+    h2 {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+    }
+
+    .closeButton {
+        width: 32px;
+        height: 32px;
+        border-radius: $radius-md;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background $transition-base;
+        cursor: pointer;
+
+        &:hover {
+            background: $muted;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+.form {
+    padding: $spacing-xl;
+
+    .formGroup {
+        margin-bottom: $spacing-md;
+
+        label {
+            display: block;
+            font-weight: $font-weight-medium;
+            margin-bottom: $spacing-sm;
+            color: $foreground;
+            font-size: $font-size-sm;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: $spacing-sm $spacing-md;
+            border: 1px solid $border;
+            border-radius: $radius-lg;
+            background: $input-background;
+            transition: all $transition-base;
+            outline: none;
+            font-family: inherit;
+
+            &:focus {
+                border-color: $primary;
+                box-shadow: 0 0 0 3px rgba($primary, 0.1);
+            }
+
+            &::placeholder {
+                color: $muted-foreground;
+            }
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .uploadArea {
+            border: 2px dashed $border;
+            border-radius: $radius-lg;
+            padding: $spacing-lg;
+            text-align: center;
+            transition: all $transition-base;
+            cursor: pointer;
+
+            &:hover {
+                border-color: $primary;
+                background: rgba($primary, 0.02);
+            }
+
+            svg {
+                width: 32px;
+                height: 32px;
+                color: $muted-foreground;
+                margin: 0 auto $spacing-sm;
+            }
+
+            p {
+                font-weight: $font-weight-medium;
+                margin-bottom: 2px;
+                font-size: $font-size-sm;
+            }
+
+            span {
+                font-size: $font-size-xs;
+                color: $muted-foreground;
+            }
+        }
+    }
+
+    .actions {
+        display: flex;
+        gap: $spacing-sm;
+        justify-content: flex-end;
+        margin-top: $spacing-lg;
+        padding-top: $spacing-lg;
+        border-top: 1px solid $border;
+
+        .cancelButton {
+            padding: $spacing-sm $spacing-lg;
+            border: 1px solid $border;
+            border-radius: $radius-lg;
+            font-weight: $font-weight-medium;
+            transition: all $transition-base;
+            color: $foreground;
+            cursor: pointer;
+
+            &:hover {
+                background: $muted;
+            }
+        }
+
+        .submitButton {
+            padding: $spacing-sm $spacing-lg;
+            background: linear-gradient(135deg, $primary 0%, $accent 100%);
+            color: white;
+            border: none;
+            border-radius: $radius-lg;
+            font-weight: $font-weight-medium;
+            cursor: pointer;
+            transition: all $transition-base;
+            box-shadow: $shadow-md;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: $shadow-lg;
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

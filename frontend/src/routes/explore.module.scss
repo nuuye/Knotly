@@ -1,0 +1,302 @@
+@use "../styles/variables.scss" as *;
+
+.explore {
+    min-height: 100vh;
+    background: $background;
+}
+
+.main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: $spacing-2xl $spacing-xl;
+}
+
+.actionContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-2xl;
+
+    .searchBar {
+        flex: 1;
+
+        .searchInput {
+            position: relative;
+            width: 100%;
+
+            svg {
+                position: absolute;
+                left: $spacing-md;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 20px;
+                height: 20px;
+                color: $muted-foreground;
+            }
+
+            input {
+                width: 100%;
+                padding: $spacing-md $spacing-md $spacing-md 48px;
+                background: $card;
+                border: 1px solid $border;
+                border-radius: $radius-xl;
+                outline: none;
+                transition: box-shadow $transition-base;
+                box-sizing: border-box;
+
+                &:focus {
+                    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+                }
+
+                &::placeholder {
+                    color: $muted-foreground;
+                }
+            }
+        }
+    }
+
+    .actions {
+        display: flex;
+        gap: $spacing-md;
+        align-items: center;
+
+        .createButton,
+        .button {
+            padding: 0.9rem $spacing-md;
+            border-radius: $radius-lg;
+            font-weight: $font-weight-medium;
+            transition: all $transition-base;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            text-decoration: none;
+            // Force font inheritance for buttons
+            font-family: inherit;
+            font-size: inherit;
+            // Use 600 or $font-weight-semibold to make it look better on colored backgrounds
+            font-weight: 600;
+        }
+
+        .createButton {
+            gap: $spacing-sm;
+            background: linear-gradient(135deg, $primary 0%, $accent 100%);
+            color: white;
+            border: 1px solid transparent;
+            box-shadow: $shadow-md;
+            cursor: pointer;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: $shadow-lg;
+            }
+
+            svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        .button {
+            border: 1px solid $border;
+            background: $card;
+            color: $foreground;
+
+            &:hover {
+                background: $muted;
+            }
+        }
+    }
+}
+
+.categories {
+    display: flex;
+    gap: $spacing-md;
+    margin-bottom: $spacing-2xl;
+    overflow-x: auto;
+    padding-bottom: $spacing-sm;
+
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $border;
+        border-radius: 3px;
+    }
+
+    .category {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        padding: $spacing-sm $spacing-md;
+        border-radius: $radius-lg;
+        white-space: nowrap;
+        border: 2px solid transparent;
+        transition: all $transition-base;
+        cursor: pointer;
+        background: $card;
+        color: $foreground;
+
+        &.active {
+            background: $primary;
+            color: white;
+            border-color: $primary;
+        }
+
+        &:not(.active):hover {
+            background: $muted;
+        }
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: $spacing-xl;
+}
+
+.communityCard {
+    position: relative;
+    background: $card;
+    border: 1px solid $border;
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+    transition: all $transition-base;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        box-shadow: $shadow-lg;
+        transform: translateY(-4px);
+    }
+
+    .iconBox {
+        position: absolute;
+        top: $spacing-md;
+        right: $spacing-md;
+        width: 48px;
+        height: 48px;
+        border-radius: $radius-md;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.orange {
+            background: linear-gradient(to bottom right, #f97316, #dc2626);
+        }
+        &.amber {
+            background: linear-gradient(to bottom right, #fbbf24, #f97316);
+        }
+        &.red {
+            background: linear-gradient(to bottom right, #dc2626, #ec4899);
+        }
+        &.orangeDark {
+            background: linear-gradient(to bottom right, #ea580c, #f59e0b);
+        }
+        &.redOrange {
+            background: linear-gradient(to bottom right, #dc2626, #f97316);
+        }
+        &.amberRed {
+            background: linear-gradient(to bottom right, #f59e0b, #dc2626);
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+    }
+
+    h3 {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        margin-bottom: $spacing-sm;
+        padding-right: 56px;
+    }
+
+    .description {
+        font-size: $font-size-sm;
+        color: $muted-foreground;
+        margin-bottom: $spacing-md;
+        flex: 1;
+    }
+
+    .stats {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: $font-size-sm;
+        margin-bottom: $spacing-md;
+
+        .members {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: $muted-foreground;
+
+            svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        .online {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #16a34a;
+
+            .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #16a34a;
+            }
+        }
+    }
+
+    .joinButton {
+        width: 100%;
+        padding: $spacing-sm $spacing-md;
+        background: $primary;
+        color: white;
+        border-radius: $radius-lg;
+        font-weight: $font-weight-medium;
+        transition: background $transition-base;
+        cursor: pointer;
+
+        &:hover {
+            background: $accent;
+        }
+    }
+}
+
+.empty {
+    text-align: center;
+    padding: 5rem 0;
+
+    svg {
+        width: 64px;
+        height: 64px;
+        color: $muted-foreground;
+        margin: 0 auto $spacing-md;
+    }
+
+    h3 {
+        font-size: $font-size-xl;
+        font-weight: $font-weight-semibold;
+        margin-bottom: $spacing-sm;
+    }
+
+    p {
+        color: $muted-foreground;
+    }
+}

@@ -1,0 +1,171 @@
+@use "../styles/variables.scss" as *;
+
+.faq {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fef7f0 0%, #ffe8d6 50%, #ffd4a8 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+.main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem $spacing-xl;
+    position: relative;
+    z-index: 10;
+
+    @media (max-width: 768px) {
+        padding: 2rem $spacing-md;
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+
+    h1 {
+        font-size: $font-size-4xl;
+        margin-bottom: $spacing-md;
+        background: linear-gradient(135deg, $foreground 0%, $primary 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+
+        @media (max-width: 768px) {
+            font-size: $font-size-3xl;
+        }
+    }
+
+    .subtitle {
+        font-size: $font-size-lg;
+        color: $muted-foreground;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+.faqList {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-bottom: 4rem;
+}
+
+.faqItem {
+    background: white;
+    border-radius: $radius-2xl;
+    border: 2px solid rgba($border, 0.5);
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+        border-color: rgba($primary, 0.3);
+        box-shadow: 0 4px 12px rgba($primary, 0.1);
+    }
+
+    &.open {
+        border-color: $primary;
+
+        .question {
+            color: $primary;
+
+            .icon {
+                color: $primary;
+            }
+        }
+
+        .answer {
+            max-height: 500px;
+            padding: 0 $spacing-xl $spacing-lg $spacing-xl;
+            opacity: 1;
+        }
+    }
+
+    .question {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: $spacing-lg $spacing-xl;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $foreground;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: $primary;
+        }
+
+        .icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            color: $muted-foreground;
+
+            transform: rotate(0deg);
+            transition:
+                transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                color 0.3s ease;
+        }
+
+        .iconOpen {
+            transform: rotate(45deg);
+        }
+    }
+
+    .answer {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 $spacing-xl;
+        opacity: 0;
+        transition: all 0.3s ease;
+
+        p {
+            color: $muted-foreground;
+            line-height: 1.7;
+            font-size: $font-size-base;
+        }
+    }
+}
+
+.contact {
+    text-align: center;
+    padding: 3rem;
+    background: rgba(white, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: $radius-2xl;
+    border: 2px solid rgba($primary, 0.2);
+
+    h2 {
+        font-size: $font-size-2xl;
+        margin-bottom: $spacing-sm;
+        color: $foreground;
+    }
+
+    p {
+        color: $muted-foreground;
+        margin-bottom: $spacing-xl;
+        font-size: $font-size-lg;
+    }
+
+    .button {
+        display: inline-block;
+        padding: $spacing-md $spacing-2xl;
+        background: linear-gradient(135deg, $primary 0%, $accent 100%);
+        color: white;
+        border-radius: $radius-xl;
+        font-weight: $font-weight-medium;
+        box-shadow: $shadow-lg;
+        transition: all $transition-base;
+        text-decoration: none;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $shadow-xl;
+        }
+    }
+}

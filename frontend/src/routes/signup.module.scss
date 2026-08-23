@@ -1,0 +1,231 @@
+@use "../styles/variables.scss" as *;
+
+.signup {
+    min-height: 100vh;
+    display: flex;
+    background: linear-gradient(135deg, #fef7f0 0%, #ffe8d6 50%, #ffd4a8 100%);
+    position: relative;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background-image:
+            radial-gradient(circle at 20% 50%, rgba(232, 93, 4, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xl;
+    position: relative;
+    z-index: 1;
+}
+
+.backLink {
+    position: absolute;
+    top: $spacing-xl;
+    left: $spacing-xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $foreground;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $radius-lg;
+    transition: all $transition-base;
+    z-index: 10;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(white, 0.5);
+        transform: translateX(-4px);
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    span {
+        font-weight: $font-weight-medium;
+    }
+}
+
+.card {
+    background: white;
+    border-radius: $radius-2xl;
+    box-shadow: $shadow-xl;
+    padding: $spacing-xl;
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid rgba($border, 0.5);
+
+    .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-lg;
+
+        .logoIcon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+
+        h1 {
+            font-size: $font-size-xl;
+            background: linear-gradient(135deg, $foreground 0%, $primary 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    }
+
+    .title {
+        text-align: center;
+        margin-bottom: 4px;
+
+        h2 {
+            font-size: $font-size-lg;
+            margin-bottom: 4px;
+        }
+
+        p {
+            color: $muted-foreground;
+            font-size: $font-size-sm;
+        }
+    }
+}
+
+.form {
+    margin-top: $spacing-lg;
+
+    .formRow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-md;
+    }
+
+    .formGroup {
+        margin-bottom: $spacing-md;
+
+        label {
+            display: block;
+            font-weight: $font-weight-medium;
+            margin-bottom: 4px;
+            color: $foreground;
+            font-size: $font-size-sm;
+        }
+
+        input {
+            width: 100%;
+            padding: $spacing-sm $spacing-md;
+            border: 1px solid $border;
+            border-radius: $radius-lg;
+            background: $input-background;
+            transition: all $transition-base;
+            outline: none;
+
+            &:focus {
+                border-color: $primary;
+                box-shadow: 0 0 0 3px rgba($primary, 0.1);
+            }
+
+            &::placeholder {
+                color: $muted-foreground;
+            }
+        }
+    }
+
+    .terms {
+        margin-bottom: $spacing-md;
+        font-size: $font-size-xs;
+        color: $muted-foreground;
+        line-height: 1.5;
+
+        a {
+            color: $primary;
+            text-decoration: underline;
+
+            &:hover {
+                color: $accent;
+            }
+        }
+    }
+
+    .submitButton {
+        width: 100%;
+        padding: $spacing-sm $spacing-md;
+        background: linear-gradient(135deg, $primary 0%, $accent 100%);
+        color: white;
+        border: none;
+        border-radius: $radius-lg;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-base;
+        box-shadow: $shadow-md;
+        font-size: $font-size-base;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $shadow-lg;
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        margin: $spacing-md 0;
+
+        .line {
+            flex: 1;
+            height: 1px;
+            background: $border;
+        }
+
+        span {
+            color: $muted-foreground;
+            font-size: $font-size-sm;
+        }
+    }
+
+    .login {
+        text-align: center;
+        color: $muted-foreground;
+        font-size: $font-size-sm;
+
+        a {
+            color: $primary;
+            font-weight: $font-weight-medium;
+            transition: color $transition-base;
+
+            &:hover {
+                color: $accent;
+                text-decoration: underline;
+            }
+        }
+    }
+}
