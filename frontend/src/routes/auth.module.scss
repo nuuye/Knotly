@@ -236,16 +236,22 @@
 }
 
 .inputWrap:focus-within { border-color: rgba($primary, 0.6); background: #fff4eb; box-shadow: 0 0 0 3px rgba($primary, 0.09); }
+.inputWrap.inputError { border-color: rgba(179, 73, 63, 0.72); box-shadow: 0 0 0 3px rgba(179, 73, 63, 0.08); }
 .inputWrap > svg { flex: 0 0 auto; }
 .inputWrap input { min-width: 0; flex: 1; color: $foreground; border: 0; outline: 0; background: transparent; }
 .inputWrap input::placeholder { color: rgba($muted-foreground, 0.58); }
 .passwordToggle { display: grid; place-items: center; flex: 0 0 auto; color: $muted-foreground; }
+.fieldHint,
+.fieldError { display: block; margin-top: 0.4rem; font-size: 0.62rem; line-height: 1.4; }
+.fieldHint { color: $muted-foreground; }
+.fieldError { color: #a84239; }
 
 .terms { color: $muted-foreground; font-size: 0.67rem; line-height: 1.5; }
 .submitButton { display: flex; align-items: center; justify-content: center; gap: 0.55rem; min-height: 52px; margin-top: 0.2rem; padding: 0.8rem 1rem; color: #fff; border-radius: 13px; background: $foreground; box-shadow: 0 12px 26px rgba(45, 24, 16, 0.18); font-weight: 750; transition: transform $transition-base, box-shadow $transition-base; }
 .submitButton:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(45, 24, 16, 0.22); }
 .submitButton svg { transition: transform $transition-base; }
 .submitButton:hover svg { transform: translateX(3px); }
+.submitButton:disabled { cursor: not-allowed; opacity: 0.58; transform: none; box-shadow: none; }
 
 .switchAuth { margin-top: 1.4rem; color: $muted-foreground; font-size: 0.78rem; text-align: center; }
 .switchAuth a { color: $primary; font-weight: 750; }

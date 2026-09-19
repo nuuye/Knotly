@@ -5,6 +5,7 @@ import { AuthBrand } from "../components/auth/AuthBrand";
 import { PasswordField } from "../components/auth/PasswordField";
 import { ConnectionNetwork } from "../components/ConnectionNetwork";
 import type { SignupFormData } from "../types/user";
+import { isValidUsername, USERNAME_PATTERN_SOURCE, USERNAME_RULE_MESSAGE } from "../utils/user";
 import styles from "./auth.module.scss";
 
 export const Route = createFileRoute("/signup")({
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/signup")({
 /** Collects the basic details needed to create a Knotly account. */
 function SignupPage() {
     const [formData, setFormData] = useState<SignupFormData>({ username: "", email: "", password: "" });
+    const usernameIsValid = isValidUsername(formData.username);
+    const showUsernameError = formData.username.length > 0 && !usernameIsValid;
 
     // Reuse one handler for every field by reading its name attribute.
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +26,7 @@ function SignupPage() {
     // Account creation will be added here when the backend is ready.
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
+        if (!usernameIsValid) return;
     };
 
     return (
@@ -76,10 +80,11 @@ function SignupPage() {
                     <form className={styles.form} onSubmit={handleSubmit}>
                         <div className={styles.formGroup}>
                             <label htmlFor="username">Username</label>
-                            <div className={styles.inputWrap}>
+                            <div className={`${styles.inputWrap} ${showUsernameError ? styles.inputError : ""}`}>
                                 <AtSign size={17} />
-                                <input id="username" name="username" type="text" autoComplete="username" placeholder="nightowl" value={formData.username} onChange={handleChange} minLength={3} maxLength={24} required />
+                                <input id="username" name="username" type="text" autoComplete="username" placeholder="nightowl" value={formData.username} onChange={handleChange} minLength={3} maxLength={24} pattern={USERNAME_PATTERN_SOURCE} title={USERNAME_RULE_MESSAGE} aria-invalid={showUsernameError} required />
                             </div>
+                            {showUsernameError ? <small className={styles.fieldError}>{USERNAME_RULE_MESSAGE}</small> : <small className={styles.fieldHint}>Letters, numbers, hyphens, underscores, and periods only.</small>}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -102,7 +107,7 @@ function SignupPage() {
 
                         <p className={styles.terms}>By creating an account, you agree to Knotly’s terms and privacy policy.</p>
 
-                        <button type="submit" className={styles.submitButton}>
+                        <button type="submit" className={styles.submitButton} disabled={!usernameIsValid}>
                             Create my account <ArrowRight size={18} />
                         </button>
                     </form>

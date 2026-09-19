@@ -6,7 +6,7 @@ import styles from "../../../routes/home.module.scss";
 const COMMUNITY_TONES: CommunityTone[] = ["coral", "amber", "rose", "brown"];
 
 /** Shares the same form between community creation and community settings. */
-export function CommunityDialog({ communityName, draft, mode, setDraft, onClose, onSubmit }: CommunityDialogProps) {
+export function CommunityDialog({ communityName, draft, mode, username, setDraft, onClose, onSubmit }: CommunityDialogProps) {
     const isCreating = mode === "create";
     const fallbackName = isCreating ? "Your community" : communityName ?? "Your community";
     const fallbackDescription = isCreating ? "A place with its own rhythm." : "Add a short community description.";
@@ -23,6 +23,13 @@ export function CommunityDialog({ communityName, draft, mode, setDraft, onClose,
                         <i className={`${styles.communityMark} ${styles[draft.tone]}`}>{getInitials(draft.name)}</i>
                         <div><strong>{draft.name.trim() || fallbackName}</strong><small>{draft.description.trim() || fallbackDescription}</small></div>
                     </div>
+                    {!isCreating && (
+                        <label className={styles.formField}>
+                            <span>Your name in this community <small>Optional</small></span>
+                            <input value={draft.localDisplayName} onChange={(event) => setDraft((current) => ({ ...current, localDisplayName: event.target.value }))} placeholder={`@${username ?? "username"}`} maxLength={32} />
+                            <small>Only members of {communityName} will see this name. Leave it empty to use your username.</small>
+                        </label>
+                    )}
                     <label className={styles.formField}>
                         <span>Community name</span>
                         <input value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} placeholder={isCreating ? "Sunday table" : undefined} autoFocus maxLength={36} />

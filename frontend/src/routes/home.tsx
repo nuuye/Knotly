@@ -69,6 +69,7 @@ function HomePage() {
     // Main navigation and community data.
     const [activeSpace, setActiveSpace] = useState("messages");
     const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
+    const [communityDisplayNames, setCommunityDisplayNames] = useState<Record<string, string>>({});
     const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
     const [selectedConversation, setSelectedConversation] = useState("maya");
     const [selectedRoom, setSelectedRoom] = useState("general");
@@ -130,7 +131,13 @@ function HomePage() {
     ).includes(selectedRoom));
     const activeRoomKey = `${activeSpace}:${selectedRoomKind}:${selectedRoom}`;
     const roomIsMuted = mutedRooms.includes(activeRoomKey);
-    const roomMembers = selectedRoomKind === "voice" ? COMMUNITY_MEMBERS.slice(0, 3) : COMMUNITY_MEMBERS;
+    const localDisplayName = activeCommunity ? communityDisplayNames[activeCommunity.id]?.trim() : "";
+    const currentCommunityDisplayName = localDisplayName || `@${DEMO_USER.username}`;
+    const currentCommunityInitials = localDisplayName ? getInitials(localDisplayName, "U") : getUsernameMark(DEMO_USER.username);
+    const communityMembers = COMMUNITY_MEMBERS.map((member, index) => index === 0
+        ? { ...member, name: currentCommunityDisplayName, initials: currentCommunityInitials }
+        : member);
+    const roomMembers = selectedRoomKind === "voice" ? communityMembers.slice(0, 3) : communityMembers;
     const joinedVoiceCommunity = communities.find((community) => community.id === joinedVoiceRoom?.communityId);
 
     useDismissableLayer(profileMenuOpen, profileMenuRef, setProfileMenuOpen);
@@ -197,6 +204,7 @@ function HomePage() {
             tone: activeCommunity.tone,
             visibility: activeCommunity.visibility,
             allowInvites: activeCommunity.allowInvites,
+            localDisplayName: communityDisplayNames[activeCommunity.id] ?? "",
         });
         setCommunitySettingsOpen(true);
     };
@@ -218,6 +226,13 @@ function HomePage() {
                 allowInvites: settingsDraft.allowInvites,
             }
             : community));
+        setCommunityDisplayNames((current) => {
+            const next = { ...current };
+            const localName = settingsDraft.localDisplayName.trim();
+            if (localName) next[activeCommunity.id] = localName;
+            else delete next[activeCommunity.id];
+            return next;
+        });
         setCommunitySettingsOpen(false);
     };
 
@@ -517,7 +532,7 @@ function HomePage() {
                                                 </>
                                             )}
                                             {joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room && (
-                                                <div className={`${styles.voicePeople} ${styles.currentVoiceUser}`}><i className={styles.brown}>{getUsernameMark(DEMO_USER.username)}</i><span>You {microphoneMuted && <MicOff aria-label="Microphone muted" />}</span></div>
+                                                <div className={`${styles.voicePeople} ${styles.currentVoiceUser}`}><i className={styles.brown}>{currentCommunityInitials}</i><span>{currentCommunityDisplayName} {microphoneMuted && <MicOff aria-label="Microphone muted" />}</span></div>
                                             )}
                                             </div>
                                         ))}
@@ -758,6 +773,7 @@ function HomePage() {
                     communityName={activeCommunity.name}
                     draft={settingsDraft}
                     mode="edit"
+                    username={DEMO_USER.username}
                     setDraft={setSettingsDraft}
                     onClose={() => setCommunitySettingsOpen(false)}
                     onSubmit={saveCommunitySettings}

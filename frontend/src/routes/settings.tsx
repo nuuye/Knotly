@@ -31,6 +31,7 @@ import {
 import { DEMO_USER_PROFILE } from "../data/user";
 import type { NotificationSettings, SettingsSectionId, ThemeId } from "../types/settings";
 import { getUsernameMark } from "../utils/text";
+import { isValidUsername, USERNAME_PATTERN_SOURCE, USERNAME_RULE_MESSAGE } from "../utils/user";
 import styles from "./settings.module.scss";
 
 export const Route = createFileRoute("/settings")({
@@ -53,6 +54,8 @@ function SettingsPage() {
         (key) => account[key as keyof typeof account] !== savedAccount[key as keyof typeof savedAccount],
     );
     const userMark = getUsernameMark(account.username);
+    const usernameIsValid = isValidUsername(account.username);
+    const showUsernameError = account.username.length > 0 && !usernameIsValid;
 
     // Update one notification option without replacing the other values.
     const updateNotification = (key: keyof NotificationSettings, checked: boolean) => {
@@ -140,6 +143,7 @@ function SettingsPage() {
                         <form
                             onSubmit={(event) => {
                                 event.preventDefault();
+                                if (!usernameIsValid) return;
                                 // Saving copies the current draft and hides the save bar.
                                 setSavedAccount(account);
                             }}
@@ -161,8 +165,8 @@ function SettingsPage() {
                                 <div className={styles.formGrid}>
                                     <label>
                                         <span>Username</span>
-                                        <div className={styles.prefixedInput}><i>@</i><input type="text" value={account.username} onChange={(event) => setAccount((current) => ({ ...current, username: event.target.value }))} minLength={3} maxLength={24} autoComplete="username" required /></div>
-                                        <small>This is the only name other people see.</small>
+                                        <div className={`${styles.prefixedInput} ${showUsernameError ? styles.inputError : ""}`}><i>@</i><input type="text" value={account.username} onChange={(event) => setAccount((current) => ({ ...current, username: event.target.value }))} minLength={3} maxLength={24} autoComplete="username" pattern={USERNAME_PATTERN_SOURCE} title={USERNAME_RULE_MESSAGE} aria-invalid={showUsernameError} required /></div>
+                                        <small className={showUsernameError ? styles.fieldError : undefined}>{showUsernameError ? USERNAME_RULE_MESSAGE : "This is the only name other people see."}</small>
                                     </label>
                                     <label>
                                         <span>Email address</span>
@@ -197,7 +201,7 @@ function SettingsPage() {
                             {hasChanges && (
                                 <div className={styles.saveBar}>
                                     <span>You have unsaved changes.</span>
-                                    <button type="submit"><Save aria-hidden="true" /> Save changes</button>
+                                    <button type="submit" disabled={!usernameIsValid}><Save aria-hidden="true" /> Save changes</button>
                                 </div>
                             )}
                         </form>

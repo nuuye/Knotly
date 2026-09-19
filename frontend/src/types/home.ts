@@ -77,6 +77,7 @@ export interface CommunityDraft {
 
 export interface CommunitySettingsDraft extends CommunityDraft {
     allowInvites: boolean;
+    localDisplayName: string;
 }
 
 export interface JoinedVoiceRoom {
@@ -121,6 +122,7 @@ export interface CommunityDialogProps {
     communityName?: string;
     draft: CommunitySettingsDraft;
     mode: "create" | "edit";
+    username?: string;
     setDraft: StateSetter<CommunitySettingsDraft>;
     onClose: () => void;
     onSubmit: (event: FormEvent) => void;

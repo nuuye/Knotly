@@ -105,4 +105,5 @@ export const EMPTY_COMMUNITY_DRAFT: CommunitySettingsDraft = {
     tone: "coral",
     visibility: "private",
     allowInvites: true,
+    localDisplayName: "",
 };
