@@ -2,8 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
     ArrowLeft,
     Bell,
+    BellOff,
     Check,
     ChevronDown,
+    Clipboard,
+    FolderPlus,
     Globe2,
     Hash,
     Headphones,
@@ -13,16 +16,23 @@ import {
     MessageCircleMore,
     MoreHorizontal,
     Paperclip,
+    Pencil,
     Phone,
+    PhoneOff,
     Plus,
     Search,
     Send,
     Settings,
     Smile,
     LockKeyhole,
+    Mic,
+    MicOff,
     UserPlus,
     UsersRound,
     Video,
+    Volume2,
+    VolumeX,
+    X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import knotlyLogo from "../assets/knotly.png";
@@ -35,10 +45,11 @@ export const Route = createFileRoute("/home")({
 type CommunityTone = "coral" | "amber" | "rose" | "brown";
 type CommunityVisibility = "private" | "public";
 
-interface RoomGroup {
+interface RoomCategory {
     id: string;
     label: string;
-    rooms: string[];
+    textRooms: string[];
+    voiceRooms: string[];
 }
 
 interface Community {
@@ -50,8 +61,7 @@ interface Community {
     description: string;
     visibility: CommunityVisibility;
     allowInvites: boolean;
-    textGroups: RoomGroup[];
-    voiceRooms: string[];
+    categories: RoomCategory[];
 }
 
 interface Conversation {
@@ -82,16 +92,26 @@ interface Friend {
     tone: string;
 }
 
-const DEFAULT_ROOM_GROUPS: RoomGroup[] = [
-    { id: "hang-out", label: "Hang out", rooms: ["general", "weekend-plans", "photo-dump"] },
-    { id: "make-things", label: "Make things", rooms: ["share-your-work", "help-desk"] },
-];
+function makeDefaultCategories(voiceRooms: string[]): RoomCategory[] {
+    return [
+        { id: "hang-out", label: "Hang out", textRooms: ["general", "weekend-plans", "photo-dump"], voiceRooms },
+        { id: "make-things", label: "Make things", textRooms: ["share-your-work", "help-desk"], voiceRooms: [] },
+    ];
+}
 
 const INITIAL_COMMUNITIES: Community[] = [
-    { id: "saturday", name: "Saturday Club", initials: "SC", online: 8, tone: "coral", description: "Plans, walks and slow weekends together.", visibility: "private", allowInvites: true, textGroups: DEFAULT_ROOM_GROUPS, voiceRooms: ["cozy-corner", "music-lounge"] },
-    { id: "studio", name: "Work in Progress", initials: "WP", online: 5, tone: "amber", description: "A shared studio for unfinished ideas.", visibility: "private", allowInvites: true, textGroups: DEFAULT_ROOM_GROUPS, voiceRooms: ["studio-table"] },
-    { id: "study", name: "Study Hall", initials: "SH", online: 12, tone: "rose", description: "Quiet focus, helpful notes and study breaks.", visibility: "public", allowInvites: true, textGroups: DEFAULT_ROOM_GROUPS, voiceRooms: ["focus-room", "coffee-break"] },
-    { id: "film", name: "Film Club", initials: "FC", online: 3, tone: "brown", description: "Watchlists, screenings and very strong opinions.", visibility: "private", allowInvites: false, textGroups: DEFAULT_ROOM_GROUPS, voiceRooms: ["after-credits"] },
+    { id: "saturday", name: "Saturday Club", initials: "SC", online: 8, tone: "coral", description: "Plans, walks and slow weekends together.", visibility: "private", allowInvites: true, categories: makeDefaultCategories(["cozy-corner", "music-lounge"]) },
+    { id: "studio", name: "Work in Progress", initials: "WP", online: 5, tone: "amber", description: "A shared studio for unfinished ideas.", visibility: "private", allowInvites: true, categories: makeDefaultCategories(["studio-table"]) },
+    { id: "study", name: "Study Hall", initials: "SH", online: 12, tone: "rose", description: "Quiet focus, helpful notes and study breaks.", visibility: "public", allowInvites: true, categories: makeDefaultCategories(["focus-room", "coffee-break"]) },
+    { id: "film", name: "Film Club", initials: "FC", online: 3, tone: "brown", description: "Watchlists, screenings and very strong opinions.", visibility: "private", allowInvites: false, categories: makeDefaultCategories(["after-credits"]) },
+];
+
+const COMMUNITY_MEMBERS = [
+    { name: "John Doe", initials: "JD", role: "Owner", status: "online", activity: "Reading this room", tone: "brown" },
+    { name: "Maya Chen", initials: "MC", role: "Host", status: "online", activity: "Around now", tone: "coral" },
+    { name: "Jules Martin", initials: "JM", role: "Member", status: "online", activity: "Listening nearby", tone: "amber" },
+    { name: "Lina Torres", initials: "LT", role: "Member", status: "online", activity: "Available", tone: "rose" },
+    { name: "Noah Williams", initials: "NW", role: "Member", status: "offline", activity: "Last seen yesterday", tone: "sage" },
 ];
 
 const CONVERSATIONS: Conversation[] = [
@@ -209,8 +229,21 @@ function HomePage() {
     const [channelCreatorOpen, setChannelCreatorOpen] = useState(false);
     const [channelType, setChannelType] = useState<"text" | "voice">("text");
     const [channelName, setChannelName] = useState("");
-    const [channelGroup, setChannelGroup] = useState("hang-out");
+    const [channelCategory, setChannelCategory] = useState("hang-out");
+    const [categoryCreatorOpen, setCategoryCreatorOpen] = useState(false);
+    const [categoryName, setCategoryName] = useState("");
+    const [membersPanelOpen, setMembersPanelOpen] = useState(false);
+    const [roomMenuOpen, setRoomMenuOpen] = useState(false);
+    const [mutedRooms, setMutedRooms] = useState<string[]>([]);
+    const [roomLinkCopied, setRoomLinkCopied] = useState(false);
+    const [roomSettingsOpen, setRoomSettingsOpen] = useState(false);
+    const [roomSettingsName, setRoomSettingsName] = useState("");
+    const [roomSettingsCategory, setRoomSettingsCategory] = useState("");
+    const [joinedVoiceRoom, setJoinedVoiceRoom] = useState<{ communityId: string; room: string } | null>(null);
+    const [microphoneMuted, setMicrophoneMuted] = useState(false);
+    const [voiceSoundMuted, setVoiceSoundMuted] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
+    const roomMenuRef = useRef<HTMLDivElement>(null);
 
     const activeConversation = conversations.find((conversation) => conversation.id === selectedConversation)
         ?? FRIENDS.find((friend) => friend.id === selectedConversation)
@@ -223,6 +256,13 @@ function HomePage() {
     }, [conversations, query]);
     const filteredFriends = FRIENDS.filter((friend) => friendFilter === "all" || friend.status === friendFilter);
     const newMessageFriends = FRIENDS.filter((friend) => friend.name.toLowerCase().includes(newMessageQuery.trim().toLowerCase()));
+    const selectedCategory = activeCommunity?.categories.find((category) => (
+        selectedRoomKind === "text" ? category.textRooms : category.voiceRooms
+    ).includes(selectedRoom));
+    const activeRoomKey = `${activeSpace}:${selectedRoomKind}:${selectedRoom}`;
+    const roomIsMuted = mutedRooms.includes(activeRoomKey);
+    const roomMembers = selectedRoomKind === "voice" ? COMMUNITY_MEMBERS.slice(0, 3) : COMMUNITY_MEMBERS;
+    const joinedVoiceCommunity = communities.find((community) => community.id === joinedVoiceRoom?.communityId);
 
     useEffect(() => {
         if (!profileMenuOpen) return;
@@ -242,10 +282,30 @@ function HomePage() {
         };
     }, [profileMenuOpen]);
 
+    useEffect(() => {
+        if (!roomMenuOpen) return;
+
+        const closeOnOutsideClick = (event: PointerEvent) => {
+            if (!roomMenuRef.current?.contains(event.target as Node)) setRoomMenuOpen(false);
+        };
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setRoomMenuOpen(false);
+        };
+
+        document.addEventListener("pointerdown", closeOnOutsideClick);
+        document.addEventListener("keydown", closeOnEscape);
+        return () => {
+            document.removeEventListener("pointerdown", closeOnOutsideClick);
+            document.removeEventListener("keydown", closeOnEscape);
+        };
+    }, [roomMenuOpen]);
+
     const openMessages = () => {
         setActiveSpace("messages");
         setMessageView("chat");
         setMobilePanel("list");
+        setMembersPanelOpen(false);
+        setRoomMenuOpen(false);
     };
 
     const openCommunity = (communityId: string) => {
@@ -253,6 +313,8 @@ function HomePage() {
         setSelectedRoom("general");
         setSelectedRoomKind("text");
         setMobilePanel("list");
+        setMembersPanelOpen(false);
+        setRoomMenuOpen(false);
     };
 
     const openCommunityCreator = () => {
@@ -275,8 +337,7 @@ function HomePage() {
             description: communityDraft.description.trim() || "A new place to gather on Knotly.",
             visibility: communityDraft.visibility,
             allowInvites: true,
-            textGroups: [{ id: "start-here", label: "Start here", rooms: ["general"] }],
-            voiceRooms: ["lounge"],
+            categories: [{ id: "start-here", label: "Start here", textRooms: ["general"], voiceRooms: ["lounge"] }],
         };
 
         setCommunities((current) => [...current, newCommunity]);
@@ -318,9 +379,9 @@ function HomePage() {
         setCommunitySettingsOpen(false);
     };
 
-    const openChannelCreator = (type: "text" | "voice", groupId = activeCommunity?.textGroups[0]?.id ?? "start-here") => {
+    const openChannelCreator = (type: "text" | "voice", categoryId = activeCommunity?.categories[0]?.id ?? "start-here") => {
         setChannelType(type);
-        setChannelGroup(groupId);
+        setChannelCategory(categoryId);
         setChannelName("");
         setChannelCreatorOpen(true);
     };
@@ -333,21 +394,93 @@ function HomePage() {
 
         setCommunities((current) => current.map((community) => {
             if (community.id !== activeCommunity.id) return community;
-            if (channelType === "voice") {
-                if (community.voiceRooms.includes(roomName)) return community;
-                return { ...community, voiceRooms: [...community.voiceRooms, roomName] };
-            }
             return {
                 ...community,
-                textGroups: community.textGroups.map((group) => group.id === channelGroup && !group.rooms.includes(roomName)
-                    ? { ...group, rooms: [...group.rooms, roomName] }
-                    : group),
+                categories: community.categories.map((category) => {
+                    if (category.id !== channelCategory) return category;
+                    if (channelType === "voice") {
+                        return category.voiceRooms.includes(roomName) ? category : { ...category, voiceRooms: [...category.voiceRooms, roomName] };
+                    }
+                    return category.textRooms.includes(roomName) ? category : { ...category, textRooms: [...category.textRooms, roomName] };
+                }),
             };
         }));
-        setSelectedRoom(roomName);
-        setSelectedRoomKind(channelType);
-        setMobilePanel("chat");
+        if (channelType === "voice") {
+            setJoinedVoiceRoom({ communityId: activeCommunity.id, room: roomName });
+            setMicrophoneMuted(false);
+            setVoiceSoundMuted(false);
+            setMobilePanel("list");
+        } else {
+            setSelectedRoom(roomName);
+            setSelectedRoomKind("text");
+            setMobilePanel("chat");
+        }
         setChannelCreatorOpen(false);
+    };
+
+    const createCategory = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!activeCommunity) return;
+        const label = categoryName.trim();
+        const id = makeRoomName(label);
+        if (!label || !id) return;
+
+        setCommunities((current) => current.map((community) => community.id === activeCommunity.id && !community.categories.some((category) => category.id === id)
+            ? { ...community, categories: [...community.categories, { id, label, textRooms: [], voiceRooms: [] }] }
+            : community));
+        setChannelCategory(id);
+        setCategoryCreatorOpen(false);
+        setCategoryName("");
+    };
+
+    const openRoomSettings = () => {
+        setRoomSettingsName(selectedRoom);
+        setRoomSettingsCategory(selectedCategory?.id ?? activeCommunity?.categories[0]?.id ?? "");
+        setRoomMenuOpen(false);
+        setRoomSettingsOpen(true);
+    };
+
+    const saveRoomSettings = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!activeCommunity || !selectedCategory) return;
+        const nextName = makeRoomName(roomSettingsName);
+        if (!nextName || !roomSettingsCategory) return;
+
+        setCommunities((current) => current.map((community) => {
+            if (community.id !== activeCommunity.id) return community;
+            const withoutCurrent = community.categories.map((category) => ({
+                ...category,
+                textRooms: selectedRoomKind === "text" ? category.textRooms.filter((room) => room !== selectedRoom) : category.textRooms,
+                voiceRooms: selectedRoomKind === "voice" ? category.voiceRooms.filter((room) => room !== selectedRoom) : category.voiceRooms,
+            }));
+            return {
+                ...community,
+                categories: withoutCurrent.map((category) => category.id === roomSettingsCategory
+                    ? selectedRoomKind === "text"
+                        ? { ...category, textRooms: [...category.textRooms, nextName] }
+                        : { ...category, voiceRooms: [...category.voiceRooms, nextName] }
+                    : category),
+            };
+        }));
+        setSelectedRoom(nextName);
+        setRoomSettingsOpen(false);
+    };
+
+    const toggleRoomMuted = () => {
+        const roomKey = `${activeSpace}:${selectedRoomKind}:${selectedRoom}`;
+        setMutedRooms((current) => current.includes(roomKey) ? current.filter((key) => key !== roomKey) : [...current, roomKey]);
+        setRoomMenuOpen(false);
+    };
+
+    const copyRoomLink = async () => {
+        const roomUrl = `${window.location.origin}/home?community=${activeSpace}&room=${selectedRoom}`;
+        try {
+            await navigator.clipboard.writeText(roomUrl);
+        } catch {
+            // Clipboard access can be blocked in local previews; the visual confirmation still keeps the demo flow usable.
+        }
+        setRoomLinkCopied(true);
+        window.setTimeout(() => setRoomLinkCopied(false), 1800);
     };
 
     const sendMessage = (event: React.FormEvent) => {
@@ -526,14 +659,14 @@ function HomePage() {
                             </div>
 
                             <div className={styles.roomNavigation}>
-                                {activeCommunity?.textGroups.map((group) => (
-                                    <section key={group.id}>
-                                        <span>{group.label}<button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("text", group.id)} aria-label={`Add a text room to ${group.label}`}><Plus /></button></span>
-                                        {group.rooms.map((room) => (
+                                {activeCommunity?.categories.map((category) => (
+                                    <section key={category.id}>
+                                        <span>{category.label}<button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("text", category.id)} aria-label={`Add a room to ${category.label}`}><Plus /></button></span>
+                                        {category.textRooms.map((room) => (
                                             <button
                                                 key={room}
                                                 type="button"
-                                                className={selectedRoom === room ? styles.selectedRoom : ""}
+                                                className={selectedRoom === room && selectedRoomKind === "text" ? styles.selectedRoom : ""}
                                                 onClick={() => {
                                                     setSelectedRoom(room);
                                                     setSelectedRoomKind("text");
@@ -543,32 +676,46 @@ function HomePage() {
                                                 <Hash /> {room} {room === "general" && <small>3</small>}
                                             </button>
                                         ))}
-                                    </section>
-                                ))}
-                                <section>
-                                    <span>Voice rooms<button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("voice")} aria-label="Add a voice room"><Plus /></button></span>
-                                    {activeCommunity?.voiceRooms.map((room, index) => (
-                                        <div key={room}>
+                                        {category.voiceRooms.map((room) => (
+                                            <div key={room}>
                                             <button
                                                 type="button"
-                                                className={selectedRoom === room && selectedRoomKind === "voice" ? styles.selectedRoom : ""}
+                                                className={joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? styles.joinedVoiceButton : ""}
                                                 onClick={() => {
-                                                    setSelectedRoom(room);
-                                                    setSelectedRoomKind("voice");
-                                                    setMobilePanel("chat");
+                                                    setJoinedVoiceRoom({ communityId: activeCommunity.id, room });
+                                                    setMicrophoneMuted(false);
+                                                    setVoiceSoundMuted(false);
+                                                    setRoomMenuOpen(false);
                                                 }}
+                                                aria-label={`Join ${room}`}
                                             >
-                                                <Headphones /> {room}
+                                                <Headphones /> {room}<small>{joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? "Joined" : "Join"}</small>
                                             </button>
-                                            {index === 0 && activeCommunity?.id === "saturday" && (
+                                            {room === "cozy-corner" && activeCommunity?.id === "saturday" && (
                                                 <>
                                                     <div className={styles.voicePeople}><i className={styles.coral}>MC</i><span>Maya is talking<AudioWave /></span></div>
                                                     <div className={styles.voicePeople}><i className={styles.amber}>JM</i><span>Jules</span></div>
                                                 </>
                                             )}
+                                            {joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room && (
+                                                <div className={`${styles.voicePeople} ${styles.currentVoiceUser}`}><i className={styles.brown}>JD</i><span>You {microphoneMuted && <MicOff aria-label="Microphone muted" />}</span></div>
+                                            )}
+                                            </div>
+                                        ))}
+                                    </section>
+                                ))}
+                                <button type="button" className={styles.addCategoryButton} onClick={() => { setCategoryName(""); setCategoryCreatorOpen(true); }}><FolderPlus /> New category</button>
+                                {joinedVoiceRoom && (
+                                    <div className={styles.voiceConnection}>
+                                        <i>{microphoneMuted ? <MicOff /> : <AudioWave />}</i>
+                                        <span><small>{voiceSoundMuted ? "Sound muted" : microphoneMuted ? "Microphone muted" : `Voice connected · ${joinedVoiceCommunity?.name}`}</small><strong>{joinedVoiceRoom.room}</strong></span>
+                                        <div className={styles.voiceControls}>
+                                            <button type="button" className={microphoneMuted ? styles.voiceControlActive : ""} onClick={() => setMicrophoneMuted((muted) => !muted)} aria-label={microphoneMuted ? "Turn microphone on" : "Mute microphone"} aria-pressed={microphoneMuted}>{microphoneMuted ? <MicOff /> : <Mic />}</button>
+                                            <button type="button" className={voiceSoundMuted ? styles.voiceControlActive : ""} onClick={() => setVoiceSoundMuted((muted) => !muted)} aria-label={voiceSoundMuted ? "Turn sound on" : "Mute sound"} aria-pressed={voiceSoundMuted}>{voiceSoundMuted ? <VolumeX /> : <Volume2 />}</button>
+                                            <button type="button" className={styles.leaveVoiceButton} onClick={() => setJoinedVoiceRoom(null)} aria-label={`Leave ${joinedVoiceRoom.room}`}><PhoneOff /></button>
                                         </div>
-                                    ))}
-                                </section>
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}
@@ -688,13 +835,46 @@ function HomePage() {
                         </form>
                     </section>
                 ) : (
-                    <section className={styles.chatPanel}>
+                    <section className={`${styles.chatPanel} ${styles.communityChatPanel} ${membersPanelOpen ? styles.membersOpen : ""}`}>
                         <header className={styles.chatHeader}>
                             <button type="button" className={styles.mobileBack} onClick={() => setMobilePanel("list")} aria-label="Back to rooms"><ArrowLeft /></button>
                             <span className={styles.roomIcon}>{selectedRoomKind === "voice" ? <Headphones /> : <Hash />}</span>
-                            <div><strong>{selectedRoom}</strong><span>{activeCommunity?.name}</span></div>
-                            <div className={styles.chatActions}><button type="button" aria-label="Members"><UsersRound /></button><button type="button" aria-label="Room options"><MoreHorizontal /></button></div>
+                            <div><strong>{selectedRoom}</strong><span>{activeCommunity?.name} · {selectedCategory?.label}</span></div>
+                            <div className={styles.chatActions}>
+                                <button type="button" className={membersPanelOpen ? styles.activeChatAction : ""} aria-label="Show room members" aria-expanded={membersPanelOpen} onClick={() => { setMembersPanelOpen((open) => !open); setRoomMenuOpen(false); }}><UsersRound /></button>
+                                <div className={styles.roomMenuWrap} ref={roomMenuRef}>
+                                    <button type="button" className={roomMenuOpen ? styles.activeChatAction : ""} aria-label="Room options" aria-expanded={roomMenuOpen} onClick={() => { setRoomMenuOpen((open) => !open); setMembersPanelOpen(false); }}><MoreHorizontal /></button>
+                                    {roomMenuOpen && (
+                                        <div className={styles.roomOptionsMenu}>
+                                            <div><strong>{selectedRoomKind === "text" ? "#" : ""}{selectedRoom}</strong><small>{selectedCategory?.label}</small></div>
+                                            <button type="button" onClick={openRoomSettings}><Pencil /> Edit room</button>
+                                            <button type="button" onClick={toggleRoomMuted}>{roomIsMuted ? <Bell /> : <BellOff />} {roomIsMuted ? "Unmute room" : "Mute room"}</button>
+                                            <button type="button" onClick={copyRoomLink}><Clipboard /> {roomLinkCopied ? "Link copied" : "Copy room link"}</button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </header>
+                            <aside className={`${styles.membersPanel} ${membersPanelOpen ? styles.membersPanelVisible : ""}`} aria-label={`Members in ${selectedRoom}`} aria-hidden={!membersPanelOpen} inert={!membersPanelOpen}>
+                                <header><div><span>{selectedRoomKind === "text" ? "#" : ""}{selectedRoom}</span><strong>{selectedRoomKind === "voice" ? "Listening now" : "Members"}</strong></div><button type="button" onClick={() => setMembersPanelOpen(false)} aria-label="Close members"><X /></button></header>
+                                <div className={styles.memberSummary}><span>{roomMembers.filter((member) => member.status === "online").length}</span><p><strong>People nearby</strong><small>{selectedRoomKind === "voice" ? "Currently in this voice room" : "Can read and join this conversation"}</small></p></div>
+                                {(["online", "offline"] as const).map((status) => {
+                                    const members = roomMembers.filter((member) => member.status === status);
+                                    if (!members.length) return null;
+                                    return (
+                                        <section key={status}>
+                                            <span>{status} — {members.length}</span>
+                                            {members.map((member) => (
+                                                <button type="button" key={member.name}>
+                                                    <i className={`${styles.memberAvatar} ${styles[member.tone]} ${member.status === "offline" ? styles.offlineMember : ""}`}>{member.initials}<b /></i>
+                                                    <span><strong>{member.name}</strong><small>{member.activity}</small></span>
+                                                    {member.role !== "Member" && <em>{member.role}</em>}
+                                                </button>
+                                            ))}
+                                        </section>
+                                    );
+                                })}
+                            </aside>
                         <div className={`${styles.messageArea} ${styles.communityRoom}`}>
                             <div className={styles.roomWelcome}>
                                 <span>{selectedRoomKind === "voice" ? <Headphones /> : <Hash />}</span>
@@ -732,7 +912,7 @@ function HomePage() {
                     <section className={styles.newMessageModal} role="dialog" aria-modal="true" aria-labelledby="new-message-title" onMouseDown={(event) => event.stopPropagation()}>
                         <header>
                             <div><span>Start something</span><h2 id="new-message-title">New message</h2></div>
-                            <button type="button" onClick={() => setNewMessageOpen(false)} aria-label="Close">×</button>
+                            <button type="button" onClick={() => setNewMessageOpen(false)} aria-label="Close"><X /></button>
                         </header>
 
                         <div className={styles.messageModeTabs}>
@@ -793,7 +973,7 @@ function HomePage() {
                     <form className={`${styles.newMessageModal} ${styles.managementModal}`} onSubmit={createCommunity} onMouseDown={(event) => event.stopPropagation()}>
                         <header>
                             <div><span>A fresh corner</span><h2>Create a community</h2></div>
-                            <button type="button" onClick={() => setCreateCommunityOpen(false)} aria-label="Close">×</button>
+                            <button type="button" onClick={() => setCreateCommunityOpen(false)} aria-label="Close"><X /></button>
                         </header>
                         <div className={styles.managementBody}>
                             <div className={styles.communityIdentityPreview}>
@@ -834,7 +1014,7 @@ function HomePage() {
                     <form className={`${styles.newMessageModal} ${styles.managementModal}`} onSubmit={saveCommunitySettings} onMouseDown={(event) => event.stopPropagation()}>
                         <header>
                             <div><span>{activeCommunity.name}</span><h2>Community settings</h2></div>
-                            <button type="button" onClick={() => setCommunitySettingsOpen(false)} aria-label="Close">×</button>
+                            <button type="button" onClick={() => setCommunitySettingsOpen(false)} aria-label="Close"><X /></button>
                         </header>
                         <div className={styles.managementBody}>
                             <div className={styles.communityIdentityPreview}>
@@ -879,7 +1059,7 @@ function HomePage() {
                     <form className={`${styles.newMessageModal} ${styles.managementModal} ${styles.channelModal}`} onSubmit={createChannel} onMouseDown={(event) => event.stopPropagation()}>
                         <header>
                             <div><span>{activeCommunity.name}</span><h2>Add a room</h2></div>
-                            <button type="button" onClick={() => setChannelCreatorOpen(false)} aria-label="Close">×</button>
+                            <button type="button" onClick={() => setChannelCreatorOpen(false)} aria-label="Close"><X /></button>
                         </header>
                         <div className={styles.messageModeTabs}>
                             <button type="button" className={channelType === "text" ? styles.activeMode : ""} onClick={() => setChannelType("text")}><Hash /> Text room</button>
@@ -891,20 +1071,69 @@ function HomePage() {
                                 <div className={styles.roomNameInput}>{channelType === "text" ? <Hash /> : <Headphones />}<input value={channelName} onChange={(event) => setChannelName(event.target.value)} placeholder={channelType === "text" ? "new-ideas" : "kitchen-table"} autoFocus maxLength={36} /></div>
                                 {channelName.trim() && <small>It will appear as {makeRoomName(channelName) || "room-name"}.</small>}
                             </label>
-                            {channelType === "text" && (
-                                <label className={styles.formField}>
-                                    <span>Section</span>
-                                    <select value={channelGroup} onChange={(event) => setChannelGroup(event.target.value)}>
-                                        {activeCommunity.textGroups.map((group) => <option key={group.id} value={group.id}>{group.label}</option>)}
-                                    </select>
-                                </label>
-                            )}
+                            <label className={styles.formField}>
+                                <span>Category</span>
+                                <select value={channelCategory} onChange={(event) => setChannelCategory(event.target.value)}>
+                                    {activeCommunity.categories.map((category) => <option key={category.id} value={category.id}>{category.label}</option>)}
+                                </select>
+                            </label>
                             <div className={styles.roomTypeNote}>
                                 {channelType === "text" ? <Hash /> : <Headphones />}
                                 <p><strong>{channelType === "text" ? "A place to keep a conversation." : "A place people can drop into."}</strong><span>{channelType === "text" ? "Messages stay here for everyone to catch up." : "Members can see who is around before joining."}</span></p>
                             </div>
                         </div>
                         <footer><span>{channelType === "text" ? "Text room" : "Voice room"} · {activeCommunity.name}</span><button type="submit" disabled={!makeRoomName(channelName)}>Create room <Plus /></button></footer>
+                    </form>
+                </div>
+            )}
+
+            {categoryCreatorOpen && activeCommunity && (
+                <div className={styles.modalBackdrop} onMouseDown={() => setCategoryCreatorOpen(false)}>
+                    <form className={`${styles.newMessageModal} ${styles.managementModal} ${styles.channelModal}`} onSubmit={createCategory} onMouseDown={(event) => event.stopPropagation()}>
+                        <header>
+                            <div><span>{activeCommunity.name}</span><h2>New category</h2></div>
+                            <button type="button" onClick={() => setCategoryCreatorOpen(false)} aria-label="Close"><X /></button>
+                        </header>
+                        <div className={styles.managementBody}>
+                            <label className={styles.formField}>
+                                <span>Category name</span>
+                                <div className={styles.roomNameInput}><FolderPlus /><input value={categoryName} onChange={(event) => setCategoryName(event.target.value)} placeholder="Games, projects, after hours…" autoFocus maxLength={30} /></div>
+                            </label>
+                            <div className={styles.categoryPreview}>
+                                <div><span>{categoryName.trim() || "New category"}</span><Plus /></div>
+                                <p><Hash /> text-room</p>
+                                <p><Headphones /> voice-room</p>
+                            </div>
+                        </div>
+                        <footer><span>Text and voice rooms can live together.</span><button type="submit" disabled={!makeRoomName(categoryName)}>Create category <FolderPlus /></button></footer>
+                    </form>
+                </div>
+            )}
+
+            {roomSettingsOpen && activeCommunity && (
+                <div className={styles.modalBackdrop} onMouseDown={() => setRoomSettingsOpen(false)}>
+                    <form className={`${styles.newMessageModal} ${styles.managementModal} ${styles.channelModal}`} onSubmit={saveRoomSettings} onMouseDown={(event) => event.stopPropagation()}>
+                        <header>
+                            <div><span>{activeCommunity.name}</span><h2>Edit room</h2></div>
+                            <button type="button" onClick={() => setRoomSettingsOpen(false)} aria-label="Close"><X /></button>
+                        </header>
+                        <div className={styles.managementBody}>
+                            <label className={styles.formField}>
+                                <span>Room name</span>
+                                <div className={styles.roomNameInput}>{selectedRoomKind === "text" ? <Hash /> : <Headphones />}<input value={roomSettingsName} onChange={(event) => setRoomSettingsName(event.target.value)} autoFocus maxLength={36} /></div>
+                            </label>
+                            <label className={styles.formField}>
+                                <span>Move to category</span>
+                                <select value={roomSettingsCategory} onChange={(event) => setRoomSettingsCategory(event.target.value)}>
+                                    {activeCommunity.categories.map((category) => <option key={category.id} value={category.id}>{category.label}</option>)}
+                                </select>
+                            </label>
+                            <div className={styles.roomTypeNote}>
+                                {selectedRoomKind === "text" ? <Hash /> : <Headphones />}
+                                <p><strong>{selectedRoomKind === "text" ? "Text room" : "Voice room"}</strong><span>You can rename it or move it without changing its type.</span></p>
+                            </div>
+                        </div>
+                        <footer><span>{selectedCategory?.label} → {activeCommunity.categories.find((category) => category.id === roomSettingsCategory)?.label}</span><button type="submit" disabled={!makeRoomName(roomSettingsName)}>Save room <Check /></button></footer>
                     </form>
                 </div>
             )}

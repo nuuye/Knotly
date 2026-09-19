@@ -1,17 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
-    ArrowRight,
-    ChevronRight,
-    Compass,
     MessageCircleMore,
-    Mic2,
     Plus,
-    Search,
     ShieldCheck,
     Sparkles,
     UsersRound,
 } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { Footer } from "../components/footer/footer";
 import { NavBar } from "../components/navBar/navBar";
 import styles from "./faq.module.scss";
@@ -135,12 +130,11 @@ const FAQS: FAQEntry[] = [
 
 interface FAQItemProps {
     entry: FAQEntry;
-    categoryLabel?: string;
     isOpen: boolean;
     onToggle: () => void;
 }
 
-function FAQItem({ entry, categoryLabel, isOpen, onToggle }: FAQItemProps) {
+function FAQItem({ entry, isOpen, onToggle }: FAQItemProps) {
     const answerId = useId();
     const questionId = `${answerId}-question`;
 
@@ -154,10 +148,7 @@ function FAQItem({ entry, categoryLabel, isOpen, onToggle }: FAQItemProps) {
                 aria-expanded={isOpen}
                 aria-controls={answerId}
             >
-                <span>
-                    {categoryLabel && <small>{categoryLabel}</small>}
-                    {entry.question}
-                </span>
+                <span>{entry.question}</span>
                 <i><Plus className={styles.plusIcon} aria-hidden="true" /></i>
             </button>
             <div
@@ -174,161 +165,51 @@ function FAQItem({ entry, categoryLabel, isOpen, onToggle }: FAQItemProps) {
 }
 
 function FAQPage() {
-    const searchInputRef = useRef<HTMLInputElement>(null);
     const [activeCategory, setActiveCategory] = useState<CategoryId>("getting-started");
-    const [query, setQuery] = useState("");
     const [openQuestion, setOpenQuestion] = useState<string | null>(FAQS[0].question);
 
-    const normalizedQuery = query.trim().toLowerCase();
     const activeCategoryInfo = CATEGORIES.find((category) => category.id === activeCategory) ?? CATEGORIES[0];
-    const visibleFaqs = useMemo(() => {
-        if (!normalizedQuery) return FAQS.filter((entry) => entry.category === activeCategory);
-
-        return FAQS.filter((entry) =>
-            `${entry.question} ${entry.answer}`.toLowerCase().includes(normalizedQuery),
-        );
-    }, [activeCategory, normalizedQuery]);
-
-    useEffect(() => {
-        const focusSearch = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-                event.preventDefault();
-                searchInputRef.current?.focus();
-            }
-        };
-
-        window.addEventListener("keydown", focusSearch);
-        return () => window.removeEventListener("keydown", focusSearch);
-    }, []);
+    const visibleFaqs = FAQS.filter((entry) => entry.category === activeCategory);
 
     const chooseCategory = (category: CategoryId) => {
         const firstQuestion = FAQS.find((entry) => entry.category === category)?.question ?? null;
         setActiveCategory(category);
-        setQuery("");
         setOpenQuestion(firstQuestion);
-        document.getElementById("answers")?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
     return (
         <div className={styles.page}>
             <NavBar />
 
-            <main>
-                <div className={styles.heroShell}>
-                    <section className={styles.hero}>
-                        <div className={styles.heroCopy}>
-                            <span className={styles.eyebrow}>Knotly help</span>
-                            <h1>Answers, without the maze.</h1>
-                            <p>Find the useful bit, get back to your people, and leave the technical jargon behind.</p>
+            <main className={styles.faqMain}>
+                <header className={styles.pageHeader}>
+                    <div><span>Knotly help</span><h1>Frequently asked questions</h1><p>Clear answers about communities, conversations and your account.</p></div>
+                    <strong>{FAQS.length} answers</strong>
+                </header>
 
-                            <label className={styles.searchBox}>
-                                <span className={styles.srOnly}>Search frequently asked questions</span>
-                                <Search size={20} aria-hidden="true" />
-                                <input
-                                    ref={searchInputRef}
-                                    type="search"
-                                    value={query}
-                                    onChange={(event) => {
-                                        setQuery(event.target.value);
-                                        setOpenQuestion(null);
-                                    }}
-                                    placeholder="Search invites, voice rooms, roles…"
-                                />
-                                <kbd>⌘ K</kbd>
-                            </label>
-                        </div>
-                    </section>
-                </div>
-
-                <section className={styles.quickPaths} aria-labelledby="quick-heading">
-                    <div className={styles.sectionIntro}>
-                        <span>Start here</span>
-                        <h2 id="quick-heading">What are you trying to do?</h2>
-                    </div>
-                    <div className={styles.quickGrid}>
-                        <button type="button" onClick={() => chooseCategory("getting-started")}>
-                            <span className={styles.quickIcon}><Sparkles /></span>
-                            <span><strong>Set up a new space</strong><small>Accounts, first rooms, and the basics</small></span>
-                            <ChevronRight aria-hidden="true" />
+                <nav className={styles.categoryTabs} aria-label="FAQ topics">
+                    {CATEGORIES.map(({ id, label, icon: Icon }) => (
+                        <button key={id} type="button" className={activeCategory === id ? styles.activeCategory : ""} onClick={() => chooseCategory(id)}>
+                            <Icon aria-hidden="true" /><span>{label}</span>
                         </button>
-                        <button type="button" onClick={() => chooseCategory("conversations")}>
-                            <span className={styles.quickIcon}><Mic2 /></span>
-                            <span><strong>Join the conversation</strong><small>Text rooms, voice, and activity</small></span>
-                            <ChevronRight aria-hidden="true" />
-                        </button>
-                        <button type="button" onClick={() => chooseCategory("communities")}>
-                            <span className={styles.quickIcon}><UsersRound /></span>
-                            <span><strong>Shape your community</strong><small>Invites, roles, and organization</small></span>
-                            <ChevronRight aria-hidden="true" />
-                        </button>
+                    ))}
+                </nav>
+
+                <section className={styles.answersPanel} id="answers">
+                    <header className={styles.answersHeader}>
+                        <div><span>{activeCategoryInfo.label}</span><p>{activeCategoryInfo.description}</p></div>
+                        <strong>{visibleFaqs.length}</strong>
+                    </header>
+                    <div className={styles.faqList}>
+                        {visibleFaqs.map((entry) => (
+                            <FAQItem
+                                key={entry.question}
+                                entry={entry}
+                                isOpen={openQuestion === entry.question}
+                                onToggle={() => setOpenQuestion((current) => current === entry.question ? null : entry.question)}
+                            />
+                        ))}
                     </div>
-                </section>
-
-                <section className={styles.helpSection}>
-                    <aside className={styles.topicRail} aria-label="FAQ topics">
-                        <span className={styles.railLabel}>Browse by topic</span>
-                        <div className={styles.topicList}>
-                            {CATEGORIES.map(({ id, label, description, icon: Icon }) => (
-                                <button
-                                    key={id}
-                                    type="button"
-                                    className={!normalizedQuery && activeCategory === id ? styles.activeTopic : ""}
-                                    onClick={() => chooseCategory(id)}
-                                >
-                                    <i><Icon aria-hidden="true" /></i>
-                                    <span><strong>{label}</strong><small>{description}</small></span>
-                                    <ChevronRight aria-hidden="true" />
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className={styles.exploreNote}>
-                            <Compass size={20} aria-hidden="true" />
-                            <strong>Looking for your people?</strong>
-                            <p>Browse communities built around games, study, music, books, and more.</p>
-                            <Link to="/explore">Explore communities <ArrowRight size={15} /></Link>
-                        </div>
-                    </aside>
-
-                    <div className={styles.answersPanel} id="answers">
-                        <header className={styles.answersHeader}>
-                            <div>
-                                <span>{normalizedQuery ? "Search results" : activeCategoryInfo.label}</span>
-                                <h2>{normalizedQuery ? `Results for “${query.trim()}”` : activeCategoryInfo.description}</h2>
-                            </div>
-                            <strong>{visibleFaqs.length} {visibleFaqs.length === 1 ? "answer" : "answers"}</strong>
-                        </header>
-
-                        {visibleFaqs.length > 0 ? (
-                            <div className={styles.faqList}>
-                                {visibleFaqs.map((entry) => (
-                                    <FAQItem
-                                        key={entry.question}
-                                        entry={entry}
-                                        categoryLabel={normalizedQuery ? CATEGORIES.find((category) => category.id === entry.category)?.label : undefined}
-                                        isOpen={openQuestion === entry.question}
-                                        onToggle={() => setOpenQuestion((current) => current === entry.question ? null : entry.question)}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className={styles.emptyState}>
-                                <Search size={26} aria-hidden="true" />
-                                <h3>No answer hiding here.</h3>
-                                <p>Try a shorter phrase, or choose a topic from the list.</p>
-                                <button type="button" onClick={() => setQuery("")}>Clear search</button>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                <section className={styles.bottomCta}>
-                    <div>
-                        <span>Ready when you are</span>
-                        <h2>Make some room for your people.</h2>
-                        <p>Start a community, add the rooms you need, and send the first invite.</p>
-                    </div>
-                    <Link to="/signup">Create your space <ArrowRight size={18} /></Link>
                 </section>
             </main>
 

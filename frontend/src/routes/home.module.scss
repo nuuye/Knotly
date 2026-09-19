@@ -300,17 +300,24 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .sectionAdd { display: grid; place-items: center; width: 25px; height: 25px; margin: -0.35rem -0.25rem -0.35rem 0; color: $muted-foreground; border-radius: 8px; }
 .sectionAdd:hover { color: $primary; background: rgba(255, 248, 242, 0.7); }
 .sectionAdd svg { width: 13px; }
+.addCategoryButton { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: calc(100% - 0.5rem); min-height: 39px; margin: 0.2rem 0.25rem 0; color: $muted-foreground; border: 1px dashed rgba($foreground, 0.16); border-radius: 11px; font-size: 0.65rem; font-weight: 700; }
+.addCategoryButton:hover { color: $primary; border-color: rgba($primary, 0.32); background: rgba(255, 248, 242, 0.48); }
+.addCategoryButton svg { width: 15px; }
 .roomNavigation section > button,
 .roomNavigation section > div > button { display: flex; align-items: center; gap: 0.5rem; width: 100%; min-height: 40px; padding: 0 0.55rem; color: $muted-foreground; border-radius: 10px; font-size: 0.74rem; font-weight: 650; text-align: left; }
 .roomNavigation section > button svg,
 .roomNavigation section > div > button svg { width: 15px; }
 .roomNavigation section > button small { display: grid; place-items: center; width: 17px; height: 17px; margin-left: auto; color: #fff; border-radius: 50%; background: $primary; font-size: 0.5rem; }
+.roomNavigation section > div > button small { margin-left: auto; color: rgba($muted-foreground, 0.72); font-size: 0.5rem; font-weight: 750; text-transform: uppercase; }
 .roomNavigation section > button:hover,
 .roomNavigation section > div > button:hover { color: $foreground; background: rgba(255, 248, 242, 0.45); }
 .roomNavigation section > button.selectedRoom,
 .roomNavigation section > div > button.selectedRoom { color: $foreground; background: #fff8f2; }
 .roomNavigation section > button.selectedRoom svg,
 .roomNavigation section > div > button.selectedRoom svg { color: $primary; }
+.roomNavigation section > div > button.joinedVoiceButton { color: $foreground; background: rgba(75, 173, 105, 0.1); box-shadow: inset 3px 0 0 #4bad69; }
+.roomNavigation section > div > button.joinedVoiceButton svg,
+.roomNavigation section > div > button.joinedVoiceButton small { color: #318b4e; }
 .voicePeople { display: flex; align-items: center; gap: 0.45rem; min-height: 34px; padding-left: 1.7rem; }
 .voicePeople > i { display: grid; place-items: center; width: 24px; height: 24px; color: #fff; border-radius: 8px; font-size: 0.45rem; font-style: normal; font-weight: 800; }
 .voicePeople > span { display: flex; align-items: center; gap: 0.45rem; color: $muted-foreground; font-size: 0.65rem; }
@@ -320,6 +327,22 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .audioWave i:nth-child(2) { height: 10px; animation-delay: 180ms; }
 .audioWave i:nth-child(3) { height: 7px; animation-delay: 360ms; }
 @keyframes wave { to { transform: scaleY(0.5); } }
+.currentVoiceUser { color: $foreground; }
+.currentVoiceUser > span { color: $foreground; font-weight: 750; }
+.currentVoiceUser > span svg { width: 12px; color: #b3493f; }
+.voiceConnection { position: sticky; bottom: 0.6rem; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.65rem; margin: 1rem 0.25rem 0; padding: 0.65rem; border: 1px solid rgba(75, 173, 105, 0.22); border-radius: 14px; background: rgba(255, 248, 242, 0.94); box-shadow: 0 12px 26px rgba(45, 24, 16, 0.1); backdrop-filter: blur(12px); }
+.voiceConnection > i { display: grid; place-items: center; width: 32px; height: 32px; color: #318b4e; border-radius: 10px; background: rgba(75, 173, 105, 0.12); font-style: normal; }
+.voiceConnection > i > svg { width: 15px; }
+.voiceConnection > span { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; }
+.voiceConnection small { color: #318b4e; font-size: 0.49rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.voiceConnection strong { overflow: hidden; font-size: 0.65rem; text-overflow: ellipsis; white-space: nowrap; }
+.voiceControls { display: flex; align-items: center; gap: 0.2rem; }
+.voiceControls > button { display: grid; place-items: center; width: 29px; height: 29px; color: $muted-foreground; border-radius: 8px; background: rgba($foreground, 0.055); transition: color $transition-base, background $transition-base, transform $transition-base; }
+.voiceControls > button:hover { color: $foreground; background: rgba($foreground, 0.1); transform: translateY(-1px); }
+.voiceControls > button svg { width: 13px; }
+.voiceControls > button.voiceControlActive { color: #fff; background: $primary; }
+.voiceControls > button.leaveVoiceButton { color: #b3493f; background: rgba(179, 73, 63, 0.09); }
+.voiceControls > button.leaveVoiceButton:hover { color: #fff; background: #b3493f; }
 
 .chatPanel {
     display: grid;
@@ -335,12 +358,59 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .chatHeader strong { overflow: hidden; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; }
 .chatHeader > div:nth-of-type(1) > span { color: $muted-foreground; font-size: 0.64rem; }
 .chatActions { display: flex; align-items: center; gap: 0.35rem; margin-left: auto; }
-.chatActions button { display: grid; place-items: center; width: 36px; height: 36px; color: $muted-foreground; border-radius: 11px; }
-.chatActions button:hover { color: $foreground; background: rgba($primary, 0.07); }
-.chatActions svg { width: 17px; }
+.chatActions > button,
+.roomMenuWrap > button { display: grid; place-items: center; width: 36px; height: 36px; color: $muted-foreground; border-radius: 11px; }
+.chatActions > button:hover,
+.roomMenuWrap > button:hover,
+.chatActions > button.activeChatAction,
+.roomMenuWrap > button.activeChatAction { color: $primary; background: rgba($primary, 0.09); }
+.chatActions > button svg,
+.roomMenuWrap > button svg { width: 17px; }
+.roomMenuWrap { position: relative; }
+.roomOptionsMenu { position: absolute; z-index: 45; top: calc(100% + 0.55rem); right: 0; width: 220px; padding: 0.45rem; border: 1px solid rgba($foreground, 0.1); border-radius: 15px; background: #fff8f2; box-shadow: 0 18px 45px rgba(45, 24, 16, 0.18); animation: profileMenuIn 160ms ease-out; }
+.roomOptionsMenu > div { display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; margin-bottom: 0.3rem; padding: 0.55rem 0.65rem 0.65rem; border-bottom: 1px solid rgba($foreground, 0.07); }
+.roomOptionsMenu > div strong { overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.roomOptionsMenu > div small { color: $muted-foreground; font-size: 0.57rem; }
+.roomOptionsMenu > button { display: flex; align-items: center; gap: 0.55rem; width: 100%; min-height: 38px; padding: 0 0.65rem; color: $muted-foreground; border-radius: 9px; font-size: 0.66rem; font-weight: 650; text-align: left; }
+.roomOptionsMenu > button:hover { color: $foreground; background: #f3dfd0; }
+.roomOptionsMenu > button svg { width: 15px; }
 .roomIcon { display: grid; place-items: center; width: 38px; height: 38px; color: $primary; border-radius: 12px; background: rgba($primary, 0.08); }
 .roomIcon svg { width: 18px; }
 .mobileBack { display: none; }
+
+.communityChatPanel { grid-template-columns: 0 minmax(0, 1fr); transition: grid-template-columns 320ms cubic-bezier(0.22, 1, 0.36, 1); }
+.communityChatPanel.membersOpen { grid-template-columns: 250px minmax(0, 1fr); }
+.communityChatPanel > .chatHeader { grid-column: 2; grid-row: 1; }
+.communityChatPanel > .messageArea { grid-column: 2; grid-row: 2; }
+.communityChatPanel > .composer { grid-column: 2; grid-row: 3; }
+.membersPanel { z-index: 35; grid-column: 1; grid-row: 1 / 4; width: 250px; min-width: 0; min-height: 0; padding: 0 0.75rem 1rem; overflow-y: auto; visibility: hidden; opacity: 0; border-right: 1px solid rgba($foreground, 0.09); background: #f2d9c5; box-shadow: 14px 0 34px rgba(45, 24, 16, 0.07); transform: translateX(-18px); pointer-events: none; transition: opacity 230ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 320ms; }
+.membersPanel.membersPanelVisible { visibility: visible; opacity: 1; transform: translateX(0); pointer-events: auto; transition-delay: 0s; }
+.membersPanel > header { position: sticky; z-index: 2; top: 0; display: flex; align-items: center; justify-content: space-between; min-height: 72px; background: #f2d9c5; }
+.membersPanel > header > div { display: flex; flex-direction: column; gap: 0.12rem; }
+.membersPanel > header span { color: $primary; font-size: 0.55rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
+.membersPanel > header strong { font-size: 1rem; letter-spacing: -0.025em; }
+.membersPanel > header button { display: grid; place-items: center; width: 33px; height: 33px; color: $muted-foreground; border-radius: 10px; background: rgba(255, 248, 242, 0.55); }
+.membersPanel > header button:hover { color: $foreground; }
+.membersPanel > header button svg { width: 16px; }
+.memberSummary { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.65rem; margin-bottom: 1rem; padding: 0.75rem; border-radius: 14px; background: rgba(255, 248, 242, 0.58); }
+.memberSummary > span { display: grid; place-items: center; width: 37px; height: 37px; color: #fff; border-radius: 12px; background: $primary; font-size: 0.72rem; font-weight: 800; }
+.memberSummary p { display: flex; flex-direction: column; gap: 0.15rem; }
+.memberSummary strong { font-size: 0.67rem; }
+.memberSummary small { color: $muted-foreground; font-size: 0.55rem; line-height: 1.35; }
+.membersPanel > section { margin-top: 1.1rem; }
+.membersPanel > section > span { display: block; padding: 0 0.35rem 0.4rem; color: $muted-foreground; font-size: 0.54rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.membersPanel > section > button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.6rem; width: 100%; min-height: 52px; padding: 0.42rem 0.35rem; border-radius: 12px; text-align: left; }
+.membersPanel > section > button:hover { background: rgba(255, 248, 242, 0.5); }
+.memberAvatar { position: relative; display: grid; place-items: center; width: 34px; height: 34px; color: #fff; border-radius: 11px; font-size: 0.5rem; font-style: normal; font-weight: 800; }
+.memberAvatar b { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border: 2px solid #f2d9c5; border-radius: 50%; background: #48a868; }
+.memberAvatar.offlineMember { filter: saturate(0.55); opacity: 0.75; }
+.memberAvatar.offlineMember b { background: #a99485; }
+.membersPanel > section > button > span { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; }
+.membersPanel > section > button strong,
+.membersPanel > section > button small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.membersPanel > section > button strong { font-size: 0.68rem; }
+.membersPanel > section > button small { color: $muted-foreground; font-size: 0.56rem; }
+.membersPanel > section > button em { padding: 0.24rem 0.38rem; color: $primary; border-radius: 6px; background: rgba($primary, 0.09); font-size: 0.48rem; font-style: normal; font-weight: 800; text-transform: uppercase; }
 
 .messageArea { min-height: 0; padding: 2rem clamp(1rem, 4vw, 3rem); overflow-y: auto; }
 .conversationIntro { display: flex; align-items: center; flex-direction: column; max-width: 520px; margin: 1.5rem auto 2rem; text-align: center; }
@@ -492,7 +562,8 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .newMessageModal > header { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 1.5rem 1rem; }
 .newMessageModal > header > div > span { color: $primary; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .newMessageModal > header h2 { margin-top: 0.15rem; font-size: 1.65rem; letter-spacing: -0.04em; }
-.newMessageModal > header > button { display: grid; place-items: center; width: 34px; height: 34px; color: $muted-foreground; border-radius: 10px; background: #f3dfd0; font-size: 1.2rem; }
+.newMessageModal > header > button { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; padding: 0; color: $muted-foreground; border-radius: 10px; background: #f3dfd0; line-height: 1; }
+.newMessageModal > header > button svg { display: block; width: 16px; height: 16px; }
 .messageModeTabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin: 0 1.5rem 1rem; padding: 0.3rem; border-radius: 13px; background: #f3dfd0; }
 .messageModeTabs button { display: flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 40px; color: $muted-foreground; border-radius: 10px; font-size: 0.7rem; font-weight: 700; transition: color $transition-base, background $transition-base, box-shadow $transition-base; }
 .messageModeTabs button svg { width: 16px; }
@@ -580,6 +651,11 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .roomTypeNote p { display: flex; flex-direction: column; gap: 0.18rem; }
 .roomTypeNote strong { font-size: 0.68rem; }
 .roomTypeNote span { color: $muted-foreground; font-size: 0.59rem; line-height: 1.4; }
+.categoryPreview { padding: 0.75rem; border: 1px solid rgba($foreground, 0.08); border-radius: 14px; background: #f3dfd0; }
+.categoryPreview > div { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; padding: 0.15rem 0.35rem 0.4rem; color: $muted-foreground; border-bottom: 1px solid rgba($foreground, 0.07); font-size: 0.57rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.categoryPreview > div svg { width: 13px; }
+.categoryPreview p { display: flex; align-items: center; gap: 0.45rem; min-height: 34px; padding: 0 0.35rem; color: $muted-foreground; font-size: 0.65rem; }
+.categoryPreview p svg { width: 14px; color: $primary; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
@@ -633,6 +709,11 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
     .visibilityPicker { grid-template-columns: 1fr; }
     .voiceRoomCard { grid-template-columns: auto minmax(0, 1fr); }
     .voiceRoomCard > button { grid-column: 1 / -1; justify-content: center; }
+    .communityChatPanel.membersOpen { grid-template-columns: minmax(0, 1fr); }
+    .communityChatPanel.membersOpen > .chatHeader,
+    .communityChatPanel.membersOpen > .messageArea,
+    .communityChatPanel.membersOpen > .composer { display: none; }
+    .membersPanel { grid-column: 1; width: 100%; border-right: 0; box-shadow: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -649,5 +730,8 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
     .friendFilters button:hover { transform: none; }
     .friendGroups,
     .modalBackdrop,
-    .newMessageModal { animation: none; }
+    .newMessageModal,
+    .membersPanel { animation: none; }
+    .communityChatPanel,
+    .membersPanel { transition: none; }
 }
