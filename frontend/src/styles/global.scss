@@ -1,5 +1,6 @@
 @use "./variables" as *;
 
+// Start every element from the same predictable box model.
 * {
     margin: 0;
     padding: 0;

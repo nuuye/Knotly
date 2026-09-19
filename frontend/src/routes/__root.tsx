@@ -5,7 +5,7 @@ import { NotFoundPage } from "../components/notFound/notFound";
 export const Route = createRootRoute({
     notFoundComponent: NotFoundPage,
     component: () => (
-        // Uses the default background color from theme
+        // Keep a full-height background around every child route.
         <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
             <Outlet />
         </Box>

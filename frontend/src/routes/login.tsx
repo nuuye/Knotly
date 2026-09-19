@@ -1,20 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, AudioLines, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { ArrowLeft, ArrowRight, AudioLines, Mail } from "lucide-react";
 import { useState } from "react";
+import { AuthBrand } from "../components/auth/AuthBrand";
+import { PasswordField } from "../components/auth/PasswordField";
 import { ConnectionNetwork } from "../components/ConnectionNetwork";
-import knotlyLogo from "../assets/knotly.png";
 import styles from "./auth.module.scss";
 
 export const Route = createFileRoute("/login")({
     component: LoginPage,
 });
 
+/** Shows the sign-in form and opens the local app demo after submit. */
 function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
 
+    // Authentication will happen here once the backend is connected.
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         void navigate({ to: "/home" });
@@ -29,10 +31,7 @@ function LoginPage() {
 
             <section className={styles.showcase}>
                 <ConnectionNetwork variant="login" className={styles.connectionField} />
-                <Link to="/" className={styles.brand}>
-                    <img src={knotlyLogo} alt="" />
-                    <span>Knotly</span>
-                </Link>
+                <AuthBrand className={styles.brand} />
 
                 <div className={styles.showcaseCopy}>
                     <span className={styles.eyebrow}>Your space is waiting</span>
@@ -63,10 +62,7 @@ function LoginPage() {
 
             <section className={styles.formSide}>
                 <div className={styles.formCard}>
-                    <Link to="/" className={styles.mobileBrand}>
-                        <img src={knotlyLogo} alt="" />
-                        <span>Knotly</span>
-                    </Link>
+                    <AuthBrand className={styles.mobileBrand} />
 
                     <div className={styles.formHeading}>
                         <span>Welcome back</span>
@@ -91,32 +87,14 @@ function LoginPage() {
                             </div>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <div className={styles.labelRow}>
-                                <label htmlFor="login-password">Password</label>
-                                <button type="button" className={styles.textButton}>Forgot password?</button>
-                            </div>
-                            <div className={styles.inputWrap}>
-                                <LockKeyhole size={17} />
-                                <input
-                                    id="login-password"
-                                    type={showPassword ? "text" : "password"}
-                                    autoComplete="current-password"
-                                    placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(event) => setPassword(event.target.value)}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    className={styles.passwordToggle}
-                                    onClick={() => setShowPassword((visible) => !visible)}
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
-                                >
-                                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                                </button>
-                            </div>
-                        </div>
+                        <PasswordField
+                            id="login-password"
+                            autoComplete="current-password"
+                            placeholder="Enter your password"
+                            showForgotPassword
+                            value={password}
+                            onChange={setPassword}
+                        />
 
                         <button type="submit" className={styles.submitButton}>
                             Sign in <ArrowRight size={18} />

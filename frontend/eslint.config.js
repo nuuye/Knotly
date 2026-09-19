@@ -5,6 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
+// Apply the standard TypeScript, React Hooks, and Vite checks to source files.
 export default defineConfig([
   globalIgnores(['dist']),
   {

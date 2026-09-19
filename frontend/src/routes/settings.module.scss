@@ -1,5 +1,6 @@
 @use "../styles/variables.scss" as *;
 
+// Settings use a fixed navigation column and a flexible content area.
 .settingsPage {
     display: grid;
     grid-template-columns: 292px minmax(0, 1fr);
@@ -64,6 +65,8 @@
 }
 
 .miniAvatar { width: 39px; height: 39px; font-size: 0.74rem; }
+.miniAvatar img,
+.largeAvatar img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
 .miniAvatar span,
 .largeAvatar span {
     position: absolute;
@@ -217,6 +220,7 @@
     background: #fffaf6;
     font-size: 0.68rem;
     font-weight: 700;
+    cursor: pointer;
 }
 
 .secondaryButton svg { width: 15px; color: $primary; }

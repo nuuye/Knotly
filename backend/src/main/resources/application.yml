@@ -1,11 +1,14 @@
+# Shared Spring settings used in every environment.
 spring:
   application:
     name: app
 
+  # Validate the schema and close database sessions before rendering responses.
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
 
+  # Run versioned database migrations when the application starts.
   flyway:
     enabled: true

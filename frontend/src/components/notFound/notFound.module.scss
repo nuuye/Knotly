@@ -1,5 +1,6 @@
 @use "../../styles/variables.scss" as *;
 
+// Keep the short error message centered on every screen size.
 .notFoundPage {
     position: relative;
     display: grid;
@@ -32,6 +33,7 @@
     text-align: center;
 }
 
+// Two nodes and a broken middle signal show a lost connection without an image.
 .interruption {
     display: grid;
     grid-template-columns: 42px minmax(48px, 110px) 54px minmax(48px, 110px) 42px;

@@ -20,108 +20,57 @@ import {
     UserRound,
     Volume2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
+import { ToggleSetting } from "../components/settings/ToggleSetting";
+import {
+    INITIAL_NOTIFICATIONS,
+    INITIAL_PRIVACY,
+    SETTINGS_COPY,
+    SETTINGS_SECTIONS,
+} from "../data/settings";
+import { DEMO_USER_PROFILE } from "../data/user";
+import type { NotificationSettings, SettingsSectionId, ThemeId } from "../types/settings";
+import { getUsernameMark } from "../utils/text";
 import styles from "./settings.module.scss";
 
 export const Route = createFileRoute("/settings")({
     component: SettingsPage,
 });
 
-type SectionId = "account" | "notifications" | "privacy" | "appearance" | "language";
-type ThemeId = "warm" | "dark" | "system";
-
-const SECTIONS = [
-    { id: "account" as const, label: "My account", description: "Profile, identity, and security", icon: UserRound },
-    { id: "notifications" as const, label: "Notifications", description: "Choose what gets your attention", icon: Bell },
-    { id: "privacy" as const, label: "Privacy & safety", description: "Control how people reach you", icon: ShieldCheck },
-    { id: "appearance" as const, label: "Appearance", description: "Make Knotly feel comfortable", icon: Palette },
-    { id: "language" as const, label: "Language & region", description: "Language, time, and locale", icon: Globe2 },
-];
-
-const SECTION_COPY: Record<SectionId, { eyebrow: string; title: string; description: string }> = {
-    account: {
-        eyebrow: "Personal settings",
-        title: "Your account.",
-        description: "Update the details people see when you join a conversation.",
-    },
-    notifications: {
-        eyebrow: "Your attention",
-        title: "Hear about what matters.",
-        description: "Keep important conversations close without letting every room interrupt you.",
-    },
-    privacy: {
-        eyebrow: "Boundaries",
-        title: "You decide who gets through.",
-        description: "Choose how people can find you, message you, and interact with your profile.",
-    },
-    appearance: {
-        eyebrow: "Your view",
-        title: "Set the right atmosphere.",
-        description: "Tune Knotly for your screen, your eyes, and the way you like to read.",
-    },
-    language: {
-        eyebrow: "Local preferences",
-        title: "Right language, right time.",
-        description: "Set the language and regional details Knotly uses around the app.",
-    },
-};
-
-const INITIAL_PROFILE = {
-    displayName: "John Doe",
-    username: "johndoe",
-    email: "john.doe@example.com",
-    bio: "Always up for a late-night voice chat.",
-};
-
-interface ToggleSettingProps {
-    checked: boolean;
-    description: string;
-    icon: typeof Bell;
-    label: string;
-    onChange: (checked: boolean) => void;
-}
-
-function ToggleSetting({ checked, description, icon: Icon, label, onChange }: ToggleSettingProps) {
-    return (
-        <div className={styles.settingRow}>
-            <div className={styles.settingIcon}><Icon aria-hidden="true" /></div>
-            <div className={styles.settingCopy}>
-                <strong>{label}</strong>
-                <span>{description}</span>
-            </div>
-            <label className={styles.toggle}>
-                <span className={styles.srOnly}>Toggle {label}</span>
-                <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
-                <span className={styles.toggleTrack} />
-            </label>
-        </div>
-    );
-}
-
+/** Manages the local settings demo and switches between settings sections. */
 function SettingsPage() {
-    const [activeSection, setActiveSection] = useState<SectionId>("account");
+    const [activeSection, setActiveSection] = useState<SettingsSectionId>("account");
     const [theme, setTheme] = useState<ThemeId>("warm");
     const [textSize, setTextSize] = useState(16);
-    const [profile, setProfile] = useState(INITIAL_PROFILE);
-    const [savedProfile, setSavedProfile] = useState(INITIAL_PROFILE);
-    const [notifications, setNotifications] = useState({
-        directMessages: true,
-        mentions: true,
-        communityActivity: false,
-        sounds: true,
-    });
-    const [privacy, setPrivacy] = useState({
-        friendRequests: true,
-        activityStatus: true,
-    });
+    const [account, setAccount] = useState(DEMO_USER_PROFILE);
+    const [savedAccount, setSavedAccount] = useState(DEMO_USER_PROFILE);
+    const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+    const [privacy, setPrivacy] = useState(INITIAL_PRIVACY);
 
-    const sectionCopy = SECTION_COPY[activeSection];
-    const hasChanges = Object.keys(profile).some(
-        (key) => profile[key as keyof typeof profile] !== savedProfile[key as keyof typeof savedProfile],
+    const sectionCopy = SETTINGS_COPY[activeSection];
+    // Compare the draft with the last saved copy before showing the save bar.
+    const hasChanges = Object.keys(account).some(
+        (key) => account[key as keyof typeof account] !== savedAccount[key as keyof typeof savedAccount],
     );
+    const userMark = getUsernameMark(account.username);
 
-    const updateNotification = (key: keyof typeof notifications, checked: boolean) => {
+    // Update one notification option without replacing the other values.
+    const updateNotification = (key: keyof NotificationSettings, checked: boolean) => {
         setNotifications((current) => ({ ...current, [key]: checked }));
+    };
+
+    // Preview the selected image locally until the backend handles uploads.
+    const updateProfilePicture = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+            if (typeof reader.result === "string") {
+                setAccount((current) => ({ ...current, avatarUrl: reader.result as string }));
+            }
+        });
+        reader.readAsDataURL(file);
     };
 
     return (
@@ -137,13 +86,13 @@ function SettingsPage() {
                     </Link>
 
                     <div className={styles.accountSummary}>
-                        <div className={styles.miniAvatar}>JD<span /></div>
-                        <div><strong>John Doe</strong><span>@johndoe</span></div>
+                        <div className={styles.miniAvatar}>{account.avatarUrl ? <img src={account.avatarUrl} alt="" /> : userMark}<span /></div>
+                        <div><strong>@{account.username}</strong><span>{account.email}</span></div>
                     </div>
 
                     <nav className={styles.navigation} aria-label="Settings sections">
                         <span>Settings</span>
-                        {SECTIONS.map(({ id, label, icon: Icon }) => (
+                        {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
                             <button
                                 key={id}
                                 type="button"
@@ -166,7 +115,7 @@ function SettingsPage() {
 
             <main className={styles.main}>
                 <div className={styles.mobileTabs} aria-label="Settings sections">
-                    {SECTIONS.map(({ id, label, icon: Icon }) => (
+                    {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
                         <button
                             key={id}
                             type="button"
@@ -191,40 +140,39 @@ function SettingsPage() {
                         <form
                             onSubmit={(event) => {
                                 event.preventDefault();
-                                setSavedProfile(profile);
+                                // Saving copies the current draft and hides the save bar.
+                                setSavedAccount(account);
                             }}
                         >
                             <section className={`${styles.card} ${styles.profileCard}`}>
                                 <div className={styles.profileBanner} />
                                 <div className={styles.profileIdentity}>
-                                    <div className={styles.largeAvatar}>JD<span /></div>
+                                    <div className={styles.largeAvatar}>{account.avatarUrl ? <img src={account.avatarUrl} alt="" /> : userMark}<span /></div>
                                     <div>
-                                        <h2>John Doe</h2>
-                                        <p>Your profile travels with you across every community.</p>
+                                        <h2>@{account.username}</h2>
+                                        <p>Your username is your identity across Knotly. Your real name stays private.</p>
                                     </div>
-                                    <button type="button" className={styles.secondaryButton}>
+                                    <label className={styles.secondaryButton}>
                                         <ImagePlus aria-hidden="true" /> Change picture
-                                    </button>
+                                        <input className={styles.srOnly} type="file" accept="image/*" onChange={updateProfilePicture} />
+                                    </label>
                                 </div>
 
                                 <div className={styles.formGrid}>
                                     <label>
-                                        <span>Display name</span>
-                                        <input type="text" value={profile.displayName} onChange={(event) => setProfile((current) => ({ ...current, displayName: event.target.value }))} />
+                                        <span>Username</span>
+                                        <div className={styles.prefixedInput}><i>@</i><input type="text" value={account.username} onChange={(event) => setAccount((current) => ({ ...current, username: event.target.value }))} minLength={3} maxLength={24} autoComplete="username" required /></div>
+                                        <small>This is the only name other people see.</small>
                                     </label>
                                     <label>
-                                        <span>Username</span>
-                                        <div className={styles.prefixedInput}><i>@</i><input type="text" value={profile.username} onChange={(event) => setProfile((current) => ({ ...current, username: event.target.value }))} /></div>
-                                    </label>
-                                    <label className={styles.fullField}>
                                         <span>Email address</span>
-                                        <input type="email" value={profile.email} onChange={(event) => setProfile((current) => ({ ...current, email: event.target.value }))} />
+                                        <input type="email" value={account.email} onChange={(event) => setAccount((current) => ({ ...current, email: event.target.value }))} autoComplete="email" required />
                                         <small>Used for sign-in and important account updates.</small>
                                     </label>
                                     <label className={styles.fullField}>
-                                        <span>A little about you</span>
-                                        <textarea rows={3} value={profile.bio} onChange={(event) => setProfile((current) => ({ ...current, bio: event.target.value }))} maxLength={160} />
-                                        <small>Keep it short—this appears on your profile.</small>
+                                        <span>Biography <small>Optional</small></span>
+                                        <textarea rows={3} value={account.bio} onChange={(event) => setAccount((current) => ({ ...current, bio: event.target.value }))} maxLength={160} />
+                                        <small>Share only what you want other people to know.</small>
                                     </label>
                                 </div>
                             </section>

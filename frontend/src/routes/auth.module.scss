@@ -1,5 +1,6 @@
 @use "../styles/variables.scss" as *;
 
+// Desktop auth pages split the visual story and the form into two columns.
 .authPage {
     display: grid;
     grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
@@ -217,7 +218,6 @@
 .formHeading p { color: $muted-foreground; font-size: 0.87rem; }
 
 .form { display: flex; flex-direction: column; gap: 1rem; }
-.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .formGroup label { display: block; margin-bottom: 0.42rem; color: $foreground; font-size: 0.72rem; font-weight: 700; }
 .labelRow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .textButton { color: $primary; font-size: 0.68rem; font-weight: 650; }
@@ -265,7 +265,6 @@
     .backLink:hover { color: $foreground; background: rgba($primary, 0.07); }
     .mobileBrand { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; }
     .mobileBrand span { color: $foreground; }
-    .formRow { grid-template-columns: 1fr; gap: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

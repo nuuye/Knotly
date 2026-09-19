@@ -1,13 +1,9 @@
 import styles from "./navBar.module.scss";
 import { Link } from "@tanstack/react-router";
 import knotlyLogo from "../../assets/knotly.png";
-import type { navBarButton } from "../../types/navBar";
+import type { NavBarButton, NavBarProps } from "../../types/navigation";
 
-interface navBarProps {
-    buttons?: navBarButton[];
-}
-
-const NAVBAR_BUTTONS: navBarButton[] = [
+const NAVBAR_BUTTONS: NavBarButton[] = [
     {
         label: "Explore",
         contained: false,
@@ -30,7 +26,8 @@ const NAVBAR_BUTTONS: navBarButton[] = [
     },
 ];
 
-export function NavBar({ buttons = NAVBAR_BUTTONS }: navBarProps) {
+/** Shows the shared top navigation and allows pages to replace its buttons. */
+export function NavBar({ buttons = NAVBAR_BUTTONS }: NavBarProps) {
     return (
         <div className={styles.root}>
             <div className={styles.container}>
@@ -41,7 +38,7 @@ export function NavBar({ buttons = NAVBAR_BUTTONS }: navBarProps) {
                     <span className={styles.title}>Knotly</span>
                 </Link>
                 <div className={styles.buttonContainter}>
-                    {buttons.map((button: navBarButton) => (
+                    {buttons.map((button) => (
                         <Link
                             key={button.link}
                             className={button.contained ? styles.contained : styles.text}

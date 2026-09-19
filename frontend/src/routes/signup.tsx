@@ -1,22 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Check, Mail } from "lucide-react";
 import { useState } from "react";
+import { AuthBrand } from "../components/auth/AuthBrand";
+import { PasswordField } from "../components/auth/PasswordField";
 import { ConnectionNetwork } from "../components/ConnectionNetwork";
-import knotlyLogo from "../assets/knotly.png";
+import type { SignupFormData } from "../types/user";
 import styles from "./auth.module.scss";
 
 export const Route = createFileRoute("/signup")({
     component: SignupPage,
 });
 
+/** Collects the basic details needed to create a Knotly account. */
 function SignupPage() {
-    const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "" });
-    const [showPassword, setShowPassword] = useState(false);
+    const [formData, setFormData] = useState<SignupFormData>({ username: "", email: "", password: "" });
 
+    // Reuse one handler for every field by reading its name attribute.
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
     };
 
+    // Account creation will be added here when the backend is ready.
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
     };
@@ -30,15 +34,12 @@ function SignupPage() {
 
             <section className={`${styles.showcase} ${styles.signupShowcase}`}>
                 <ConnectionNetwork variant="signup" className={styles.connectionField} />
-                <Link to="/" className={styles.brand}>
-                    <img src={knotlyLogo} alt="" />
-                    <span>Knotly</span>
-                </Link>
+                <AuthBrand className={styles.brand} />
 
                 <div className={styles.showcaseCopy}>
-                    <span className={styles.eyebrow}>Make room for your people</span>
+                    <span className={styles.eyebrow}>Join on your own terms</span>
                     <h1>Start the space. Let everyone make it theirs.</h1>
-                    <p>A few details now, and your first conversation is only an invite away.</p>
+                    <p>Choose a username, keep your real name private, and start gathering your people.</p>
                 </div>
 
                 <div className={`${styles.communityPreview} ${styles.setupPreview}`} aria-hidden="true">
@@ -49,7 +50,7 @@ function SignupPage() {
                     </div>
                     <div className={styles.setupStep}>
                         <i><Check size={14} /></i>
-                        <span><strong>Give it a name</strong><small>Something your people will recognize</small></span>
+                        <span><strong>Choose a username</strong><small>No real name required</small></span>
                     </div>
                     <div className={styles.setupStep}>
                         <i><Check size={14} /></i>
@@ -64,10 +65,7 @@ function SignupPage() {
 
             <section className={styles.formSide}>
                 <div className={`${styles.formCard} ${styles.signupCard}`}>
-                    <Link to="/" className={styles.mobileBrand}>
-                        <img src={knotlyLogo} alt="" />
-                        <span>Knotly</span>
-                    </Link>
+                    <AuthBrand className={styles.mobileBrand} />
 
                     <div className={styles.formHeading}>
                         <span>Join Knotly</span>
@@ -76,20 +74,11 @@ function SignupPage() {
                     </div>
 
                     <form className={styles.form} onSubmit={handleSubmit}>
-                        <div className={styles.formRow}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="firstName">First name</label>
-                                <div className={styles.inputWrap}>
-                                    <UserRound size={17} />
-                                    <input id="firstName" name="firstName" type="text" autoComplete="given-name" placeholder="Maya" value={formData.firstName} onChange={handleChange} required />
-                                </div>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="lastName">Last name</label>
-                                <div className={styles.inputWrap}>
-                                    <UserRound size={17} />
-                                    <input id="lastName" name="lastName" type="text" autoComplete="family-name" placeholder="Martin" value={formData.lastName} onChange={handleChange} required />
-                                </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="username">Username</label>
+                            <div className={styles.inputWrap}>
+                                <AtSign size={17} />
+                                <input id="username" name="username" type="text" autoComplete="username" placeholder="nightowl" value={formData.username} onChange={handleChange} minLength={3} maxLength={24} required />
                             </div>
                         </div>
 
@@ -101,16 +90,15 @@ function SignupPage() {
                             </div>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label htmlFor="signup-password">Password</label>
-                            <div className={styles.inputWrap}>
-                                <LockKeyhole size={17} />
-                                <input id="signup-password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="At least 8 characters" minLength={8} value={formData.password} onChange={handleChange} required />
-                                <button type="button" className={styles.passwordToggle} onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"}>
-                                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                                </button>
-                            </div>
-                        </div>
+                        <PasswordField
+                            id="signup-password"
+                            name="password"
+                            autoComplete="new-password"
+                            placeholder="At least 8 characters"
+                            minLength={8}
+                            value={formData.password}
+                            onChange={(password) => setFormData((current) => ({ ...current, password }))}
+                        />
 
                         <p className={styles.terms}>By creating an account, you agree to Knotly’s terms and privacy policy.</p>
 

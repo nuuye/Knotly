@@ -1,5 +1,6 @@
 @use "../styles/variables.scss" as *;
 
+// Compact FAQ layout keeps topics and questions in the first screen.
 .page {
     min-height: 100vh;
     color: $foreground;

@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import knotlyLogo from "../../assets/knotly.png";
 import styles from "./footer.module.scss";
 
+/** Shows the shared footer and its main navigation links. */
 export function Footer() {
     return (
         <footer className={styles.footer}>

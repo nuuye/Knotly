@@ -1,5 +1,6 @@
 @use "../../styles/variables.scss" as *;
 
+// Sticky navigation shared by the public pages.
 .root {
     border-bottom: 1px solid rgba($foreground, 0.08);
     background: rgba(247, 228, 212, 0.86);

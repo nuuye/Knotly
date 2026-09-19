@@ -21,6 +21,7 @@ const messages = [
     { initial: "L", name: "Lina", time: "10:28", text: "Count me in. I’ll make a shared list!", tone: "pink" },
 ];
 
+/** Builds the compact app preview shown in the landing page hero. */
 export function FloatingElements() {
     return (
         <motion.div

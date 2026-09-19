@@ -20,6 +20,7 @@ export const Route = createFileRoute("/")({
     component: LandingPage,
 });
 
+// These cards show how the same product can serve different kinds of groups.
 const communityTypes = [
     {
         icon: Gamepad2,
@@ -51,6 +52,7 @@ const communityTypes = [
     },
 ];
 
+/** Renders the public landing page and its main product story. */
 function LandingPage() {
     return (
         <div className={styles.root}>

@@ -1,5 +1,6 @@
 @use "../styles/variables.scss" as *;
 
+// Public discovery page with search, filters, and community cards.
 .explore {
     min-height: 100vh;
     overflow: hidden;

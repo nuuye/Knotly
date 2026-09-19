@@ -3,6 +3,7 @@ import { ArrowLeft, WifiOff } from "lucide-react";
 import knotlyLogo from "../../assets/knotly.png";
 import styles from "./notFound.module.scss";
 
+/** Shows a simple fallback when no application route matches the URL. */
 export function NotFoundPage() {
     return (
         <main className={styles.notFoundPage}>

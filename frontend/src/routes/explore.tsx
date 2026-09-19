@@ -1,118 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
     ArrowRight,
-    BookOpen,
-    Code,
-    Gamepad2,
-    Heart,
-    Music,
     Plus,
     Search,
-    Sparkles,
-    TrendingUp,
     Users,
 } from "lucide-react";
 import { useState } from "react";
 import { CreateCommunityModal } from "../components/createCommunityModal/createCommunityModal";
 import { Footer } from "../components/footer/footer";
 import { NavBar } from "../components/navBar/navBar";
+import { EXPLORE_CATEGORIES, EXPLORE_COMMUNITIES } from "../data/explore";
 import styles from "./explore.module.scss";
-
-const COMMUNITIES = [
-    {
-        id: "1",
-        name: "Gamers Paradise",
-        description: "Co-op nights, new releases, and a squad that is always ready for one more game.",
-        members: 12543,
-        online: 3421,
-        category: "gaming",
-        categoryLabel: "Gaming",
-        icon: Gamepad2,
-        tone: "ember",
-        rooms: ["lfg", "game-nights", "squad-room"],
-    },
-    {
-        id: "2",
-        name: "Sound & Soul",
-        description: "Trade playlists, discover hidden gems, and listen together after hours.",
-        members: 8932,
-        online: 1876,
-        category: "music",
-        categoryLabel: "Music",
-        icon: Music,
-        tone: "gold",
-        rooms: ["now-playing", "discoveries"],
-    },
-    {
-        id: "3",
-        name: "The Dev Den",
-        description: "A friendly corner for side projects, thoughtful feedback, and stubborn bugs.",
-        members: 15678,
-        online: 4532,
-        category: "tech",
-        categoryLabel: "Technology",
-        icon: Code,
-        tone: "clay",
-        rooms: ["show-your-work", "help-desk"],
-    },
-    {
-        id: "4",
-        name: "The Reading Room",
-        description: "Slow reads, lively opinions, and a monthly book worth talking about.",
-        members: 5421,
-        online: 892,
-        category: "culture",
-        categoryLabel: "Books",
-        icon: BookOpen,
-        tone: "cream",
-        rooms: ["current-read", "spoilers"],
-    },
-    {
-        id: "5",
-        name: "Move Together",
-        description: "Share small wins, find training partners, and keep each other moving.",
-        members: 9234,
-        online: 2134,
-        category: "health",
-        categoryLabel: "Wellness",
-        icon: Heart,
-        tone: "rose",
-        rooms: ["daily-check-in", "weekend-runs"],
-    },
-    {
-        id: "6",
-        name: "Right Now",
-        description: "The conversations, curiosities, and wonderfully random things people cannot stop sharing.",
-        members: 18765,
-        online: 5678,
-        category: "trending",
-        categoryLabel: "Trending",
-        icon: TrendingUp,
-        tone: "dark",
-        rooms: ["today", "deep-dives", "voice-lounge"],
-    },
-];
-
-const CATEGORIES = [
-    { id: "all", name: "All spaces", icon: Sparkles },
-    { id: "gaming", name: "Gaming", icon: Gamepad2 },
-    { id: "music", name: "Music", icon: Music },
-    { id: "tech", name: "Tech", icon: Code },
-    { id: "culture", name: "Books", icon: BookOpen },
-    { id: "health", name: "Wellness", icon: Heart },
-    { id: "trending", name: "Trending", icon: TrendingUp },
-];
 
 export const Route = createFileRoute("/explore")({
     component: ExplorePage,
 });
 
+/** Lets visitors search and filter the public community list. */
 function ExplorePage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const filteredCommunities = COMMUNITIES.filter((community) => {
+    // Both the text search and selected category must match.
+    const filteredCommunities = EXPLORE_COMMUNITIES.filter((community) => {
         const query = searchQuery.toLowerCase();
         const matchesSearch =
             community.name.toLowerCase().includes(query) || community.description.toLowerCase().includes(query);
@@ -165,7 +76,8 @@ function ExplorePage() {
                     </div>
 
                     <div className={styles.categories}>
-                        {CATEGORIES.map((category) => {
+                        {EXPLORE_CATEGORIES.map((category) => {
+                            // Icon components are stored in data so every filter uses the same markup.
                             const Icon = category.icon;
                             const isActive = selectedCategory === category.id;
                             return (
@@ -187,6 +99,7 @@ function ExplorePage() {
                 {filteredCommunities.length > 0 ? (
                     <section className={styles.grid} aria-label="Communities">
                         {filteredCommunities.map((community) => {
+                            // Each community chooses its own icon and color tone from the data above.
                             const Icon = community.icon;
                             return (
                                 <article

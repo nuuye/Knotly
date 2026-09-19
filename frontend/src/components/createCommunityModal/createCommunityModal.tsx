@@ -1,11 +1,7 @@
 import { X, Upload, Gamepad2, Music, Code, BookOpen, Heart, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
+import type { CreateCommunityModalProps } from "../../types/communityModal";
 import styles from "./createCommunityModal.module.scss";
-
-interface CreateCommunityModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 const CATEGORY_OPTIONS = [
   { id: "gaming", name: "Gaming", icon: Gamepad2 },
@@ -17,6 +13,7 @@ const CATEGORY_OPTIONS = [
   { id: "other", name: "Other", icon: Users },
 ];
 
+/** Shows the lightweight community form used on the Explore page. */
 export function CreateCommunityModal({ isOpen, onClose }: CreateCommunityModalProps) {
   const [formData, setFormData] = useState({
     name: "",
@@ -26,6 +23,7 @@ export function CreateCommunityModal({ isOpen, onClose }: CreateCommunityModalPr
 
   if (!isOpen) return null;
 
+  // One handler updates every field by using the input name as the object key.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -35,7 +33,7 @@ export function CreateCommunityModal({ isOpen, onClose }: CreateCommunityModalPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle community creation logic
+    // The backend can replace this close-only demo behavior later.
     onClose();
   };
 
