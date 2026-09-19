@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
     ArrowLeft,
+    Ban,
     Bell,
     BellOff,
     ChevronDown,
+    Check,
     Clipboard,
     FolderPlus,
     Hash,
@@ -21,10 +23,12 @@ import {
     Search,
     Send,
     Smile,
+    Trash2,
     Mic,
     MicOff,
     UserPlus,
     UserMinus,
+    UserX,
     UsersRound,
     Video,
     Volume2,
@@ -41,6 +45,7 @@ import { MessageSearch } from "../components/home/MessageSearch";
 import { CategoryDialog } from "../components/home/dialogs/CategoryDialog";
 import { ChannelDialog } from "../components/home/dialogs/ChannelDialog";
 import { CommunityDialog } from "../components/home/dialogs/CommunityDialog";
+import { DeleteCategoryDialog } from "../components/home/dialogs/DeleteCategoryDialog";
 import { AddFriendDialog, RemoveFriendDialog } from "../components/home/dialogs/FriendDialogs";
 import { GroupMembersDialog } from "../components/home/dialogs/GroupMembersDialog";
 import { InviteMembersDialog } from "../components/home/dialogs/InviteMembersDialog";
@@ -54,6 +59,7 @@ import {
     FRIENDS,
     INITIAL_COMMUNITIES,
     INITIAL_CONVERSATIONS,
+    INITIAL_FRIEND_REQUESTS,
     INITIAL_MESSAGES,
     INITIAL_MODERATION_LOGS,
     INITIAL_ROOM_MESSAGES,
@@ -70,6 +76,8 @@ import type {
     CommunitySettingsDraft,
     Friend,
     FriendFilter,
+    FriendRequest,
+    FriendsView,
     JoinedVoiceRoom,
     MessageReaction,
     MessageSearchResult,
@@ -119,6 +127,8 @@ function HomePage() {
         )]),
     ));
     const [friends, setFriends] = useState(FRIENDS);
+    const [friendRequests, setFriendRequests] = useState(INITIAL_FRIEND_REQUESTS);
+    const [blockedUsers, setBlockedUsers] = useState<Friend[]>([]);
     const [communityMemberNotes, setCommunityMemberNotes] = useState<Record<string, Record<string, string>>>({});
     const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
     const [selectedConversation, setSelectedConversation] = useState("maya");
@@ -139,6 +149,7 @@ function HomePage() {
     const [mobilePanel, setMobilePanel] = useState<MobilePanel>("list");
     const [messageView, setMessageView] = useState<MessageView>("chat");
     const [friendFilter, setFriendFilter] = useState<FriendFilter>("all");
+    const [friendsView, setFriendsView] = useState<FriendsView>("friends");
     // Dialogs and small menus.
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [newMessageOpen, setNewMessageOpen] = useState(false);
@@ -176,6 +187,7 @@ function HomePage() {
     const [channelCategory, setChannelCategory] = useState("hang-out");
     const [categoryCreatorOpen, setCategoryCreatorOpen] = useState(false);
     const [categoryName, setCategoryName] = useState("");
+    const [categoryPendingDeletionId, setCategoryPendingDeletionId] = useState<string | null>(null);
     // Room tools and voice connection controls.
     const [membersPanelOpen, setMembersPanelOpen] = useState(false);
     const [roomMenuOpen, setRoomMenuOpen] = useState(false);
@@ -207,13 +219,24 @@ function HomePage() {
     }, [conversations, query]);
     const filteredFriends = friends.filter((friend) => friendFilter === "all" || friend.status === friendFilter);
     const newMessageFriends = friends.filter((friend) => friend.name.toLowerCase().includes(newMessageQuery.trim().toLowerCase()));
-    const availableFriendCandidates = SUGGESTED_FRIENDS.filter((candidate) => !friends.some((friend) => friend.id === candidate.id));
+    const receivedFriendRequests = friendRequests.filter((request) => request.direction === "received");
+    const sentFriendRequests = friendRequests.filter((request) => request.direction === "sent");
+    const unavailableFriendIds = new Set([
+        ...friends.map((friend) => friend.id),
+        ...friendRequests.map((request) => request.person.id),
+        ...blockedUsers.map((friend) => friend.id),
+    ]);
+    const availableFriendCandidates = SUGGESTED_FRIENDS.filter((candidate) => !unavailableFriendIds.has(candidate.id));
     const friendPendingRemoval = friends.find((friend) => friend.id === friendRemovalId);
     const onlineFriendCount = friends.filter((friend) => friend.status === "online").length;
     // Find which category owns the room currently shown in the main panel.
     const selectedCategory = activeCommunity?.categories.find((category) => (
         selectedRoomKind === "text" ? category.textRooms : category.voiceRooms
     ).includes(selectedRoom));
+    const categoryPendingDeletion = activeCommunity?.categories.find((category) => category.id === categoryPendingDeletionId);
+    const canDeleteSelectedRoom = selectedRoomKind === "voice"
+        || (activeCommunity?.categories.reduce((count, category) => count + category.textRooms.length, 0) ?? 0) > 1;
+    const canDeletePendingCategory = Boolean(activeCommunity && categoryPendingDeletion && activeCommunity.categories.length > 1);
     const activeRoomKey = `${activeSpace}:${selectedRoomKind}:${selectedRoom}`;
     const roomIsMuted = mutedRooms.includes(activeRoomKey);
     const directMessages = messages[selectedConversation] ?? [];
@@ -662,11 +685,46 @@ function HomePage() {
         setEditingMessage(null);
     };
 
-    // Add one suggested profile to the local friends list.
-    const addFriend = (friendId: string) => {
+    // Create an outgoing request instead of adding someone before they accept it.
+    const sendFriendRequest = (friendId: string) => {
         const candidate = SUGGESTED_FRIENDS.find((friend) => friend.id === friendId);
-        if (!candidate) return;
-        setFriends((current) => current.some((friend) => friend.id === friendId) ? current : [...current, candidate]);
+        const alreadyKnown = friends.some((friend) => friend.id === friendId)
+            || friendRequests.some((request) => request.person.id === friendId)
+            || blockedUsers.some((friend) => friend.id === friendId);
+        if (!candidate || alreadyKnown) return;
+        setFriendRequests((current) => [...current, {
+            id: `request-${friendId}-${Date.now()}`,
+            direction: "sent",
+            person: candidate,
+            sentAt: "Just now",
+        }]);
+    };
+
+    // Accept a received request and move the person into the friends list.
+    const acceptFriendRequest = (requestId: string) => {
+        const request = friendRequests.find((item) => item.id === requestId && item.direction === "received");
+        if (!request) return;
+        setFriends((current) => current.some((friend) => friend.id === request.person.id) ? current : [...current, request.person]);
+        setFriendRequests((current) => current.filter((item) => item.id !== requestId));
+    };
+
+    // Refusing a received request and cancelling a sent request both remove the pending item.
+    const removeFriendRequest = (requestId: string, direction: FriendRequest["direction"]) => {
+        setFriendRequests((current) => current.filter((request) => request.id !== requestId || request.direction !== direction));
+    };
+
+    // Blocking clears requests and friendships, then keeps the profile in a separate list.
+    const blockUser = (requestId: string) => {
+        const request = friendRequests.find((item) => item.id === requestId);
+        if (!request) return;
+        setFriendRequests((current) => current.filter((item) => item.person.id !== request.person.id));
+        setFriends((current) => current.filter((friend) => friend.id !== request.person.id));
+        setBlockedUsers((current) => current.some((friend) => friend.id === request.person.id) ? current : [...current, request.person]);
+    };
+
+    // Unblocking makes the profile available for a future request again.
+    const unblockUser = (friendId: string) => {
+        setBlockedUsers((current) => current.filter((friend) => friend.id !== friendId));
     };
 
     // Remove the friendship while preserving any existing private messages.
@@ -788,11 +846,13 @@ function HomePage() {
         addModerationLog("rooms", "Category created", `Created the ${label} category.`);
     };
 
-    // Fill the edit form with the room and category currently on screen.
-    const openRoomSettings = () => {
+    // Fill the edit form with a chosen room without requiring it to be opened first.
+    const openRoomSettings = (room = selectedRoom, kind = selectedRoomKind, categoryId = selectedCategory?.id) => {
         if (!canManageRooms) return;
-        setRoomSettingsName(selectedRoom);
-        setRoomSettingsCategory(selectedCategory?.id ?? activeCommunity?.categories[0]?.id ?? "");
+        setSelectedRoom(room);
+        setSelectedRoomKind(kind);
+        setRoomSettingsName(room);
+        setRoomSettingsCategory(categoryId ?? activeCommunity?.categories[0]?.id ?? "");
         setRoomMenuOpen(false);
         setRoomSettingsOpen(true);
     };
@@ -823,6 +883,65 @@ function HomePage() {
         setSelectedRoom(nextName);
         setRoomSettingsOpen(false);
         addModerationLog("rooms", "Room updated", `${selectedRoom} was renamed or moved to another category as ${nextName}.`);
+    };
+
+    // Delete the selected room while always keeping one text room available for navigation.
+    const deleteRoom = () => {
+        if (!activeCommunity || !selectedCategory || !canManageRooms || !canDeleteSelectedRoom) return;
+        const roomName = selectedRoom;
+        const roomKind = selectedRoomKind;
+        const nextCategories = activeCommunity.categories.map((category) => ({
+            ...category,
+            textRooms: roomKind === "text" ? category.textRooms.filter((room) => room !== roomName) : category.textRooms,
+            voiceRooms: roomKind === "voice" ? category.voiceRooms.filter((room) => room !== roomName) : category.voiceRooms,
+        }));
+        const fallbackRoom = nextCategories.flatMap((category) => category.textRooms)[0];
+
+        setCommunities((current) => current.map((community) => community.id === activeCommunity.id
+            ? { ...community, categories: nextCategories }
+            : community));
+        setRoomMessages((current) => {
+            const next = { ...current };
+            delete next[`${activeCommunity.id}:${roomKind}:${roomName}`];
+            return next;
+        });
+        setMutedRooms((current) => current.filter((key) => key !== `${activeCommunity.id}:${roomKind}:${roomName}`));
+        if (joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === roomName) setJoinedVoiceRoom(null);
+        setSelectedRoom(fallbackRoom);
+        setSelectedRoomKind("text");
+        setRoomSettingsOpen(false);
+        setRoomMenuOpen(false);
+        addModerationLog("rooms", `${roomKind === "voice" ? "Voice" : "Text"} room deleted`, `Deleted ${roomKind === "text" ? "#" : ""}${roomName}.`);
+    };
+
+    // Delete a category and all of its rooms. A fallback room is created if needed.
+    const deleteCategory = () => {
+        if (!activeCommunity || !categoryPendingDeletion || !canManageRooms || !canDeletePendingCategory) return;
+        const removedRoomNames = new Set([...categoryPendingDeletion.textRooms, ...categoryPendingDeletion.voiceRooms]);
+        const remainingCategories = activeCommunity.categories
+            .filter((category) => category.id !== categoryPendingDeletion.id)
+            .map((category) => ({ ...category, textRooms: [...category.textRooms], voiceRooms: [...category.voiceRooms] }));
+        if (!remainingCategories.some((category) => category.textRooms.length > 0)) remainingCategories[0].textRooms.push("general");
+        const fallbackRoom = remainingCategories.flatMap((category) => category.textRooms)[0];
+
+        setCommunities((current) => current.map((community) => community.id === activeCommunity.id
+            ? { ...community, categories: remainingCategories }
+            : community));
+        setRoomMessages((current) => Object.fromEntries(Object.entries(current).filter(([key]) => {
+            const [, kind, room] = key.split(":");
+            return !key.startsWith(`${activeCommunity.id}:`) || !removedRoomNames.has(room) || !["text", "voice"].includes(kind);
+        })));
+        setMutedRooms((current) => current.filter((key) => {
+            const [, , room] = key.split(":");
+            return !key.startsWith(`${activeCommunity.id}:`) || !removedRoomNames.has(room);
+        }));
+        if (joinedVoiceRoom?.communityId === activeCommunity.id && categoryPendingDeletion.voiceRooms.includes(joinedVoiceRoom.room)) setJoinedVoiceRoom(null);
+        if (categoryPendingDeletion.textRooms.includes(selectedRoom) || categoryPendingDeletion.voiceRooms.includes(selectedRoom)) {
+            setSelectedRoom(fallbackRoom);
+            setSelectedRoomKind("text");
+        }
+        addModerationLog("rooms", "Category deleted", `Deleted ${categoryPendingDeletion.label} and its ${removedRoomNames.size} rooms.`);
+        setCategoryPendingDeletionId(null);
     };
 
     // A full key keeps same-named rooms in different communities independent.
@@ -1026,7 +1145,7 @@ function HomePage() {
                                         setMobilePanel("chat");
                                     }}
                                 >
-                                    <span><UsersRound /></span><div><strong>Friends</strong><small>{onlineFriendCount} people online</small></div><ChevronDown />
+                                    <span><UsersRound /></span><div><strong>Friends</strong><small>{receivedFriendRequests.length ? `${receivedFriendRequests.length} requests · ${onlineFriendCount} online` : `${onlineFriendCount} people online`}</small></div><ChevronDown />
                                 </button>
                             </div>
 
@@ -1077,41 +1196,49 @@ function HomePage() {
                             <div className={styles.roomNavigation}>
                                 {activeCommunity?.categories.map((category) => (
                                     <section key={category.id}>
-                                        <span>{category.label}{canManageRooms && <button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("text", category.id)} aria-label={`Add a room to ${category.label}`}><Plus /></button>}</span>
+                                        <span>{category.label}{canManageRooms && <span className={styles.categoryActions}>
+                                            <button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("text", category.id)} aria-label={`Add a room to ${category.label}`}><Plus /></button>
+                                            <button type="button" className={`${styles.sectionAdd} ${styles.deleteCategoryButton}`} onClick={() => setCategoryPendingDeletionId(category.id)} aria-label={`Delete ${category.label}`}><Trash2 /></button>
+                                        </span>}</span>
                                         {category.textRooms.map((room) => (
-                                            <button
-                                                key={room}
-                                                type="button"
-                                                className={selectedRoom === room && selectedRoomKind === "text" ? styles.selectedRoom : ""}
-                                                onClick={() => {
-                                                    setSelectedRoom(room);
-                                                    setSelectedRoomKind("text");
-                                                    setMobilePanel("chat");
-                                                    setReplyingTo(null);
-                                                    setEditingMessage(null);
-                                                    scrollMessagesToBottom();
-                                                }}
-                                            >
-                                                <Hash /> {room} {room === "general" && <small>3</small>}
-                                            </button>
+                                            <div className={styles.roomNavigationRow} key={room}>
+                                                <button
+                                                    type="button"
+                                                    className={selectedRoom === room && selectedRoomKind === "text" ? styles.selectedRoom : ""}
+                                                    onClick={() => {
+                                                        setSelectedRoom(room);
+                                                        setSelectedRoomKind("text");
+                                                        setMobilePanel("chat");
+                                                        setReplyingTo(null);
+                                                        setEditingMessage(null);
+                                                        scrollMessagesToBottom();
+                                                    }}
+                                                >
+                                                    <Hash /> {room} {room === "general" && <small>3</small>}
+                                                </button>
+                                                {canManageRooms && <button type="button" className={styles.roomAdminButton} onClick={() => openRoomSettings(room, "text", category.id)} aria-label={`Edit ${room}`}><MoreHorizontal /></button>}
+                                            </div>
                                         ))}
                                         {category.voiceRooms.map((room) => (
                                             <div key={room}>
-                                            <button
-                                                type="button"
-                                                className={joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? styles.joinedVoiceButton : ""}
-                                                onClick={() => {
-                                                    if (!canJoinVoice) return;
-                                                    setJoinedVoiceRoom({ communityId: activeCommunity.id, room });
-                                                    setMicrophoneMuted(false);
-                                                    setVoiceSoundMuted(false);
-                                                    setRoomMenuOpen(false);
-                                                }}
-                                                aria-label={`Join ${room}`}
-                                                disabled={!canJoinVoice}
-                                            >
-                                                <Headphones /> {room}<small>{!canJoinVoice ? "No access" : joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? "Joined" : "Join"}</small>
-                                            </button>
+                                                <div className={styles.roomNavigationRow}>
+                                                    <button
+                                                        type="button"
+                                                        className={joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? styles.joinedVoiceButton : ""}
+                                                        onClick={() => {
+                                                            if (!canJoinVoice) return;
+                                                            setJoinedVoiceRoom({ communityId: activeCommunity.id, room });
+                                                            setMicrophoneMuted(false);
+                                                            setVoiceSoundMuted(false);
+                                                            setRoomMenuOpen(false);
+                                                        }}
+                                                        aria-label={`Join ${room}`}
+                                                        disabled={!canJoinVoice}
+                                                    >
+                                                        <Headphones /> {room}<small>{!canJoinVoice ? "No access" : joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? "Joined" : "Join"}</small>
+                                                    </button>
+                                                    {canManageRooms && <button type="button" className={styles.roomAdminButton} onClick={() => openRoomSettings(room, "voice", category.id)} aria-label={`Edit ${room}`}><MoreHorizontal /></button>}
+                                                </div>
                                             {room === "cozy-corner" && activeCommunity?.id === "saturday" && (
                                                 <>
                                                     <button type="button" className={styles.voicePeople} onClick={() => setSelectedMemberId("maya")}><i className={styles.coral}>MC</i><span>Maya is talking<AudioWave /></span></button>
@@ -1147,65 +1274,106 @@ function HomePage() {
                         <header className={styles.chatHeader}>
                             <button type="button" className={styles.mobileBack} onClick={() => setMobilePanel("list")} aria-label="Back to conversations"><ArrowLeft /></button>
                             <span className={styles.roomIcon}><UsersRound /></span>
-                            <div><strong>Friends</strong><span>People you’ve added on Knotly</span></div>
+                            <div><strong>{friendsView === "friends" ? "Friends" : "Friend requests"}</strong><span>{friendsView === "friends" ? "People you’ve added on Knotly" : "Received, sent, and blocked profiles"}</span></div>
                             <button type="button" className={styles.addFriendButton} onClick={() => setAddFriendOpen(true)}><UserPlus /> Add friend</button>
                         </header>
 
                         <div className={styles.friendsContent}>
-                            <div className={styles.friendsHeading}>
-                                <div><span>Your people</span><h2>Friends</h2><p>See who is around, or pick up a conversation whenever you like.</p></div>
-                                <div className={styles.friendFilters}>
+                            <div className={styles.friendsToolbar}>
+                                <div className={styles.friendsViewTabs}>
+                                    <button type="button" className={friendsView === "friends" ? styles.activeFriendsView : ""} onClick={() => setFriendsView("friends")}><UsersRound /> Friends <small>{friends.length}</small></button>
+                                    <button type="button" className={friendsView === "requests" ? styles.activeFriendsView : ""} onClick={() => setFriendsView("requests")}><MailOpen /> Requests {receivedFriendRequests.length > 0 && <small>{receivedFriendRequests.length}</small>}</button>
+                                </div>
+                                {friendsView === "friends" && <div className={styles.friendFilters}>
                                     {(["all", "online", "offline"] as const).map((filter) => (
                                         <button key={filter} type="button" className={friendFilter === filter ? styles.activeFilter : ""} onClick={() => setFriendFilter(filter)}>
                                             {filter.charAt(0).toUpperCase() + filter.slice(1)}
                                         </button>
                                     ))}
-                                </div>
+                                </div>}
                             </div>
 
-                            <div className={styles.friendGroups} key={friendFilter}>
-                                {(["online", "offline"] as const).map((status) => {
-                                    const group = filteredFriends.filter((friend) => friend.status === status);
-                                    if (group.length === 0) return null;
+                            {friendsView === "friends" ? (
+                                <div className={styles.friendGroups} key={friendFilter}>
+                                        {(["online", "offline"] as const).map((status) => {
+                                            const group = filteredFriends.filter((friend) => friend.status === status);
+                                            if (group.length === 0) return null;
 
-                                    return (
-                                        <section key={status}>
-                                            <div className={styles.friendGroupLabel}><span>{status}</span><small>{group.length}</small></div>
-                                            <div className={styles.friendList}>
-                                                {group.map((friend) => (
-                                                    <div key={friend.id} className={styles.friendRow}>
-                                                        <span className={`${styles.personAvatar} ${styles[friend.tone]} ${friend.status === "offline" ? styles.offlineAvatar : ""}`}>{friend.initials}<i /></span>
-                                                        <div><strong>{friend.name}</strong><span>{friend.activity}</span></div>
-                                                        <button
-                                                            type="button"
-                                                            aria-label={`Message ${friend.name}`}
-                                                            onClick={() => openFriendConversation(friend)}
-                                                        >
-                                                            <MessageCircleMore />
-                                                        </button>
-                                                        <div className={styles.friendRowMenu} ref={friendMenuOpen && friendMenuId === friend.id ? friendMenuRef : undefined}>
-                                                            <button type="button" className={friendMenuOpen && friendMenuId === friend.id ? styles.activeFriendMenu : ""} aria-label={`More options for ${friend.name}`} aria-expanded={friendMenuOpen && friendMenuId === friend.id} onClick={() => {
-                                                                if (friendMenuId === friend.id) setFriendMenuOpen((open) => !open);
-                                                                else {
-                                                                    setFriendMenuId(friend.id);
-                                                                    setFriendMenuOpen(true);
-                                                                }
-                                                            }}><MoreHorizontal /></button>
-                                                            {friendMenuOpen && friendMenuId === friend.id && (
-                                                                <div className={styles.friendActionsMenu}>
-                                                                    <div><strong>{friend.name}</strong><small>@{friend.id}</small></div>
-                                                                    <button type="button" onClick={() => openFriendConversation(friend)}><MessageCircleMore /> Message</button>
-                                                                    <button type="button" className={styles.dangerMenuAction} onClick={() => { setFriendMenuOpen(false); setFriendRemovalId(friend.id); }}><UserMinus /> Remove friend</button>
+                                            return (
+                                                <section key={status}>
+                                                    <div className={styles.friendGroupLabel}><span>{status}</span><small>{group.length}</small></div>
+                                                    <div className={styles.friendList}>
+                                                        {group.map((friend) => (
+                                                            <div key={friend.id} className={styles.friendRow}>
+                                                                <span className={`${styles.personAvatar} ${styles[friend.tone]} ${friend.status === "offline" ? styles.offlineAvatar : ""}`}>{friend.initials}<i /></span>
+                                                                <div><strong>{friend.name}</strong><span>{friend.activity}</span></div>
+                                                                <button type="button" aria-label={`Message ${friend.name}`} onClick={() => openFriendConversation(friend)}><MessageCircleMore /></button>
+                                                                <div className={styles.friendRowMenu} ref={friendMenuOpen && friendMenuId === friend.id ? friendMenuRef : undefined}>
+                                                                    <button type="button" className={friendMenuOpen && friendMenuId === friend.id ? styles.activeFriendMenu : ""} aria-label={`More options for ${friend.name}`} aria-expanded={friendMenuOpen && friendMenuId === friend.id} onClick={() => {
+                                                                        if (friendMenuId === friend.id) setFriendMenuOpen((open) => !open);
+                                                                        else {
+                                                                            setFriendMenuId(friend.id);
+                                                                            setFriendMenuOpen(true);
+                                                                        }
+                                                                    }}><MoreHorizontal /></button>
+                                                                    {friendMenuOpen && friendMenuId === friend.id && (
+                                                                        <div className={styles.friendActionsMenu}>
+                                                                            <div><strong>{friend.name}</strong><small>@{friend.id}</small></div>
+                                                                            <button type="button" onClick={() => openFriendConversation(friend)}><MessageCircleMore /> Message</button>
+                                                                            <button type="button" className={styles.dangerMenuAction} onClick={() => { setFriendMenuOpen(false); setFriendRemovalId(friend.id); }}><UserMinus /> Remove friend</button>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
-                                                            )}
-                                                        </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                ))}
+                                                </section>
+                                            );
+                                        })}
+                                </div>
+                            ) : (
+                                <div className={styles.friendRequestGroups}>
+                                    <section>
+                                        <div className={styles.friendGroupLabel}><span>Received</span><small>{receivedFriendRequests.length}</small></div>
+                                        {receivedFriendRequests.length ? receivedFriendRequests.map((request) => (
+                                            <div className={styles.friendRequestRow} key={request.id}>
+                                                <span className={`${styles.personAvatar} ${styles[request.person.tone]}`}>{request.person.initials}<i /></span>
+                                                <div><strong>{request.person.name}</strong><span>@{request.person.id} · {request.sentAt}</span></div>
+                                                <div className={styles.friendRequestActions}>
+                                                    <button type="button" className={styles.acceptRequest} onClick={() => acceptFriendRequest(request.id)} aria-label={`Accept ${request.person.name}`}><Check /><span>Accept</span></button>
+                                                    <button type="button" onClick={() => removeFriendRequest(request.id, "received")} aria-label={`Decline ${request.person.name}`}><UserX /><span>Decline</span></button>
+                                                    <button type="button" className={styles.blockRequest} onClick={() => blockUser(request.id)} aria-label={`Block ${request.person.name}`}><Ban /></button>
+                                                </div>
                                             </div>
-                                        </section>
-                                    );
-                                })}
-                            </div>
+                                        )) : <p className={styles.friendRequestEmpty}>No received requests right now.</p>}
+                                    </section>
+
+                                    <section>
+                                        <div className={styles.friendGroupLabel}><span>Sent</span><small>{sentFriendRequests.length}</small></div>
+                                        {sentFriendRequests.length ? sentFriendRequests.map((request) => (
+                                            <div className={styles.friendRequestRow} key={request.id}>
+                                                <span className={`${styles.personAvatar} ${styles[request.person.tone]}`}>{request.person.initials}</span>
+                                                <div><strong>{request.person.name}</strong><span>Pending · {request.sentAt}</span></div>
+                                                <div className={styles.friendRequestActions}>
+                                                    <button type="button" onClick={() => removeFriendRequest(request.id, "sent")}><X /><span>Cancel</span></button>
+                                                    <button type="button" className={styles.blockRequest} onClick={() => blockUser(request.id)} aria-label={`Block ${request.person.name}`}><Ban /></button>
+                                                </div>
+                                            </div>
+                                        )) : <p className={styles.friendRequestEmpty}>No sent requests are waiting.</p>}
+                                    </section>
+
+                                    {blockedUsers.length > 0 && <section>
+                                        <div className={styles.friendGroupLabel}><span>Blocked</span><small>{blockedUsers.length}</small></div>
+                                        {blockedUsers.map((friend) => (
+                                            <div className={`${styles.friendRequestRow} ${styles.blockedFriendRow}`} key={friend.id}>
+                                                <span className={`${styles.personAvatar} ${styles[friend.tone]} ${styles.offlineAvatar}`}>{friend.initials}</span>
+                                                <div><strong>{friend.name}</strong><span>@{friend.id}</span></div>
+                                                <div className={styles.friendRequestActions}><button type="button" onClick={() => unblockUser(friend.id)}><Ban /><span>Unblock</span></button></div>
+                                            </div>
+                                        ))}
+                                    </section>}
+                                </div>
+                            )}
                         </div>
                     </section>
                 ) : activeSpace === "messages" ? (
@@ -1350,7 +1518,7 @@ function HomePage() {
                                     {roomMenuOpen && (
                                         <div className={styles.roomOptionsMenu}>
                                             <div><strong>{selectedRoomKind === "text" ? "#" : ""}{selectedRoom}</strong><small>{selectedCategory?.label}</small></div>
-                                            {canManageRooms && <button type="button" onClick={openRoomSettings}><Pencil /> Edit room</button>}
+                                            {canManageRooms && <button type="button" onClick={() => openRoomSettings()}><Pencil /> Edit room</button>}
                                             <button type="button" onClick={toggleRoomMuted}>{roomIsMuted ? <Bell /> : <BellOff />} {roomIsMuted ? "Unmute room" : "Mute room"}</button>
                                             <button type="button" onClick={copyRoomLink}><Clipboard /> {roomLinkCopied ? "Link copied" : "Copy room link"}</button>
                                         </div>
@@ -1582,7 +1750,7 @@ function HomePage() {
             {addFriendOpen && (
                 <AddFriendDialog
                     candidates={availableFriendCandidates}
-                    onAdd={addFriend}
+                    onAdd={sendFriendRequest}
                     onClose={() => setAddFriendOpen(false)}
                 />
             )}
@@ -1628,10 +1796,22 @@ function HomePage() {
                     name={roomSettingsName}
                     roomKind={selectedRoomKind}
                     targetCategoryId={roomSettingsCategory}
+                    canDelete={canDeleteSelectedRoom}
                     setName={setRoomSettingsName}
                     setTargetCategoryId={setRoomSettingsCategory}
                     onClose={() => setRoomSettingsOpen(false)}
+                    onDelete={deleteRoom}
                     onSubmit={saveRoomSettings}
+                />
+            )}
+
+            {categoryPendingDeletion && activeCommunity && canManageRooms && (
+                <DeleteCategoryDialog
+                    canDelete={canDeletePendingCategory}
+                    category={categoryPendingDeletion}
+                    communityName={activeCommunity.name}
+                    onClose={() => setCategoryPendingDeletionId(null)}
+                    onConfirm={deleteCategory}
                 />
             )}
         </main>

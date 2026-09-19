@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { AddFriendDialogProps, RemoveFriendDialogProps } from "../../../types/home";
 import styles from "../../../routes/home.module.scss";
 
-/** Finds a local demo profile and adds it to the friends list. */
+/** Finds a local demo profile and sends a friend request. */
 export function AddFriendDialog({ candidates, onAdd, onClose }: AddFriendDialogProps) {
     const [query, setQuery] = useState("");
     const normalizedQuery = query.trim().toLowerCase();
@@ -16,7 +16,7 @@ export function AddFriendDialog({ candidates, onAdd, onClose }: AddFriendDialogP
         <div className={styles.modalBackdrop} onMouseDown={onClose}>
             <section className={`${styles.newMessageModal} ${styles.addFriendModal}`} role="dialog" aria-modal="true" aria-labelledby="add-friend-title" onMouseDown={(event) => event.stopPropagation()}>
                 <header>
-                    <div><span>Your circle</span><h2 id="add-friend-title">Add a friend</h2></div>
+                    <div><span>Your circle</span><h2 id="add-friend-title">Send a friend request</h2></div>
                     <button type="button" onClick={onClose} aria-label="Close"><X /></button>
                 </header>
                 <div className={styles.addFriendBody}>
@@ -28,7 +28,7 @@ export function AddFriendDialog({ candidates, onAdd, onClose }: AddFriendDialogP
                                 <span><strong>{friend.name}</strong><small>@{friend.id} · {friend.activity}</small></span>
                                 <b><UserPlus /></b>
                             </button>
-                        )) : <p>{normalizedQuery ? "No new profile matches this search." : "You have added everyone suggested for now."}</p>}
+                        )) : <p>{normalizedQuery ? "No available profile matches this search." : "No more suggestions for now."}</p>}
                     </div>
                 </div>
             </section>

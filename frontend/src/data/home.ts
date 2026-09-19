@@ -6,6 +6,7 @@ import type {
     CommunityRole,
     Conversation,
     Friend,
+    FriendRequest,
     ModerationLogEntry,
     RoomMessage,
     RoomCategory,
@@ -111,6 +112,13 @@ export const SUGGESTED_FRIENDS: Friend[] = [
     { id: "elias", name: "Elias Berg", initials: "EB", status: "online", activity: "Listening to music", tone: "sage" },
     { id: "sofia", name: "Sofia Rossi", initials: "SR", status: "offline", activity: "Last seen Monday", tone: "rose" },
     { id: "milo", name: "Milo Tan", initials: "MT", status: "online", activity: "In Study Hall", tone: "brown" },
+];
+
+export const INITIAL_FRIEND_REQUESTS: FriendRequest[] = [
+    { id: "request-avery", direction: "received", person: SUGGESTED_FRIENDS[0], sentAt: "2 hours ago" },
+    { id: "request-mina", direction: "received", person: SUGGESTED_FRIENDS[1], sentAt: "Yesterday" },
+    { id: "request-camille", direction: "sent", person: SUGGESTED_FRIENDS[2], sentAt: "Yesterday" },
+    { id: "request-elias", direction: "sent", person: SUGGESTED_FRIENDS[3], sentAt: "3 days ago" },
 ];
 
 export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {

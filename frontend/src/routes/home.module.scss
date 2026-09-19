@@ -317,6 +317,8 @@ i.plum,
 .sectionAdd { display: grid; place-items: center; width: 25px; height: 25px; margin: -0.35rem -0.25rem -0.35rem 0; color: $muted-foreground; border-radius: 8px; }
 .sectionAdd:hover { color: $primary; background: rgba(255, 248, 242, 0.7); }
 .sectionAdd svg { width: 13px; }
+.categoryActions { display: flex; align-items: center; gap: 0.12rem; }
+.deleteCategoryButton:hover { color: #a84239; background: rgba(179, 73, 63, 0.08); }
 .addCategoryButton { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: calc(100% - 0.5rem); min-height: 39px; margin: 0.2rem 0.25rem 0; color: $muted-foreground; border: 1px dashed rgba($foreground, 0.16); border-radius: 11px; font-size: 0.65rem; font-weight: 700; }
 .addCategoryButton:hover { color: $primary; border-color: rgba($primary, 0.32); background: rgba(255, 248, 242, 0.48); }
 .addCategoryButton svg { width: 15px; }
@@ -337,6 +339,20 @@ i.plum,
 .roomNavigation section > div > button.joinedVoiceButton { color: $foreground; background: rgba(75, 173, 105, 0.1); box-shadow: inset 3px 0 0 #4bad69; }
 .roomNavigation section > div > button.joinedVoiceButton svg,
 .roomNavigation section > div > button.joinedVoiceButton small { color: #318b4e; }
+.roomNavigationRow { display: flex; align-items: center; gap: 0.18rem; }
+.roomNavigationRow > button:first-child { display: flex; min-width: 0; min-height: 40px; align-items: center; gap: 0.5rem; padding: 0 0.55rem; flex: 1; color: $muted-foreground; border-radius: 10px; font-size: 0.74rem; font-weight: 650; text-align: left; }
+.roomNavigationRow > button:first-child:hover { color: $foreground; background: rgba(255, 248, 242, 0.45); }
+.roomNavigationRow > button:first-child > svg { flex: 0 0 auto; width: 15px; }
+.roomNavigationRow > button:first-child > small { margin-left: auto; color: rgba($muted-foreground, 0.72); font-size: 0.5rem; font-weight: 750; text-transform: uppercase; }
+.roomNavigationRow > button:first-child.selectedRoom { color: $foreground; background: #fff8f2; }
+.roomNavigationRow > button:first-child.joinedVoiceButton { color: $foreground; background: rgba(75, 173, 105, 0.1); box-shadow: inset 3px 0 0 #4bad69; }
+.roomNavigationRow > button:first-child.joinedVoiceButton svg,
+.roomNavigationRow > button:first-child.joinedVoiceButton small { color: #318b4e; }
+.roomNavigationRow > button.roomAdminButton { display: grid; place-items: center; width: 29px; min-width: 29px; height: 29px; min-height: 29px; padding: 0; opacity: 0; color: $muted-foreground; border-radius: 8px; }
+.roomNavigationRow:hover > button.roomAdminButton,
+.roomNavigationRow > button.roomAdminButton:focus-visible { opacity: 1; }
+.roomNavigationRow > button.roomAdminButton:hover { color: $primary; background: rgba(255, 248, 242, 0.7); }
+.roomNavigationRow > button.roomAdminButton svg { width: 14px; }
 .voicePeople { display: flex; align-items: center; gap: 0.45rem; width: 100%; min-height: 34px; padding-left: 1.7rem; border-radius: 9px; text-align: left; }
 .voicePeople:hover { background: rgba(255, 248, 242, 0.42); }
 .voicePeople > i { display: grid; place-items: center; width: 24px; height: 24px; color: #fff; border-radius: 8px; font-size: 0.45rem; font-style: normal; font-weight: 800; }
@@ -607,10 +623,12 @@ i.plum,
 .addFriendButton { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 38px; margin-left: auto; padding: 0 0.8rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.69rem; font-weight: 750; }
 .addFriendButton svg { width: 15px; }
 .friendsContent { min-height: 0; padding: clamp(1.5rem, 4vw, 3rem); overflow-y: auto; }
-.friendsHeading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 2.2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba($foreground, 0.08); }
-.friendsHeading > div:first-child > span { color: $primary; font-size: 0.63rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
-.friendsHeading h2 { margin: 0.25rem 0 0.35rem; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.05em; }
-.friendsHeading p { color: $muted-foreground; font-size: 0.75rem; }
+.friendsToolbar { display: flex; max-width: 900px; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.6rem; padding-bottom: 1.1rem; border-bottom: 1px solid rgba($foreground, 0.08); }
+.friendsViewTabs { display: inline-flex; gap: 0.3rem; padding: 0.28rem; border: 1px solid rgba($foreground, 0.07); border-radius: 13px; background: rgba(243, 223, 208, 0.7); }
+.friendsViewTabs button { display: flex; min-height: 36px; align-items: center; gap: 0.45rem; padding: 0 0.72rem; color: $muted-foreground; border-radius: 9px; font-size: 0.66rem; font-weight: 750; transition: color 180ms ease, background 180ms ease, box-shadow 180ms ease; }
+.friendsViewTabs button svg { width: 15px; }
+.friendsViewTabs button small { display: grid; place-items: center; min-width: 19px; height: 19px; padding: 0 0.25rem; color: $foreground; border-radius: 99px; background: rgba($secondary, 0.25); font-size: 0.52rem; }
+.friendsViewTabs button.activeFriendsView { color: $foreground; background: #fff8f2; box-shadow: 0 5px 13px rgba(73, 34, 15, 0.08); }
 .friendFilters { display: flex; gap: 0.35rem; padding: 0.3rem; border-radius: 12px; background: #f3dfd0; }
 .friendFilters button { min-height: 34px; padding: 0 0.75rem; color: $muted-foreground; border-radius: 9px; font-size: 0.67rem; font-weight: 700; }
 .friendFilters button { transition: color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
@@ -647,6 +665,23 @@ i.plum,
 .friendActionsMenu > button.dangerMenuAction:hover { background: rgba(179, 73, 63, 0.08); }
 .personAvatar.offlineAvatar { filter: saturate(0.55); opacity: 0.72; }
 .personAvatar.offlineAvatar i { background: #a99485; }
+.friendRequestGroups { max-width: 900px; animation: friendsSwap 240ms ease-out; }
+.friendRequestGroups > section { margin-bottom: 2rem; }
+.friendRequestRow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; min-height: 70px; padding: 0.4rem 0; border-top: 1px solid rgba($foreground, 0.08); }
+.friendRequestRow:last-child { border-bottom: 1px solid rgba($foreground, 0.08); }
+.friendRequestRow > div:nth-child(2) { display: flex; min-width: 0; flex-direction: column; gap: 0.16rem; }
+.friendRequestRow > div:nth-child(2) strong { overflow: hidden; font-size: 0.76rem; text-overflow: ellipsis; white-space: nowrap; }
+.friendRequestRow > div:nth-child(2) span { color: $muted-foreground; font-size: 0.6rem; }
+.friendRequestActions { display: flex; align-items: center; gap: 0.35rem; }
+.friendRequestActions button { display: flex; min-height: 34px; align-items: center; justify-content: center; gap: 0.35rem; padding: 0 0.62rem; color: $muted-foreground; border-radius: 9px; background: #f3dfd0; font-size: 0.6rem; font-weight: 750; }
+.friendRequestActions button:hover { color: $foreground; background: #ead4c4; }
+.friendRequestActions button svg { width: 14px; }
+.friendRequestActions button.acceptRequest { color: #fff; background: $foreground; }
+.friendRequestActions button.acceptRequest:hover { background: $primary; }
+.friendRequestActions button.blockRequest { width: 34px; padding: 0; color: #a84239; background: rgba(179, 73, 63, 0.08); }
+.friendRequestActions button.blockRequest:hover { background: rgba(179, 73, 63, 0.15); }
+.friendRequestEmpty { min-height: 66px; padding: 1.25rem 0.75rem; color: $muted-foreground; border-top: 1px solid rgba($foreground, 0.08); border-bottom: 1px solid rgba($foreground, 0.08); font-size: 0.63rem; }
+.blockedFriendRow { opacity: 0.76; }
 
 @keyframes friendsSwap {
     from { opacity: 0; transform: translateY(7px); }
@@ -915,6 +950,25 @@ i.plum,
 .roomTypeNote p { display: flex; flex-direction: column; gap: 0.18rem; }
 .roomTypeNote strong { font-size: 0.68rem; }
 .roomTypeNote span { color: $muted-foreground; font-size: 0.59rem; line-height: 1.4; }
+.roomDeleteArea { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; padding: 0.85rem; border: 1px solid rgba(168, 66, 57, 0.14); border-radius: 14px; background: rgba(179, 73, 63, 0.045); }
+.roomDeleteArea > div:first-child { display: flex; min-width: 0; flex-direction: column; gap: 0.18rem; }
+.roomDeleteArea strong { font-size: 0.67rem; }
+.roomDeleteArea span { color: $muted-foreground; font-size: 0.56rem; line-height: 1.35; }
+.roomDeleteArea > button,
+.inlineDeleteConfirm button { display: inline-flex; min-height: 35px; align-items: center; justify-content: center; gap: 0.35rem; padding: 0 0.62rem; color: #a84239; border-radius: 9px; background: rgba(179, 73, 63, 0.09); font-size: 0.58rem; font-weight: 750; }
+.roomDeleteArea button svg { width: 13px; }
+.roomDeleteArea button:disabled { cursor: not-allowed; opacity: 0.38; }
+.inlineDeleteConfirm { display: flex; gap: 0.3rem; }
+.inlineDeleteConfirm button:first-child { color: $muted-foreground; background: #f3dfd0; }
+.inlineDeleteConfirm button:last-child { color: #fff; background: #a84239; }
+.deleteCategoryBody { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.8rem; margin: 0.2rem 1.5rem 1.4rem; padding: 0.9rem; border-radius: 15px; background: #f3dfd0; }
+.deleteCategoryBody > i { display: grid; place-items: center; width: 43px; height: 43px; color: #a84239; border-radius: 13px; background: rgba(179, 73, 63, 0.1); }
+.deleteCategoryBody > i svg { width: 20px; }
+.deleteCategoryBody > div { display: flex; min-width: 0; flex-direction: column; gap: 0.16rem; }
+.deleteCategoryBody strong { font-size: 0.75rem; }
+.deleteCategoryBody span,
+.deleteCategoryBody p { color: $muted-foreground; font-size: 0.58rem; line-height: 1.4; }
+.deleteCategoryBody p { color: #a84239; }
 .categoryPreview { padding: 0.75rem; border: 1px solid rgba($foreground, 0.08); border-radius: 14px; background: #f3dfd0; }
 .categoryPreview > div { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; padding: 0.15rem 0.35rem 0.4rem; color: $muted-foreground; border-bottom: 1px solid rgba($foreground, 0.07); font-size: 0.57rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .categoryPreview > div svg { width: 13px; }
@@ -1143,7 +1197,7 @@ i.plum,
     .availableGroupMembers { max-height: 220px; }
     .composer { margin-right: 0.7rem; margin-left: 0.7rem; }
     .composer > button.mobileOptionalAction { display: none; }
-    .friendsHeading { align-items: flex-start; flex-direction: column; gap: 1rem; }
+    .friendsToolbar { align-items: stretch; flex-direction: column; }
     .friendFilters { width: 100%; }
     .friendFilters button { flex: 1; }
     .addFriendButton { width: 38px; padding: 0; justify-content: center; }
@@ -1172,6 +1226,14 @@ i.plum,
     .moderationLogIntro { grid-template-columns: auto minmax(0, 1fr); }
     .moderationLogIntro > b { display: none; }
     .moderationLogList > article > div > span { align-items: flex-start; flex-direction: column; gap: 0.18rem; }
+    .friendsContent { padding-right: 1rem; padding-left: 1rem; }
+    .friendsViewTabs { display: flex; }
+    .friendsViewTabs button { flex: 1; justify-content: center; }
+    .friendRequestRow { grid-template-columns: auto minmax(0, 1fr); }
+    .friendRequestActions { grid-column: 1 / -1; justify-content: flex-end; }
+    .roomDeleteArea { grid-template-columns: 1fr; }
+    .roomDeleteArea > button,
+    .inlineDeleteConfirm { justify-self: end; }
 }
 
 @media (hover: none) {
@@ -1179,6 +1241,7 @@ i.plum,
     .messageDeleteConfirm,
     .quickReactionPicker { top: calc(100% + 0.45rem); right: 0; bottom: auto; }
     .communityMessage .messageDeleteConfirm { right: 0; left: auto; }
+    .roomNavigationRow > button.roomAdminButton { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

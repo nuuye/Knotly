@@ -6,6 +6,8 @@ export type CommunityVisibility = "private" | "public";
 export type RoomKind = "text" | "voice";
 export type FriendStatus = "online" | "offline";
 export type FriendFilter = "all" | FriendStatus;
+export type FriendsView = "friends" | "requests";
+export type FriendRequestDirection = "received" | "sent";
 export type MessageAuthor = "me" | "them";
 export type MessageView = "chat" | "friends";
 export type MobilePanel = "list" | "chat";
@@ -96,6 +98,13 @@ export interface Friend extends PersonSummary {
     id: string;
     status: FriendStatus;
     activity: string;
+}
+
+export interface FriendRequest {
+    id: string;
+    direction: FriendRequestDirection;
+    person: Friend;
+    sentAt: string;
 }
 
 export interface CommunityMember extends PersonSummary {
@@ -315,6 +324,14 @@ export interface CategoryDialogProps {
     onSubmit: (event: FormEvent) => void;
 }
 
+export interface DeleteCategoryDialogProps {
+    canDelete: boolean;
+    category: RoomCategory;
+    communityName: string;
+    onClose: () => void;
+    onConfirm: () => void;
+}
+
 export interface RoomSettingsDialogProps {
     categories: RoomCategory[];
     communityName: string;
@@ -322,8 +339,10 @@ export interface RoomSettingsDialogProps {
     name: string;
     roomKind: RoomKind;
     targetCategoryId: string;
+    canDelete: boolean;
     setName: StateSetter<string>;
     setTargetCategoryId: StateSetter<string>;
     onClose: () => void;
+    onDelete: () => void;
     onSubmit: (event: FormEvent) => void;
 }
