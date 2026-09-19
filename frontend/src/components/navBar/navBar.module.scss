@@ -1,13 +1,13 @@
 @use "../../styles/variables.scss" as *;
 
 .root {
-    border-bottom: 2px solid $border;
-    background: rgb(235 167 99 / 18%);
-    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba($foreground, 0.08);
+    background: rgba(247, 228, 212, 0.86);
+    backdrop-filter: blur(18px);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(74, 36, 17, 0.035);
 
     .container {
         max-width: 1280px;
@@ -59,12 +59,30 @@
                 }
 
                 &:last-child {
-                    background: linear-gradient(135deg, $primary 0%, $accent 100%);
+                    background: $foreground;
                     color: white;
 
                     &:hover {
                         transform: translateY(-2px);
                         box-shadow: $shadow-md;
+                    }
+                }
+            }
+        }
+
+        @media (max-width: 680px) {
+            padding: .75rem 1rem;
+
+            .buttonContainter {
+                gap: .25rem;
+
+                a {
+                    padding: .55rem .7rem;
+                    font-size: .82rem;
+
+                    &:first-child,
+                    &:nth-child(2) {
+                        display: none;
                     }
                 }
             }

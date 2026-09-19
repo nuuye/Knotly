@@ -1,0 +1,157 @@
+@use "../../styles/variables.scss" as *;
+
+.notFoundPage {
+    position: relative;
+    display: flex;
+    min-height: 100svh;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem clamp(1rem, 4vw, 3rem);
+    overflow: hidden;
+    color: #fff8f1;
+    background:
+        radial-gradient(circle at 12% 88%, rgba($primary, 0.22), transparent 25rem),
+        radial-gradient(circle at 90% 4%, rgba($secondary, 0.13), transparent 22rem),
+        $foreground;
+}
+
+.notFoundPage::before {
+    content: "404";
+    position: absolute;
+    right: -0.04em;
+    bottom: -0.26em;
+    color: rgba(255, 248, 241, 0.025);
+    font-size: min(46vw, 42rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.12em;
+    pointer-events: none;
+}
+
+.brand {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.6rem;
+}
+
+.brand img { width: 42px; height: 42px; object-fit: contain; }
+.brand span { font-size: 1.12rem; font-weight: 760; }
+
+.content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(380px, 0.8fr);
+    align-items: center;
+    gap: clamp(3rem, 8vw, 8rem);
+    width: min(100%, 1180px);
+    margin: 3rem auto;
+}
+
+.copy { max-width: 650px; }
+.errorCode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1.2rem;
+    color: $secondary;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.errorCode svg { width: 16px; }
+
+.copy h1 {
+    margin-bottom: 1.3rem;
+    color: #fff8f1;
+    font-size: clamp(3.7rem, 8vw, 7.5rem);
+    font-weight: 780;
+    line-height: 0.9;
+    letter-spacing: -0.07em;
+}
+
+.copy h1 em { color: $secondary; font-style: normal; }
+.copy > p { max-width: 580px; color: rgba(255, 248, 241, 0.6); font-size: 0.95rem; line-height: 1.7; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2rem; }
+.actions a { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 48px; padding: 0 1rem; border-radius: 13px; font-size: 0.72rem; font-weight: 750; transition: transform $transition-base, background $transition-base; }
+.actions a:first-child { color: $foreground; background: $secondary; }
+.actions a:last-child { color: #fff8f1; border: 1px solid rgba(255, 255, 255, 0.13); background: rgba(255, 255, 255, 0.06); }
+.actions a:hover { transform: translateY(-3px); }
+.actions svg { width: 16px; }
+
+.lostRoom {
+    width: min(100%, 440px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 25px;
+    background: rgba(255, 248, 241, 0.075);
+    box-shadow: 0 30px 70px rgba(10, 4, 2, 0.25);
+    transform: rotate(2deg);
+    backdrop-filter: blur(16px);
+}
+
+.roomHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 65px;
+    padding: 0 1.15rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+.roomHeader > span { display: flex; align-items: center; gap: 0.4rem; font-size: 0.83rem; font-weight: 750; }
+.roomHeader svg { width: 17px; color: $secondary; }
+.roomHeader i { color: rgba(255, 248, 241, 0.38); font-size: 0.63rem; font-style: normal; }
+
+.roomBody { min-height: 265px; padding: 1.2rem; }
+.systemMessage { margin-bottom: 1.7rem; color: rgba(255, 248, 241, 0.35); font-size: 0.64rem; text-align: center; }
+.message { display: flex; align-items: flex-start; gap: 0.75rem; }
+.avatar { display: grid; place-items: center; flex: 0 0 auto; width: 38px; height: 38px; color: #fff; border-radius: 13px; background: $primary; font-size: 0.75rem; font-weight: 800; }
+.message > div:last-child { display: flex; flex-direction: column; gap: 0.2rem; }
+.message strong { font-size: 0.72rem; }
+.message strong span { margin-left: 0.3rem; color: rgba(255, 248, 241, 0.3); font-size: 0.55rem; font-weight: 500; }
+.message p { color: rgba(255, 248, 241, 0.7); font-size: 0.78rem; }
+.silence { margin: 3.2rem 0 0 3.2rem; color: rgba(255, 248, 241, 0.25); font-size: 0.62rem; font-style: italic; }
+
+.voiceStatus {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0.8rem 0.8rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.055);
+}
+.voiceStatus > svg { box-sizing: content-box; width: 17px; padding: 0.6rem; color: $secondary; border-radius: 11px; background: rgba($secondary, 0.1); }
+.voiceStatus div { display: flex; flex-direction: column; gap: 0.18rem; }
+.voiceStatus strong { font-size: 0.7rem; }
+.voiceStatus span { color: rgba(255, 248, 241, 0.4); font-size: 0.59rem; }
+
+.footerNote { position: relative; z-index: 2; color: rgba(255, 248, 241, 0.3); font-size: 0.62rem; text-align: center; }
+
+@media (max-width: 860px) {
+    .content { grid-template-columns: 1fr; }
+    .copy { text-align: center; margin: 0 auto; }
+    .copy > p { margin: 0 auto; }
+    .actions { justify-content: center; }
+    .lostRoom { margin: 0 auto; transform: rotate(1deg); }
+}
+
+@media (max-width: 520px) {
+    .notFoundPage { padding: 1rem; }
+    .content { margin: 4rem auto 2rem; }
+    .copy h1 { font-size: clamp(3.2rem, 17vw, 5rem); }
+    .actions { flex-direction: column; }
+    .actions a { justify-content: center; width: 100%; }
+    .lostRoom { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .actions a { transition: none; }
+    .actions a:hover { transform: none; }
+}

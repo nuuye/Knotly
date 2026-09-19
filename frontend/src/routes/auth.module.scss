@@ -1,0 +1,276 @@
+@use "../styles/variables.scss" as *;
+
+.authPage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
+    min-height: 100svh;
+    background: #f3d9c5;
+}
+
+.backLink {
+    position: absolute;
+    z-index: 10;
+    top: 1.6rem;
+    left: 1.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.7rem;
+    color: rgba(255, 248, 241, 0.7);
+    border-radius: 10px;
+    font-size: 0.76rem;
+    font-weight: 650;
+    transition: color $transition-base, background $transition-base, transform $transition-base;
+}
+
+.backLink:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(-3px);
+}
+
+.showcase {
+    position: relative;
+    display: flex;
+    min-height: 100svh;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem clamp(2rem, 6vw, 6rem) 3.5rem;
+    overflow: hidden;
+    color: #fff8f1;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.025), transparent 55%),
+        #2d1810;
+}
+
+.signupShowcase { background: linear-gradient(145deg, #3b2117, #27140e); }
+
+.connectionField {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.brand {
+    position: absolute;
+    z-index: 2;
+    top: 1.45rem;
+    right: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.brand img,
+.mobileBrand img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+.brand span,
+.mobileBrand span {
+    color: #fff8f1;
+    font-size: 1.05rem;
+    font-weight: 750;
+}
+
+.showcaseCopy {
+    position: relative;
+    z-index: 2;
+    max-width: 670px;
+    margin-bottom: 2.5rem;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 0.9rem;
+    color: $secondary;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.showcaseCopy h1 {
+    margin-bottom: 1.15rem;
+    color: #fff8f1;
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-weight: 770;
+    line-height: 0.98;
+    letter-spacing: -0.06em;
+}
+
+.showcaseCopy p {
+    max-width: 530px;
+    color: rgba(255, 248, 241, 0.6);
+    font-size: 0.98rem;
+    line-height: 1.65;
+}
+
+.communityPreview {
+    position: relative;
+    z-index: 2;
+    width: min(100%, 570px);
+    padding: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    background: rgba(255, 248, 241, 0.07);
+    box-shadow: 0 22px 55px rgba(10, 5, 3, 0.22);
+    backdrop-filter: blur(14px);
+}
+
+.previewHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 0.35rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.communityMark {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    color: #fff;
+    border-radius: 12px 12px 12px 4px;
+    background: $primary;
+    font-size: 0.7rem;
+    font-weight: 850;
+}
+
+.previewHeader > div:nth-child(2) { display: flex; flex: 1; flex-direction: column; }
+.previewHeader strong { font-size: 0.69rem; }
+.previewHeader span { color: rgba(255, 248, 241, 0.48); font-size: 0.53rem; }
+.previewAvatars { display: flex; }
+.previewAvatars i { display: grid; place-items: center; width: 25px; height: 25px; margin-left: -6px; color: $foreground; border: 2px solid #41271d; border-radius: 50%; background: $secondary; font-size: 0.47rem; font-style: normal; font-weight: 850; }
+.previewAvatars i:nth-child(2) { background: #ef8d68; }
+.previewAvatars i:nth-child(3) { background: #e8aba7; }
+
+.previewMessage {
+    display: flex;
+    gap: 0.55rem;
+    width: 78%;
+    margin: 0.65rem 0;
+    padding: 0.65rem;
+    border-radius: 13px 13px 13px 4px;
+    background: rgba(255, 248, 241, 0.09);
+}
+
+.previewMessage.reply { margin-left: 2.2rem; border-radius: 13px 13px 4px 13px; background: rgba(255, 165, 89, 0.1); }
+.previewMessage > i { display: grid; place-items: center; flex: 0 0 auto; width: 28px; height: 28px; color: $foreground; border-radius: 9px; font-size: 0.52rem; font-style: normal; font-weight: 850; }
+.avatarOrange { background: #ef7b4a; }
+.avatarYellow { background: $secondary; }
+.previewMessage > div { display: flex; min-width: 0; flex-direction: column; }
+.previewMessage strong { font-size: 0.57rem; }
+.previewMessage span { overflow: hidden; color: rgba(255, 248, 241, 0.55); font-size: 0.56rem; text-overflow: ellipsis; white-space: nowrap; }
+
+.voicePreview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.7rem;
+    border-radius: 13px;
+    background: #f0b05c;
+}
+
+.voicePreview > div { display: flex; align-items: center; gap: 0.55rem; color: $foreground; }
+.voicePreview span { display: flex; flex-direction: column; }
+.voicePreview strong { font-size: 0.62rem; }
+.voicePreview small { color: rgba($foreground, 0.62); font-size: 0.49rem; }
+.voicePreview button { padding: 0.42rem 0.65rem; color: #fff; border-radius: 8px; background: $foreground; font-size: 0.52rem; font-weight: 750; }
+
+.setupPreview { padding: 0.9rem; }
+.progress { padding: 0.35rem 0.5rem; color: $secondary; border-radius: 8px; background: rgba(255, 165, 89, 0.1); font-size: 0.55rem; font-weight: 750; }
+.setupStep { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.55rem; padding: 0.65rem; border-radius: 13px; background: rgba(255, 248, 241, 0.08); }
+.setupStep > i { display: grid; place-items: center; flex: 0 0 auto; width: 27px; height: 27px; color: $foreground; border-radius: 9px; background: $secondary; font-size: 0.55rem; font-style: normal; font-weight: 850; }
+.setupStep > span { display: flex; flex-direction: column; }
+.setupStep strong { font-size: 0.6rem; }
+.setupStep small { color: rgba(255, 248, 241, 0.48); font-size: 0.51rem; }
+.nextStep { border: 1px dashed rgba(255, 165, 89, 0.35); background: rgba(255, 165, 89, 0.04); }
+.nextStep > i { color: $secondary; border: 1px solid rgba(255, 165, 89, 0.4); background: transparent; }
+
+.formSide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100svh;
+    padding: 3rem clamp(1.5rem, 5vw, 5rem);
+    background:
+        radial-gradient(circle at 95% 5%, rgba(255, 165, 89, 0.28), transparent 22rem),
+        linear-gradient(160deg, #f7e5d6, #efd0b8);
+}
+
+.formCard { width: min(100%, 440px); }
+.signupCard { width: min(100%, 500px); }
+.mobileBrand { display: none; }
+
+.formHeading { margin-bottom: 2rem; }
+.formHeading > span { display: block; margin-bottom: 0.55rem; color: $primary; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.formHeading h2 { margin-bottom: 0.45rem; color: $foreground; font-size: clamp(2.1rem, 3vw, 3rem); font-weight: 760; letter-spacing: -0.05em; }
+.formHeading p { color: $muted-foreground; font-size: 0.87rem; }
+
+.form { display: flex; flex-direction: column; gap: 1rem; }
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.formGroup label { display: block; margin-bottom: 0.42rem; color: $foreground; font-size: 0.72rem; font-weight: 700; }
+.labelRow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.textButton { color: $primary; font-size: 0.68rem; font-weight: 650; }
+
+.inputWrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 50px;
+    padding: 0 0.8rem;
+    color: rgba($muted-foreground, 0.7);
+    border: 1px solid rgba($foreground, 0.1);
+    border-radius: 13px;
+    background: rgba(255, 244, 235, 0.76);
+    transition: border-color $transition-base, box-shadow $transition-base, background $transition-base;
+}
+
+.inputWrap:focus-within { border-color: rgba($primary, 0.6); background: #fff4eb; box-shadow: 0 0 0 3px rgba($primary, 0.09); }
+.inputWrap > svg { flex: 0 0 auto; }
+.inputWrap input { min-width: 0; flex: 1; color: $foreground; border: 0; outline: 0; background: transparent; }
+.inputWrap input::placeholder { color: rgba($muted-foreground, 0.58); }
+.passwordToggle { display: grid; place-items: center; flex: 0 0 auto; color: $muted-foreground; }
+
+.terms { color: $muted-foreground; font-size: 0.67rem; line-height: 1.5; }
+.submitButton { display: flex; align-items: center; justify-content: center; gap: 0.55rem; min-height: 52px; margin-top: 0.2rem; padding: 0.8rem 1rem; color: #fff; border-radius: 13px; background: $foreground; box-shadow: 0 12px 26px rgba(45, 24, 16, 0.18); font-weight: 750; transition: transform $transition-base, box-shadow $transition-base; }
+.submitButton:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(45, 24, 16, 0.22); }
+.submitButton svg { transition: transform $transition-base; }
+.submitButton:hover svg { transform: translateX(3px); }
+
+.switchAuth { margin-top: 1.4rem; color: $muted-foreground; font-size: 0.78rem; text-align: center; }
+.switchAuth a { color: $primary; font-weight: 750; }
+.switchAuth a:hover { text-decoration: underline; }
+
+@media (max-width: 940px) {
+    .authPage { grid-template-columns: 1fr; }
+    .showcase { min-height: 560px; padding-top: 7rem; }
+    .showcaseCopy { max-width: 720px; }
+    .formSide { min-height: auto; padding-top: 5rem; padding-bottom: 5rem; }
+}
+
+@media (max-width: 600px) {
+    .showcase { display: none; }
+    .formSide { min-height: 100svh; padding: 5.5rem 1rem 3rem; }
+    .backLink { top: 1rem; left: 0.8rem; color: $muted-foreground; }
+    .backLink:hover { color: $foreground; background: rgba($primary, 0.07); }
+    .mobileBrand { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; }
+    .mobileBrand span { color: $foreground; }
+    .formRow { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .backLink,
+    .inputWrap,
+    .submitButton,
+    .submitButton svg { transition: none; }
+}

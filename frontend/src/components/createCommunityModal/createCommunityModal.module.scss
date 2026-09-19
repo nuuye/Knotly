@@ -6,7 +6,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(45, 24, 16, 0.58);
+    backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,33 +17,35 @@
 }
 
 .modal {
-    background: $card;
-    border-radius: $radius-xl;
+    background: #f7e4d5;
+    border: 1px solid rgba($foreground, 0.1);
+    border-radius: 24px;
     width: 100%;
     max-width: 540px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow:
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        0 30px 70px -10px rgba(45, 24, 16, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: $spacing-lg $spacing-xl;
-    border-bottom: 1px solid $border;
+    padding: 1.4rem $spacing-xl;
+    border-bottom: 1px solid rgba($foreground, 0.09);
 
     h2 {
-        font-size: $font-size-lg;
-        font-weight: $font-weight-semibold;
+        font-size: 1.5rem;
+        font-weight: 750;
+        letter-spacing: -0.035em;
     }
 
     .closeButton {
         width: 32px;
         height: 32px;
-        border-radius: $radius-md;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -50,7 +53,7 @@
         cursor: pointer;
 
         &:hover {
-            background: $muted;
+            background: rgba($primary, 0.09);
         }
 
         svg {
@@ -79,9 +82,9 @@
         select {
             width: 100%;
             padding: $spacing-sm $spacing-md;
-            border: 1px solid $border;
-            border-radius: $radius-lg;
-            background: $input-background;
+            border: 1px solid rgba($foreground, 0.1);
+            border-radius: 12px;
+            background: #fff3e9;
             transition: all $transition-base;
             outline: none;
             font-family: inherit;
@@ -106,16 +109,17 @@
         }
 
         .uploadArea {
-            border: 2px dashed $border;
-            border-radius: $radius-lg;
+            border: 1px dashed rgba($primary, 0.35);
+            border-radius: 14px;
             padding: $spacing-lg;
+            background: rgba(255, 243, 233, 0.52);
             text-align: center;
             transition: all $transition-base;
             cursor: pointer;
 
             &:hover {
                 border-color: $primary;
-                background: rgba($primary, 0.02);
+                background: rgba($primary, 0.06);
             }
 
             svg {
@@ -144,28 +148,28 @@
         justify-content: flex-end;
         margin-top: $spacing-lg;
         padding-top: $spacing-lg;
-        border-top: 1px solid $border;
+        border-top: 1px solid rgba($foreground, 0.09);
 
         .cancelButton {
             padding: $spacing-sm $spacing-lg;
-            border: 1px solid $border;
-            border-radius: $radius-lg;
+            border: 1px solid rgba($foreground, 0.11);
+            border-radius: 11px;
             font-weight: $font-weight-medium;
             transition: all $transition-base;
             color: $foreground;
             cursor: pointer;
 
             &:hover {
-                background: $muted;
+                background: rgba($primary, 0.08);
             }
         }
 
         .submitButton {
             padding: $spacing-sm $spacing-lg;
-            background: linear-gradient(135deg, $primary 0%, $accent 100%);
+            background: $foreground;
             color: white;
             border: none;
-            border-radius: $radius-lg;
+            border-radius: 11px;
             font-weight: $font-weight-medium;
             cursor: pointer;
             transition: all $transition-base;

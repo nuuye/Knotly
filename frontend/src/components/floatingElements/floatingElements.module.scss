@@ -1,193 +1,185 @@
 @use "../../styles/variables" as *;
 
-.floatingContainer {
-    position: relative;
+.previewShell {
+    position: absolute;
+    inset: 2.2rem -0.4rem 1.2rem 0;
+    filter: drop-shadow(0 28px 45px rgba(70, 33, 13, 0.2));
+}
+
+.appFrame {
+    display: grid;
+    grid-template-rows: 64px minmax(0, 1fr);
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    border: 6px solid rgba(255, 237, 222, 0.78);
+    border-radius: 26px;
+    background: #eacbb2;
+    box-shadow: 0 0 0 1px rgba(45, 24, 16, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.68);
 }
 
-.glassCard {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    position: absolute;
-    transition: transform 0.3s ease;
-
-    &:hover {
-        transform: translateY(-5px);
-    }
+.topBar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0 0.9rem;
+    border-bottom: 1px solid rgba($foreground, 0.08);
+    background: #f9e8da;
 }
 
-.sidebar {
-    width: 220px;
-    padding: $spacing-lg;
-    top: 0;
-    left: 0;
-    animation: float 6s ease-in-out infinite;
+.communityShortcuts { display: flex; align-items: center; gap: 0.4rem; }
+.communityShortcuts button {
+    display: grid;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    color: $muted-foreground;
+    border: 1px solid rgba($foreground, 0.08);
+    border-radius: 9px;
+    background: #efd3bd;
+    font-size: 0.58rem;
+    font-weight: 800;
+}
+.communityShortcuts button:nth-child(2) { background: #f6c192; }
+.communityShortcuts button:nth-child(3) { color: #fff; background: #8e5943; }
+.communityShortcuts .activeShortcut { color: #fff; border-color: $primary; background: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+.communityName { margin-left: 0.35rem; color: $foreground; font-size: 0.68rem; font-weight: 750; }
 
-    .sidebarHeader {
-        margin-bottom: $spacing-md;
-        padding-bottom: $spacing-sm;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+.topActions { display: flex; align-items: center; gap: 0.75rem; color: $muted-foreground; }
+.profile { position: relative; display: grid; place-items: center; width: 31px; height: 31px; color: $foreground; border-radius: 10px; background: $secondary; font-size: 0.64rem; font-weight: 850; }
+.profile i { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border: 2px solid #f9e8da; border-radius: 50%; background: #62b978; }
 
-        h4 {
-            font-size: $font-size-sm;
-            font-weight: $font-weight-semibold;
-            color: $foreground;
-        }
-    }
-
-    .channels {
-        display: flex;
-        flex-direction: column;
-        gap: $spacing-xs;
-    }
-
-    .channel {
-        display: flex;
-        align-items: center;
-        gap: $spacing-sm;
-        padding: $spacing-sm;
-        border-radius: $radius-md;
-        font-size: $font-size-sm;
-        color: $muted-foreground;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        svg {
-            opacity: 0.7;
-        }
-
-        &:hover {
-            background: rgba(0, 0, 0, 0.05);
-            color: $foreground;
-        }
-
-        &.active {
-            background: rgba($primary, 0.15);
-            color: $primary;
-            font-weight: $font-weight-medium;
-
-            svg {
-                opacity: 1;
-            }
-        }
-    }
+.workspace {
+    display: grid;
+    grid-template-columns: 175px minmax(0, 1fr);
+    gap: 0.55rem;
+    min-height: 0;
+    padding: 0.55rem;
 }
 
-.chatCard {
-    width: 280px;
-    padding: $spacing-lg;
-    top: 140px;
-    right: 30px;
-    animation: float 7s ease-in-out infinite;
-    animation-delay: 0.5s;
+.roomsPanel,
+.chatPanel { min-width: 0; overflow: hidden; border: 1px solid rgba($foreground, 0.07); border-radius: 17px; }
 
-    .message {
-        display: flex;
-        align-items: center;
-        gap: $spacing-sm;
-        margin-bottom: $spacing-md;
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    .avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-        svg {
-            color: white;
-        }
-    }
-
-    .messageContent {
-        flex: 1;
-    }
-
-    .messageName {
-        font-size: $font-size-sm;
-        font-weight: $font-weight-semibold;
-        color: $foreground;
-        margin-bottom: 2px;
-    }
-
-    .messageText {
-        font-size: $font-size-sm;
-        color: $muted-foreground;
-        line-height: 1.4;
-    }
+.roomsPanel {
+    position: relative;
+    padding: 0.85rem 0.55rem 3.7rem;
+    background: #f3dac6;
 }
 
-.typingCard {
-    width: 180px;
-    padding: $spacing-sm $spacing-md;
-    bottom: 80px;
-    left: 100px;
-    animation: float 5s ease-in-out infinite;
-    animation-delay: 1.5s;
+.panelTitle {
     display: flex;
     align-items: center;
-    gap: $spacing-sm;
-
-    .typingIndicator {
-        display: flex;
-        gap: 4px;
-    }
-
-    .typingDot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: $primary;
-        animation: typingAnimation 1.4s infinite;
-
-        &:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        &:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-    }
-
-    .typingText {
-        font-size: $font-size-xs;
-        color: $muted-foreground;
-    }
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+    padding: 0 0.35rem;
+    color: rgba($muted-foreground, 0.75);
+    font-size: 0.54rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
 }
 
-@keyframes float {
-    0%,
-    100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-20px);
-    }
+.room {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 34px;
+    padding: 0.42rem 0.48rem;
+    color: rgba($muted-foreground, 0.9);
+    border-radius: 10px;
+    font-size: 0.61rem;
 }
 
-@keyframes typingAnimation {
-    0%,
-    60%,
-    100% {
-        opacity: 0.3;
-        transform: scale(0.8);
-    }
-    30% {
-        opacity: 1;
-        transform: scale(1);
-    }
+.room > span { overflow: hidden; min-width: 0; text-overflow: ellipsis; white-space: nowrap; }
+.room > i { display: grid; place-items: center; width: 16px; height: 16px; margin-left: auto; color: #fff; border-radius: 50%; background: $primary; font-size: 0.48rem; font-style: normal; font-weight: 800; }
+.activeRoom { color: $foreground; background: #fff1e6; box-shadow: 0 5px 13px rgba(74, 35, 16, 0.06); font-weight: 700; }
+.roomDivider { height: 1px; margin: 0.65rem 0.35rem; background: rgba($foreground, 0.08); }
+.liveRoom { align-items: flex-start; color: #39774a; background: rgba(255, 244, 235, 0.46); }
+.liveRoom > span { display: flex; flex-direction: column; }
+.liveRoom strong { color: $foreground; font-size: 0.59rem; }
+.liveRoom small { color: #4b8a5c; font-size: 0.48rem; }
+.liveRoom > i { width: 7px; height: 7px; margin-top: 0.35rem; background: #55a96a; box-shadow: 0 0 0 3px rgba(85, 169, 106, 0.12); }
+
+.voiceMembers { display: flex; flex-direction: column; gap: 0.22rem; margin: 0.2rem 0 0.55rem 1.35rem; }
+.voiceMembers > div { display: flex; align-items: center; gap: 0.4rem; min-height: 25px; padding-right: 0.3rem; color: $muted-foreground; }
+.voiceMembers > div > i { display: grid; place-items: center; flex: 0 0 auto; width: 21px; height: 21px; color: $foreground; border-radius: 7px; font-size: 0.44rem; font-style: normal; font-weight: 850; }
+.voiceMembers > div > span { overflow: hidden; min-width: 0; flex: 1; font-size: 0.52rem; text-overflow: ellipsis; white-space: nowrap; }
+.voiceOrange { background: #f08050; }
+.voiceYellow { background: $secondary; }
+.voicePink { background: #e8a3a7; }
+.voiceBrown { color: #fff !important; background: #87523c; }
+.speakingIcon { flex: 0 0 auto; width: 12px; height: 12px; color: #3f9554; }
+
+.accountBar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 52px;
+    padding: 0.55rem;
+    border-top: 1px solid rgba($foreground, 0.07);
+    background: rgba(232, 198, 173, 0.52);
+}
+
+.accountAvatar { position: relative; display: grid; place-items: center; width: 28px; height: 28px; color: $foreground; border-radius: 9px; background: $secondary; font-size: 0.57rem; font-weight: 850; }
+.accountAvatar i { position: absolute; right: -2px; bottom: -2px; width: 8px; height: 8px; border: 2px solid #ecd0bc; border-radius: 50%; background: #62b978; }
+.accountBar > span { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+.accountBar strong { font-size: 0.55rem; }
+.accountBar small { color: $muted-foreground; font-size: 0.45rem; }
+.accountBar svg { width: 12px; color: $muted-foreground; }
+
+.chatPanel { position: relative; display: flex; flex-direction: column; padding-bottom: 3.8rem; background: #fff1e7; }
+.chatHeader { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 0.7rem 0.85rem; border-bottom: 1px solid rgba($foreground, 0.07); }
+.chatHeader > div:first-child { display: flex; align-items: center; gap: 0.45rem; color: $primary; }
+.chatHeader > div:first-child span { display: flex; min-width: 0; flex-direction: column; }
+.chatHeader strong { color: $foreground; font-size: 0.72rem; }
+.chatHeader small { color: rgba($muted-foreground, 0.7); font-size: 0.48rem; }
+.onlineAvatars { display: flex; align-items: center; }
+.onlineAvatars i { display: grid; place-items: center; width: 24px; height: 24px; margin-left: -6px; color: $foreground; border: 2px solid #fff1e7; border-radius: 50%; background: $secondary; font-size: 0.48rem; font-style: normal; font-weight: 850; }
+.onlineAvatars i:nth-child(2) { background: #f28b68; }
+.onlineAvatars i:nth-child(3) { background: #eab5af; }
+.onlineAvatars span { margin-left: 0.3rem; color: $muted-foreground; font-size: 0.5rem; }
+
+.messages { flex: 1; padding: 0.8rem 0.85rem; }
+.dayDivider { margin: 0.2rem 0 0.8rem; text-align: center; border-top: 1px solid rgba($foreground, 0.07); }
+.dayDivider span { position: relative; top: -0.56rem; padding: 0 0.5rem; color: rgba($muted-foreground, 0.6); background: #fff1e7; font-size: 0.48rem; }
+.message { display: flex; gap: 0.55rem; margin-bottom: 0.8rem; }
+.avatar { display: grid; place-items: center; flex: 0 0 auto; width: 30px; height: 30px; color: #fff; border-radius: 10px; font-size: 0.58rem; font-weight: 850; }
+.orange { background: linear-gradient(145deg, $primary, #ff9470); }
+.yellow { color: $foreground; background: linear-gradient(145deg, $secondary, #ffd18d); }
+.pink { background: linear-gradient(145deg, #c45f73, #e9a4aa); }
+.message > div:last-child { min-width: 0; }
+.message p { margin-bottom: 0.12rem; font-size: 0.62rem; }
+.message time { margin-left: 0.4rem; color: rgba($muted-foreground, 0.55); font-size: 0.46rem; font-weight: 400; }
+.message div > span { display: block; color: $muted-foreground; font-size: 0.62rem; line-height: 1.4; }
+.message small { display: inline-block; margin-top: 0.35rem; padding: 0.12rem 0.34rem; border: 1px solid rgba($primary, 0.14); border-radius: 6px; background: #f8ddc8; font-size: 0.48rem; }
+
+.composer { position: absolute; right: 0.75rem; bottom: 0.7rem; left: 0.75rem; display: flex; align-items: center; gap: 0.55rem; min-height: 40px; padding: 0.3rem 0.35rem 0.3rem 0.65rem; color: rgba($muted-foreground, 0.65); border: 1px solid rgba($foreground, 0.08); border-radius: 12px; background: #f7decb; }
+.composer > span { flex: 1; font-size: 0.55rem; }
+.composer button { display: grid; place-items: center; width: 29px; height: 29px; color: #fff; border-radius: 9px; background: $primary; }
+
+@media (max-width: 760px) {
+    .previewShell { inset: 1.7rem 0.25rem 0.5rem; }
+    .appFrame { grid-template-rows: 58px minmax(0, 1fr); border-width: 5px; border-radius: 22px; }
+    .topBar { grid-template-columns: 1fr auto; gap: 0.4rem; padding: 0 0.55rem; }
+    .communityShortcuts button:nth-child(3),
+    .communityShortcuts button:nth-child(4),
+    .topActions > svg { display: none; }
+    .communityName { display: none; }
+    .workspace { grid-template-columns: 145px minmax(260px, 1fr); gap: 0.4rem; padding: 0.4rem; }
+    .roomsPanel { padding-right: 0.35rem; padding-left: 0.35rem; }
+    .room { gap: 0.28rem; padding-right: 0.3rem; padding-left: 0.3rem; font-size: 0.54rem; }
+    .accountBar > span, .accountBar svg:last-child { display: none; }
+    .chatHeader { padding-right: 0.6rem; padding-left: 0.6rem; }
+    .onlineAvatars { display: none; }
+    .messages { padding-right: 0.6rem; padding-left: 0.6rem; }
+    .message div > span { font-size: 0.56rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .communityShortcuts button { transition: none; }
 }

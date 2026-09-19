@@ -1,6 +1,6 @@
 import { X, Upload, Gamepad2, Music, Code, BookOpen, Heart, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
-import styles from './CreateCommunityModal.module.scss';
+import styles from "./createCommunityModal.module.scss";
 
 interface CreateCommunityModalProps {
   isOpen: boolean;
@@ -44,7 +44,7 @@ export function CreateCommunityModal({ isOpen, onClose }: CreateCommunityModalPr
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2>Create Community</h2>
-          <button className={styles.closeButton} onClick={onClose}>
+          <button type="button" aria-label="Close" className={styles.closeButton} onClick={onClose}>
             <X />
           </button>
         </div>

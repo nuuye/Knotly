@@ -1,0 +1,653 @@
+@use "../styles/variables.scss" as *;
+
+.appPage {
+    height: 100svh;
+    overflow: hidden;
+    color: $foreground;
+    background: #f8e8da;
+}
+
+.spaceBar {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    height: 78px;
+    padding: 0 1rem;
+    border-bottom: 1px solid rgba($foreground, 0.09);
+    background: rgba(248, 232, 218, 0.94);
+    box-shadow: 0 8px 28px rgba(74, 36, 17, 0.045);
+    backdrop-filter: blur(18px);
+}
+
+.appBrand {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    background: transparent;
+}
+.appBrand img { width: 38px; height: 38px; object-fit: contain; }
+
+.spaceNav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.spaceNav::-webkit-scrollbar { display: none; }
+
+.messageSpace,
+.communityButton,
+.addCommunity {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 1px solid transparent;
+    transition: transform $transition-base, border-color $transition-base, background $transition-base, box-shadow $transition-base;
+}
+
+.messageSpace {
+    gap: 0.5rem;
+    min-height: 43px;
+    padding: 0 0.8rem;
+    color: $muted-foreground;
+    border-radius: 13px;
+    font-size: 0.76rem;
+    font-weight: 750;
+}
+.messageSpace svg { width: 18px; }
+.messageSpace:hover { color: $foreground; background: rgba(255, 248, 242, 0.65); }
+.messageSpace.activeSpace { color: #fff; background: $foreground; box-shadow: 0 9px 18px rgba(45, 24, 16, 0.15); }
+
+.spaceDivider { flex: 0 0 auto; width: 1px; height: 26px; margin: 0 0.15rem; background: rgba($foreground, 0.12); }
+
+.communityButton {
+    gap: 0.45rem;
+    height: 45px;
+    padding: 0.25rem 0.65rem 0.25rem 0.3rem;
+    color: $foreground;
+    border-radius: 15px;
+}
+.communityButton > span {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    color: #fff;
+    border-radius: 11px;
+    font-size: 0.6rem;
+    font-weight: 850;
+    letter-spacing: -0.03em;
+}
+.communityButton small { max-width: 108px; overflow: hidden; font-size: 0.7rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.communityButton:hover { background: rgba(255, 248, 242, 0.62); transform: translateY(-2px); }
+.communityButton.activeSpace { border-color: rgba($primary, 0.18); background: #fff8f2; box-shadow: 0 8px 20px rgba(74, 36, 17, 0.07); }
+.communityButton.activeSpace::after {
+    content: "";
+    position: absolute;
+    right: 14%;
+    bottom: -9px;
+    left: 14%;
+    height: 3px;
+    border-radius: 99px;
+    background: $primary;
+}
+
+.coral > span,
+.coral.personAvatar,
+.coral.heroAvatar,
+.coral.messageAvatar,
+i.coral,
+.coral.communityMark { background: linear-gradient(145deg, #e85d04, #ff8b4c); }
+.amber > span,
+.amber.personAvatar,
+.amber.heroAvatar,
+.amber.messageAvatar,
+i.amber,
+.amber.communityMark { color: $foreground; background: linear-gradient(145deg, #f6b64f, #ffd386); }
+.rose > span,
+.rose.personAvatar,
+.rose.heroAvatar,
+.rose.messageAvatar,
+i.rose,
+.rose.communityMark { background: linear-gradient(145deg, #d97465, #f2a28f); }
+.brown > span,
+.brown.personAvatar,
+.brown.heroAvatar,
+.brown.messageAvatar,
+i.brown,
+.brown.communityMark { background: linear-gradient(145deg, #68402f, #9a6952); }
+.sage.personAvatar,
+.sage.heroAvatar,
+.sage.messageAvatar,
+i.sage { color: $foreground; background: linear-gradient(145deg, #a9bf86, #d1dda9); }
+.plum.personAvatar,
+.plum.heroAvatar,
+.plum.messageAvatar,
+i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
+
+.addCommunity,
+.iconButton {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 39px;
+    height: 39px;
+    color: $muted-foreground;
+    border: 1px dashed rgba($foreground, 0.17);
+    border-radius: 12px;
+    background: rgba(255, 248, 242, 0.4);
+}
+.addCommunity svg,
+.iconButton svg { width: 17px; }
+.addCommunity:hover { color: $primary; border-color: rgba($primary, 0.35); background: #fff8f2; }
+
+.userActions { display: flex; align-items: center; gap: 0.4rem; flex: 0 0 auto; }
+.profileMenuWrap { position: relative; }
+.iconButton { position: relative; border-style: solid; }
+.iconButton i { position: absolute; top: 8px; right: 8px; width: 5px; height: 5px; border: 1px solid #f8e8da; border-radius: 50%; background: $primary; }
+.iconButton:hover { color: $foreground; background: #fff8f2; }
+.userMenu { display: flex; align-items: center; gap: 0.45rem; min-height: 42px; padding: 0.2rem 0.45rem 0.2rem 0.25rem; color: $foreground; border-radius: 13px; }
+.userMenu:hover { background: rgba(255, 248, 242, 0.65); }
+.userMenu > span { position: relative; display: grid; place-items: center; width: 34px; height: 34px; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.6rem; font-weight: 800; }
+.userMenu > span i { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border: 2px solid #f8e8da; border-radius: 50%; background: #4bad69; }
+.userMenu strong { font-size: 0.73rem; }
+.userMenu > svg { width: 14px; color: $muted-foreground; }
+
+.profileMenu {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 0.7rem);
+    right: 0;
+    width: 240px;
+    padding: 0.55rem;
+    border: 1px solid rgba($foreground, 0.1);
+    border-radius: 17px;
+    background: #fff8f2;
+    box-shadow: 0 22px 55px rgba(45, 24, 16, 0.18);
+    animation: profileMenuIn 160ms ease-out;
+}
+.profileMenuHeader { display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem; }
+.profileMenuHeader > span { position: relative; display: grid; place-items: center; width: 40px; height: 40px; color: #fff; border-radius: 13px; background: $foreground; font-size: 0.63rem; font-weight: 800; }
+.profileMenuHeader > span i { position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border: 2px solid #fff8f2; border-radius: 50%; background: #4bad69; }
+.profileMenuHeader > div { display: flex; min-width: 0; flex-direction: column; }
+.profileMenuHeader strong { font-size: 0.78rem; }
+.profileMenuHeader small { color: $muted-foreground; font-size: 0.65rem; }
+.profilePresence { display: flex; align-items: center; gap: 0.4rem; margin: 0.2rem 0.35rem 0.55rem; padding: 0.55rem 0.65rem; color: $muted-foreground; border-radius: 10px; background: #f5e5d9; font-size: 0.67rem; }
+.profilePresence i { width: 7px; height: 7px; border-radius: 50%; background: #4bad69; }
+.profileMenu > a { display: flex; align-items: center; gap: 0.6rem; min-height: 39px; padding: 0 0.65rem; color: $muted-foreground; border-radius: 10px; font-size: 0.7rem; font-weight: 650; }
+.profileMenu > a:hover { color: $foreground; background: #f5e5d9; }
+.profileMenu > a svg { width: 15px; }
+.profileMenu > a.profileSignOut { margin-top: 0.25rem; color: #b3493f; border-top: 1px solid rgba($foreground, 0.07); border-radius: 0 0 10px 10px; }
+@keyframes profileMenuIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+.workspace {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    height: calc(100svh - 78px);
+    min-height: 0;
+}
+
+.listPanel {
+    min-width: 0;
+    overflow-y: auto;
+    border-right: 1px solid rgba($foreground, 0.08);
+    background: #f2d9c5;
+}
+
+.listHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.15rem 1rem;
+}
+.listHeader > div { display: flex; flex-direction: column; }
+.listHeader span,
+.communityHeader > div:nth-child(2) > span { color: $primary; font-size: 0.57rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.listHeader h1,
+.communityHeader h1 { margin-top: 0.15rem; font-size: 1.45rem; font-weight: 770; letter-spacing: -0.04em; }
+.listHeader > button,
+.communityHeader > button { display: grid; place-items: center; width: 35px; height: 35px; color: $muted-foreground; border-radius: 11px; background: rgba(255, 248, 242, 0.65); }
+.listHeader button svg,
+.communityHeader button svg { width: 16px; }
+
+.searchBox {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 43px;
+    margin: 0 1.15rem 1rem;
+    padding: 0 0.75rem;
+    color: rgba($muted-foreground, 0.75);
+    border: 1px solid rgba($foreground, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 248, 242, 0.7);
+}
+.searchBox svg { width: 15px; }
+.searchBox input { min-width: 0; flex: 1; color: $foreground; border: 0; outline: 0; background: transparent; font-size: 0.74rem; }
+.searchBox input::placeholder { color: rgba($muted-foreground, 0.68); }
+
+.inboxShortcut { padding: 0 0.75rem 0.65rem; }
+.inboxShortcut button { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.65rem; width: 100%; padding: 0.7rem; border-radius: 14px; text-align: left; }
+.inboxShortcut button:hover { background: rgba(255, 248, 242, 0.5); }
+.inboxShortcut button > span { display: grid; place-items: center; width: 36px; height: 36px; color: $primary; border-radius: 11px; background: rgba($primary, 0.09); }
+.inboxShortcut button > span svg { width: 17px; }
+.inboxShortcut button > div { display: flex; flex-direction: column; }
+.inboxShortcut strong { font-size: 0.78rem; }
+.inboxShortcut small { color: $muted-foreground; font-size: 0.65rem; }
+.inboxShortcut button > svg { width: 14px; color: $muted-foreground; transform: rotate(-90deg); }
+.inboxShortcut button.activeShortcut { background: #fff8f2; box-shadow: 0 8px 22px rgba(73, 34, 15, 0.055); }
+.inboxShortcut button.activeShortcut > span { color: #fff; background: $primary; }
+
+.conversationSection { padding: 0 0.75rem 1rem; }
+.sectionLabel { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.45rem; color: $muted-foreground; }
+.sectionLabel span { font-size: 0.59rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.sectionLabel small { font-size: 0.58rem; }
+.conversationList { display: flex; flex-direction: column; gap: 0.2rem; }
+.conversationList > button {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    min-height: 64px;
+    padding: 0.5rem 0.55rem;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    text-align: left;
+    transition: background $transition-base, border-color $transition-base, transform $transition-base;
+}
+.conversationList > button:hover { background: rgba(255, 248, 242, 0.48); transform: translateX(2px); }
+.conversationList > button.selectedConversation { border-color: rgba($primary, 0.12); background: #fff8f2; box-shadow: 0 8px 22px rgba(73, 34, 15, 0.055); }
+
+.personAvatar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    border-radius: 13px;
+    font-size: 0.59rem;
+    font-weight: 850;
+}
+.personAvatar i { position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border: 2px solid #f2d9c5; border-radius: 50%; background: #48a868; }
+.selectedConversation .personAvatar i { border-color: #fff8f2; }
+.conversationCopy { display: flex; min-width: 0; flex-direction: column; gap: 0.28rem; }
+.conversationCopy > span { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.conversationCopy strong { overflow: hidden; font-size: 0.79rem; text-overflow: ellipsis; white-space: nowrap; }
+.conversationCopy time { color: rgba($muted-foreground, 0.65); font-size: 0.61rem; }
+.conversationCopy small { overflow: hidden; color: $muted-foreground; font-size: 0.68rem; text-overflow: ellipsis; white-space: nowrap; }
+.conversationList > button > b { display: grid; place-items: center; width: 18px; height: 18px; color: #fff; border-radius: 99px; background: $primary; font-size: 0.54rem; }
+
+.communityHeader { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.75rem; padding: 1.35rem 1rem 1.1rem; border-bottom: 1px solid rgba($foreground, 0.07); }
+.communityMark { display: grid; place-items: center; width: 47px; height: 47px; color: #fff; border-radius: 15px; font-size: 0.68rem; font-weight: 850; }
+.communityHeader > div:nth-child(2) { min-width: 0; }
+.communityHeader h1 { overflow: hidden; font-size: 1.15rem; text-overflow: ellipsis; white-space: nowrap; }
+.communityHeader small { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.15rem; color: $muted-foreground; font-size: 0.57rem; }
+.communityHeader small i { width: 6px; height: 6px; border-radius: 50%; background: #48a868; }
+
+.roomNavigation { padding: 1rem 0.75rem 2rem; }
+.roomNavigation section { margin-bottom: 1.2rem; }
+.roomNavigation section > span { display: flex; align-items: center; justify-content: space-between; padding: 0.3rem 0.55rem 0.45rem; color: $muted-foreground; font-size: 0.57rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
+.sectionAdd { display: grid; place-items: center; width: 25px; height: 25px; margin: -0.35rem -0.25rem -0.35rem 0; color: $muted-foreground; border-radius: 8px; }
+.sectionAdd:hover { color: $primary; background: rgba(255, 248, 242, 0.7); }
+.sectionAdd svg { width: 13px; }
+.roomNavigation section > button,
+.roomNavigation section > div > button { display: flex; align-items: center; gap: 0.5rem; width: 100%; min-height: 40px; padding: 0 0.55rem; color: $muted-foreground; border-radius: 10px; font-size: 0.74rem; font-weight: 650; text-align: left; }
+.roomNavigation section > button svg,
+.roomNavigation section > div > button svg { width: 15px; }
+.roomNavigation section > button small { display: grid; place-items: center; width: 17px; height: 17px; margin-left: auto; color: #fff; border-radius: 50%; background: $primary; font-size: 0.5rem; }
+.roomNavigation section > button:hover,
+.roomNavigation section > div > button:hover { color: $foreground; background: rgba(255, 248, 242, 0.45); }
+.roomNavigation section > button.selectedRoom,
+.roomNavigation section > div > button.selectedRoom { color: $foreground; background: #fff8f2; }
+.roomNavigation section > button.selectedRoom svg,
+.roomNavigation section > div > button.selectedRoom svg { color: $primary; }
+.voicePeople { display: flex; align-items: center; gap: 0.45rem; min-height: 34px; padding-left: 1.7rem; }
+.voicePeople > i { display: grid; place-items: center; width: 24px; height: 24px; color: #fff; border-radius: 8px; font-size: 0.45rem; font-style: normal; font-weight: 800; }
+.voicePeople > span { display: flex; align-items: center; gap: 0.45rem; color: $muted-foreground; font-size: 0.65rem; }
+.audioWave { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
+.audioWave i { width: 2px; border-radius: 99px; background: #4bad69; animation: wave 900ms ease-in-out infinite alternate; }
+.audioWave i:nth-child(1) { height: 5px; }
+.audioWave i:nth-child(2) { height: 10px; animation-delay: 180ms; }
+.audioWave i:nth-child(3) { height: 7px; animation-delay: 360ms; }
+@keyframes wave { to { transform: scaleY(0.5); } }
+
+.chatPanel {
+    display: grid;
+    grid-template-rows: 68px minmax(0, 1fr) auto;
+    min-width: 0;
+    min-height: 0;
+    background: #fff8f2;
+}
+.chatHeader { display: flex; align-items: center; gap: 0.7rem; min-width: 0; padding: 0 1.2rem; border-bottom: 1px solid rgba($foreground, 0.075); background: rgba(255, 248, 242, 0.9); }
+.chatHeader .personAvatar { width: 38px; height: 38px; }
+.chatHeader .personAvatar i { border-color: #fff8f2; }
+.chatHeader > div:nth-of-type(1) { display: flex; min-width: 0; flex-direction: column; }
+.chatHeader strong { overflow: hidden; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; }
+.chatHeader > div:nth-of-type(1) > span { color: $muted-foreground; font-size: 0.64rem; }
+.chatActions { display: flex; align-items: center; gap: 0.35rem; margin-left: auto; }
+.chatActions button { display: grid; place-items: center; width: 36px; height: 36px; color: $muted-foreground; border-radius: 11px; }
+.chatActions button:hover { color: $foreground; background: rgba($primary, 0.07); }
+.chatActions svg { width: 17px; }
+.roomIcon { display: grid; place-items: center; width: 38px; height: 38px; color: $primary; border-radius: 12px; background: rgba($primary, 0.08); }
+.roomIcon svg { width: 18px; }
+.mobileBack { display: none; }
+
+.messageArea { min-height: 0; padding: 2rem clamp(1rem, 4vw, 3rem); overflow-y: auto; }
+.conversationIntro { display: flex; align-items: center; flex-direction: column; max-width: 520px; margin: 1.5rem auto 2rem; text-align: center; }
+.heroAvatar { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: 0.8rem; color: #fff; border-radius: 23px; box-shadow: 0 15px 28px rgba(80, 35, 13, 0.12); font-size: 0.95rem; font-weight: 850; }
+.conversationIntro h2 { margin-bottom: 0.3rem; font-size: 1.45rem; letter-spacing: -0.035em; }
+.conversationIntro p { color: $muted-foreground; font-size: 0.75rem; }
+.dateDivider { display: flex; align-items: center; gap: 0.8rem; margin: 1rem 0 1.5rem; color: rgba($muted-foreground, 0.68); font-size: 0.56rem; font-weight: 700; }
+.dateDivider::before,
+.dateDivider::after { content: ""; height: 1px; flex: 1; background: rgba($foreground, 0.08); }
+
+.messageRow { display: grid; grid-template-columns: 34px minmax(0, 680px); gap: 0.65rem; margin: 0.8rem 0; }
+.messageRow.myMessage { grid-template-columns: 34px minmax(0, 680px); justify-content: end; }
+.messageRow.groupedMessage { margin-top: -0.45rem; }
+.messageAvatar { display: grid; place-items: center; width: 32px; height: 32px; color: #fff; border-radius: 10px; font-size: 0.48rem; font-weight: 850; }
+.avatarSpace { width: 32px; }
+.messageBubble { min-width: 0; }
+.messageBubble > span { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.28rem; }
+.messageBubble strong { font-size: 0.75rem; }
+.messageBubble time { color: rgba($muted-foreground, 0.62); font-size: 0.58rem; }
+.messageBubble p { display: inline-block; max-width: 100%; padding: 0.75rem 0.9rem; color: $foreground; border: 1px solid rgba($foreground, 0.07); border-radius: 7px 15px 15px 15px; background: #f5e6da; font-size: 0.81rem; line-height: 1.55; }
+.myMessage .messageBubble { grid-column: 2; justify-self: end; text-align: right; }
+.myMessage .messageBubble > span { justify-content: flex-end; }
+.myMessage .messageBubble p { color: #fff; border-color: $primary; border-radius: 15px 7px 15px 15px; background: $primary; text-align: left; }
+
+.composer { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 0.25rem; min-height: 64px; margin: 0 1.2rem 1rem; padding: 0.45rem; border: 1px solid rgba($foreground, 0.1); border-radius: 17px; background: #f5e4d7; box-shadow: 0 12px 30px rgba(73, 34, 15, 0.055); }
+.composer input { min-width: 0; height: 42px; padding: 0 0.35rem; color: $foreground; border: 0; outline: 0; background: transparent; font-size: 0.81rem; }
+.composer input::placeholder { color: rgba($muted-foreground, 0.7); }
+.composer button { display: grid; place-items: center; width: 38px; height: 38px; color: $muted-foreground; border-radius: 11px; }
+.composer button:hover { color: $foreground; background: rgba(255, 248, 242, 0.65); }
+.composer button svg { width: 17px; }
+.composer button.sendButton { color: #fff; background: $foreground; }
+.composer button.sendButton:disabled { cursor: default; opacity: 0.35; }
+
+.communityRoom { display: flex; flex-direction: column; justify-content: flex-end; }
+.roomWelcome { margin-bottom: 2.5rem; }
+.roomWelcome > span { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 1rem; color: $primary; border-radius: 16px; background: rgba($primary, 0.09); }
+.roomWelcome > span svg { width: 24px; }
+.roomWelcome small { color: $primary; font-size: 0.59rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.roomWelcome h2 { margin: 0.25rem 0 0.5rem; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.055em; }
+.roomWelcome p { max-width: 580px; color: $muted-foreground; font-size: 0.82rem; line-height: 1.6; }
+.communityMessage { display: grid; grid-template-columns: auto 1fr; gap: 0.7rem; margin: 0.9rem 0; }
+.communityMessage > i { display: grid; place-items: center; width: 34px; height: 34px; color: #fff; border-radius: 11px; font-size: 0.5rem; font-style: normal; font-weight: 800; }
+.communityMessage > div > span { display: flex; align-items: baseline; gap: 0.5rem; }
+.communityMessage strong { font-size: 0.76rem; }
+.communityMessage time { color: rgba($muted-foreground, 0.65); font-size: 0.58rem; }
+.communityMessage p { margin-top: 0.25rem; color: $foreground; font-size: 0.8rem; line-height: 1.5; }
+.voiceRoomCard { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem; margin-top: 0.75rem; padding: 1rem; border: 1px solid rgba($foreground, 0.08); border-radius: 18px; background: #f5e6da; }
+.voiceRoomCard > div:first-child { display: flex; padding-left: 0.6rem; }
+.voiceRoomCard .personAvatar { width: 38px; height: 38px; margin-left: -0.6rem; border: 3px solid #f5e6da; }
+.voiceRoomCard .personAvatar i { border-color: #f5e6da; }
+.voiceRoomCard > div:nth-child(2) { display: flex; min-width: 0; flex-direction: column; gap: 0.2rem; }
+.voiceRoomCard strong { font-size: 0.76rem; }
+.voiceRoomCard small { color: $muted-foreground; font-size: 0.64rem; }
+.voiceRoomCard > button { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 39px; padding: 0 0.8rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.66rem; font-weight: 750; }
+.voiceRoomCard > button svg { width: 15px; }
+
+.friendsPanel { grid-template-rows: 68px minmax(0, 1fr); }
+.addFriendButton { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 38px; margin-left: auto; padding: 0 0.8rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.69rem; font-weight: 750; }
+.addFriendButton svg { width: 15px; }
+.friendsContent { min-height: 0; padding: clamp(1.5rem, 4vw, 3rem); overflow-y: auto; }
+.friendsHeading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 2.2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba($foreground, 0.08); }
+.friendsHeading > div:first-child > span { color: $primary; font-size: 0.63rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.friendsHeading h2 { margin: 0.25rem 0 0.35rem; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.05em; }
+.friendsHeading p { color: $muted-foreground; font-size: 0.75rem; }
+.friendFilters { display: flex; gap: 0.35rem; padding: 0.3rem; border-radius: 12px; background: #f3dfd0; }
+.friendFilters button { min-height: 34px; padding: 0 0.75rem; color: $muted-foreground; border-radius: 9px; font-size: 0.67rem; font-weight: 700; }
+.friendFilters button { transition: color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+.friendFilters button:hover { transform: translateY(-1px); }
+.friendFilters button.activeFilter { color: $foreground; background: #fff8f2; box-shadow: 0 5px 13px rgba(73, 34, 15, 0.08); }
+.friendGroups { max-width: 900px; animation: friendsSwap 240ms ease-out; }
+.friendGroups > section { margin-bottom: 2rem; }
+.friendGroupLabel { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.55rem; color: $muted-foreground; }
+.friendGroupLabel span { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.friendGroupLabel small { display: grid; place-items: center; min-width: 19px; height: 19px; padding: 0 0.25rem; border-radius: 99px; background: rgba($secondary, 0.17); font-size: 0.57rem; }
+.friendList { border-top: 1px solid rgba($foreground, 0.08); }
+.friendRow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 0.75rem; min-height: 68px; border-bottom: 1px solid rgba($foreground, 0.08); }
+.friendRow > div { display: flex; min-width: 0; flex-direction: column; gap: 0.18rem; }
+.friendRow strong { overflow: hidden; font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
+.friendRow > div > span { overflow: hidden; color: $muted-foreground; font-size: 0.66rem; text-overflow: ellipsis; white-space: nowrap; }
+.friendRow > button { display: grid; place-items: center; width: 35px; height: 35px; color: $muted-foreground; border-radius: 10px; }
+.friendRow > button:hover { color: $foreground; background: #f3dfd0; }
+.friendRow > button svg { width: 16px; }
+.personAvatar.offlineAvatar { filter: saturate(0.55); opacity: 0.72; }
+.personAvatar.offlineAvatar i { background: #a99485; }
+
+@keyframes friendsSwap {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.groupAvatar {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 22px);
+    grid-template-rows: repeat(2, 22px);
+    flex: 0 0 auto;
+    width: 45px;
+    height: 45px;
+}
+.groupAvatar i,
+.groupAvatar b {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    color: #fff;
+    border: 2px solid #f2d9c5;
+    border-radius: 9px;
+    font-size: 0.4rem;
+    font-style: normal;
+    font-weight: 850;
+}
+.groupAvatar i:nth-child(1) { grid-column: 1; grid-row: 1; z-index: 2; }
+.groupAvatar i:nth-child(2) { grid-column: 2; grid-row: 1; }
+.groupAvatar i:nth-child(3) { grid-column: 1; grid-row: 2; }
+.groupAvatar b { grid-column: 2; grid-row: 2; color: $foreground; background: $secondary; }
+.selectedConversation .groupAvatar i,
+.selectedConversation .groupAvatar b,
+.chatHeader .groupAvatar i,
+.chatHeader .groupAvatar b { border-color: #fff8f2; }
+.compactGroupAvatar { transform: scale(0.9); transform-origin: center; }
+.largeGroupAvatar { width: 84px; height: 84px; grid-template-columns: repeat(2, 39px); grid-template-rows: repeat(2, 39px); margin-bottom: 1rem; }
+.largeGroupAvatar i,
+.largeGroupAvatar b { width: 45px; height: 45px; border-width: 3px; border-radius: 14px; font-size: 0.57rem; }
+
+.modalBackdrop {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(45, 24, 16, 0.42);
+    backdrop-filter: blur(6px);
+    animation: backdropIn 160ms ease-out;
+}
+.newMessageModal {
+    display: flex;
+    width: min(100%, 540px);
+    max-height: min(760px, calc(100svh - 2rem));
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba($foreground, 0.1);
+    border-radius: 24px;
+    background: #fff8f2;
+    box-shadow: 0 30px 90px rgba(45, 24, 16, 0.28);
+    animation: modalIn 190ms ease-out;
+}
+.newMessageModal > header { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 1.5rem 1rem; }
+.newMessageModal > header > div > span { color: $primary; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.newMessageModal > header h2 { margin-top: 0.15rem; font-size: 1.65rem; letter-spacing: -0.04em; }
+.newMessageModal > header > button { display: grid; place-items: center; width: 34px; height: 34px; color: $muted-foreground; border-radius: 10px; background: #f3dfd0; font-size: 1.2rem; }
+.messageModeTabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin: 0 1.5rem 1rem; padding: 0.3rem; border-radius: 13px; background: #f3dfd0; }
+.messageModeTabs button { display: flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 40px; color: $muted-foreground; border-radius: 10px; font-size: 0.7rem; font-weight: 700; transition: color $transition-base, background $transition-base, box-shadow $transition-base; }
+.messageModeTabs button svg { width: 16px; }
+.messageModeTabs button.activeMode { color: $foreground; background: #fff8f2; box-shadow: 0 5px 14px rgba(73, 34, 15, 0.08); }
+.groupNameField { display: flex; flex-direction: column; margin: 0 1.5rem 1rem; }
+.groupNameField > span { margin-bottom: 0.4rem; font-size: 0.67rem; font-weight: 750; }
+.groupNameField > span small { margin-left: 0.3rem; color: $muted-foreground; font-size: 0.56rem; font-weight: 500; }
+.groupNameField input,
+.modalSearch { min-height: 44px; border: 1px solid rgba($foreground, 0.1); border-radius: 12px; background: #f8e9de; }
+.groupNameField input { padding: 0 0.75rem; outline: 0; font-size: 0.74rem; }
+.groupNameField input:focus { border-color: rgba($primary, 0.45); box-shadow: 0 0 0 3px rgba($primary, 0.08); }
+.modalSearch { display: flex; align-items: center; gap: 0.55rem; margin: 0 1.5rem 0.75rem; padding: 0 0.75rem; color: $muted-foreground; }
+.modalSearch svg { width: 16px; }
+.modalSearch input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font-size: 0.74rem; }
+.contactPicker { min-height: 220px; padding: 0 0.8rem; overflow-y: auto; }
+.contactPicker > button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.7rem; width: 100%; min-height: 58px; padding: 0.45rem 0.7rem; border-radius: 13px; text-align: left; }
+.contactPicker > button:hover { background: #f8e9de; }
+.contactPicker > button.selectedContact { background: rgba($primary, 0.07); }
+.contactPicker .personAvatar { width: 36px; height: 36px; border-radius: 11px; }
+.contactPicker > button > span:nth-child(2) { display: flex; min-width: 0; flex-direction: column; gap: 0.15rem; }
+.contactPicker strong { font-size: 0.74rem; }
+.contactPicker small { overflow: hidden; color: $muted-foreground; font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
+.selectionMark { display: grid; place-items: center; width: 21px; height: 21px; color: #fff; border: 1px solid rgba($foreground, 0.14); border-radius: 7px; font-size: 0.62rem; font-style: normal; }
+.selectedContact .selectionMark { border-color: $primary; background: $primary; }
+.newMessageModal > footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.5rem 1.3rem; border-top: 1px solid rgba($foreground, 0.08); }
+.newMessageModal > footer > span { color: $muted-foreground; font-size: 0.61rem; }
+.newMessageModal > footer > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 42px; padding: 0 0.9rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.69rem; font-weight: 750; }
+.newMessageModal > footer > button svg { width: 15px; }
+.newMessageModal > footer > button:disabled { cursor: default; opacity: 0.35; }
+.managementModal { width: min(100%, 590px); }
+.managementBody { display: flex; min-height: 0; flex-direction: column; gap: 1rem; padding: 0.2rem 1.5rem 1.4rem; overflow-y: auto; }
+.communityIdentityPreview { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.8rem; padding: 0.8rem; border: 1px solid rgba($foreground, 0.08); border-radius: 16px; background: #f3dfd0; }
+.communityIdentityPreview .communityMark { width: 46px; height: 46px; font-style: normal; }
+.communityIdentityPreview > div { display: flex; min-width: 0; flex-direction: column; gap: 0.18rem; }
+.communityIdentityPreview strong,
+.communityIdentityPreview small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.communityIdentityPreview strong { font-size: 0.78rem; }
+.communityIdentityPreview small { color: $muted-foreground; font-size: 0.63rem; }
+.formField { display: flex; flex-direction: column; gap: 0.42rem; }
+.formField > span { color: $foreground; font-size: 0.67rem; font-weight: 750; }
+.formField > span small { margin-left: 0.3rem; color: $muted-foreground; font-size: 0.56rem; font-weight: 500; }
+.formField > small { color: $muted-foreground; font-size: 0.58rem; }
+.formField input,
+.formField textarea,
+.formField select,
+.roomNameInput { width: 100%; color: $foreground; border: 1px solid rgba($foreground, 0.1); border-radius: 12px; outline: 0; background: #f8e9de; font-size: 0.74rem; transition: border-color $transition-base, box-shadow $transition-base; }
+.formField input,
+.formField select { min-height: 44px; padding: 0 0.78rem; }
+.formField textarea { min-height: 82px; padding: 0.72rem 0.78rem; resize: vertical; line-height: 1.45; }
+.formField input:focus,
+.formField textarea:focus,
+.formField select:focus,
+.roomNameInput:focus-within { border-color: rgba($primary, 0.45); box-shadow: 0 0 0 3px rgba($primary, 0.08); }
+.tonePicker { display: flex; gap: 0.55rem; }
+.toneOption { position: relative; display: grid; place-items: center; width: 42px; height: 42px; border: 2px solid transparent; border-radius: 13px; background: #f3dfd0; }
+.toneOption > i { width: 27px; height: 27px; border-radius: 9px; }
+.toneOption.coral > i { background: linear-gradient(145deg, #e85d04, #ff8b4c); }
+.toneOption.amber > i { background: linear-gradient(145deg, #f6b64f, #ffd386); }
+.toneOption.rose > i { background: linear-gradient(145deg, #d97465, #f2a28f); }
+.toneOption.brown > i { background: linear-gradient(145deg, #68402f, #9a6952); }
+.toneOption > svg { position: absolute; right: -4px; bottom: -4px; width: 16px; height: 16px; padding: 3px; color: #fff; border: 2px solid #fff8f2; border-radius: 50%; background: $primary; }
+.toneOption.selectedTone { border-color: rgba($primary, 0.3); background: #fff8f2; box-shadow: 0 6px 15px rgba(73, 34, 15, 0.07); }
+.visibilityPicker { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+.visibilityPicker > button { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.65rem; min-height: 58px; padding: 0.65rem 0.75rem; color: $muted-foreground; border: 1px solid rgba($foreground, 0.09); border-radius: 13px; background: #f8e9de; text-align: left; }
+.visibilityPicker > button > svg { width: 17px; }
+.visibilityPicker > button > span { display: flex; flex-direction: column; gap: 0.1rem; }
+.visibilityPicker strong { color: $foreground; font-size: 0.68rem; }
+.visibilityPicker small { font-size: 0.57rem; }
+.visibilityPicker > button.selectedVisibility { color: $primary; border-color: rgba($primary, 0.3); background: rgba($primary, 0.055); box-shadow: inset 0 0 0 1px rgba($primary, 0.05); }
+.switchRow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; padding: 0.85rem; border: 1px solid rgba($foreground, 0.08); border-radius: 14px; background: #f8e9de; text-align: left; }
+.switchRow > span { display: flex; flex-direction: column; gap: 0.2rem; }
+.switchRow strong { font-size: 0.69rem; }
+.switchRow small { color: $muted-foreground; font-size: 0.59rem; }
+.switchRow > i { position: relative; flex: 0 0 auto; width: 38px; height: 22px; border-radius: 99px; background: #cfbbaa; transition: background $transition-base; }
+.switchRow > i b { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff8f2; box-shadow: 0 2px 5px rgba(45, 24, 16, 0.15); transition: transform $transition-base; }
+.switchRow > i.switchActive { background: $primary; }
+.switchRow > i.switchActive b { transform: translateX(16px); }
+.channelModal { width: min(100%, 520px); }
+.roomNameInput { display: flex; align-items: center; gap: 0.45rem; min-height: 44px; padding: 0 0.72rem; }
+.roomNameInput > svg { width: 16px; flex: 0 0 auto; color: $primary; }
+.roomNameInput input { min-width: 0; min-height: 42px; padding: 0; flex: 1; border: 0; background: transparent; box-shadow: none; }
+.roomNameInput input:focus { box-shadow: none; }
+.roomTypeNote { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem; padding: 0.85rem; border-radius: 14px; background: rgba($primary, 0.055); }
+.roomTypeNote > svg { width: 18px; color: $primary; }
+.roomTypeNote p { display: flex; flex-direction: column; gap: 0.18rem; }
+.roomTypeNote strong { font-size: 0.68rem; }
+.roomTypeNote span { color: $muted-foreground; font-size: 0.59rem; line-height: 1.4; }
+@keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 1080px) {
+    .communityButton small { display: none; }
+    .communityButton { padding-right: 0.3rem; }
+    .userMenu strong,
+    .userMenu > svg { display: none; }
+}
+
+@media (max-width: 760px) {
+    .spaceBar { height: 68px; padding: 0 0.65rem; }
+    .appBrand { width: 42px; height: 42px; }
+    .appBrand img { width: 34px; height: 34px; }
+    .messageSpace { width: 41px; padding: 0; }
+    .messageSpace span { display: none; }
+    .communityButton { height: 42px; }
+    .communityButton > span { width: 32px; height: 32px; }
+    .addCommunity { width: 35px; height: 35px; }
+    .userActions .iconButton:first-child { display: none; }
+    .workspace { grid-template-columns: 1fr; height: calc(100svh - 68px); }
+    .chatPanel { display: none; }
+    .workspace.showChat .listPanel { display: none; }
+    .workspace.showChat .chatPanel { display: grid; }
+    .listPanel { border-right: 0; }
+    .mobileBack { display: grid; place-items: center; flex: 0 0 auto; width: 35px; height: 35px; color: $muted-foreground; border-radius: 10px; }
+    .mobileBack svg { width: 18px; }
+    .messageArea { padding: 1.5rem 1rem; }
+    .composer { margin-right: 0.7rem; margin-left: 0.7rem; }
+    .composer > button:nth-of-type(2),
+    .composer > button:nth-of-type(3) { display: none; }
+    .friendsHeading { align-items: flex-start; flex-direction: column; gap: 1rem; }
+    .friendFilters { width: 100%; }
+    .friendFilters button { flex: 1; }
+    .addFriendButton { width: 38px; padding: 0; justify-content: center; }
+    .addFriendButton { font-size: 0; }
+}
+
+@media (max-width: 430px) {
+    .userActions .iconButton { display: none; }
+    .userMenu { padding-right: 0; }
+    .spaceDivider { display: none; }
+    .chatActions button:nth-child(2) { display: none; }
+    .conversationIntro { margin-top: 0.5rem; }
+    .newMessageModal { max-height: calc(100svh - 1rem); border-radius: 20px; }
+    .newMessageModal > footer { align-items: stretch; flex-direction: column; }
+    .newMessageModal > footer > button { width: 100%; }
+    .managementBody { padding-right: 1rem; padding-left: 1rem; }
+    .visibilityPicker { grid-template-columns: 1fr; }
+    .voiceRoomCard { grid-template-columns: auto minmax(0, 1fr); }
+    .voiceRoomCard > button { grid-column: 1 / -1; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .messageSpace,
+    .communityButton,
+    .addCommunity,
+    .conversationList > button { transition: none; }
+    .messageSpace:hover,
+    .communityButton:hover,
+    .conversationList > button:hover { transform: none; }
+    .audioWave i { animation: none; }
+    .profileMenu { animation: none; }
+    .friendFilters button { transition: none; }
+    .friendFilters button:hover { transform: none; }
+    .friendGroups,
+    .modalBackdrop,
+    .newMessageModal { animation: none; }
+}
