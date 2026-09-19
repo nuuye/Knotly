@@ -48,3 +48,9 @@ export interface SettingsPasswordInputProps {
     value: string;
     onChange: (value: string) => void;
 }
+
+export interface DeleteAccountDialogProps {
+    username: string;
+    onClose: () => void;
+    onFinish: () => void;
+}

@@ -168,6 +168,24 @@ export interface MessageActionsProps {
     onReply: () => void;
 }
 
+export interface MessageSearchResult {
+    author: string;
+    id: number;
+    scope: "direct" | "room";
+    text: string;
+    time: string;
+}
+
+export interface MessageSearchProps {
+    contextLabel: string;
+    isOpen: boolean;
+    query: string;
+    results: MessageSearchResult[];
+    setIsOpen: StateSetter<boolean>;
+    setQuery: StateSetter<string>;
+    onSelect: (result: MessageSearchResult) => void;
+}
+
 export interface GroupMembersDialogProps {
     friends: Friend[];
     groupName: string;

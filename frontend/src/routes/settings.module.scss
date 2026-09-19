@@ -478,6 +478,34 @@
 .passwordSuccess > p { margin-top: 0.25rem; color: $muted-foreground; font-size: 0.67rem; }
 .passwordSuccess > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 40px; margin-top: 1.2rem; padding: 0 1rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.65rem; font-weight: 750; }
 .passwordSuccess > button svg { width: 14px; }
+.deleteAccountDialog > header > div > span { color: $destructive; }
+.deleteAccountDialog > form { padding-top: 0.15rem; }
+.deleteAccountWarning { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem; margin-bottom: 1rem; padding: 0.8rem; border: 1px solid rgba($destructive, 0.15); border-radius: 14px; background: rgba($destructive, 0.055); }
+.deleteAccountWarning > svg { width: 18px; color: $destructive; }
+.deleteAccountWarning > span { display: flex; flex-direction: column; gap: 0.15rem; }
+.deleteAccountWarning strong { font-size: 0.67rem; }
+.deleteAccountWarning small { color: $muted-foreground; font-size: 0.58rem; line-height: 1.45; }
+.deleteConfirmationField { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.8rem; }
+.deleteConfirmationField > span { color: $foreground; font-size: 0.65rem; font-weight: 700; }
+.deleteConfirmationField > span strong { color: $destructive; }
+.deleteConfirmationField > input,
+.deletePasswordField { width: 100%; min-height: 46px; border: 1px solid rgba($foreground, 0.1); border-radius: 12px; outline: 0; background: #f8e9de; transition: border-color $transition-base, box-shadow $transition-base; }
+.deleteConfirmationField > input { padding: 0 0.75rem; font-size: 0.72rem; }
+.deleteConfirmationField > input:focus,
+.deletePasswordField:focus-within { border-color: rgba($destructive, 0.48); box-shadow: 0 0 0 3px rgba($destructive, 0.07); }
+.deletePasswordField { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 0.4rem 0 0.75rem; }
+.deletePasswordField input { min-width: 0; height: 44px; border: 0; outline: 0; background: transparent; font-size: 0.72rem; }
+.deletePasswordField button { display: grid; place-items: center; width: 33px; height: 33px; color: $muted-foreground; border-radius: 9px; }
+.deletePasswordField button:hover { color: $foreground; background: #f3dfd0; }
+.deletePasswordField button svg { width: 15px; }
+.passwordDialog form > footer button.confirmAccountDeletion { color: #fff; background: $destructive; }
+.accountDeletedState { display: flex; align-items: center; flex-direction: column; padding: 1rem 1.5rem 1.6rem; text-align: center; }
+.accountDeletedState > i { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: 0.9rem; color: #fff; border-radius: 20px; background: $destructive; box-shadow: 0 13px 28px rgba($destructive, 0.2); }
+.accountDeletedState > i svg { width: 27px; }
+.accountDeletedState > strong { font-size: 0.9rem; }
+.accountDeletedState > p { max-width: 340px; margin-top: 0.3rem; color: $muted-foreground; font-size: 0.65rem; line-height: 1.5; }
+.accountDeletedState > button { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 40px; margin-top: 1.2rem; padding: 0 0.9rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.65rem; font-weight: 750; }
+.accountDeletedState > button svg { width: 14px; }
 
 @keyframes passwordBackdropIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes passwordDialogIn { from { opacity: 0; transform: translateY(9px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }

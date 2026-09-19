@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
     ArrowLeft,
     Bell,
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import { ChangePasswordDialog } from "../components/settings/ChangePasswordDialog";
+import { DeleteAccountDialog } from "../components/settings/DeleteAccountDialog";
 import { ToggleSetting } from "../components/settings/ToggleSetting";
 import {
     INITIAL_NOTIFICATIONS,
@@ -41,6 +42,7 @@ export const Route = createFileRoute("/settings")({
 
 /** Manages the local settings demo and switches between settings sections. */
 function SettingsPage() {
+    const navigate = useNavigate();
     const [activeSection, setActiveSection] = useState<SettingsSectionId>("account");
     const [theme, setTheme] = useState<ThemeId>("warm");
     const [textSize, setTextSize] = useState(16);
@@ -50,6 +52,7 @@ function SettingsPage() {
     const [privacy, setPrivacy] = useState(INITIAL_PRIVACY);
     const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
+    const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
     const sectionCopy = SETTINGS_COPY[activeSection];
     // Compare the draft with the last saved copy before showing the save bar.
@@ -250,7 +253,7 @@ function SettingsPage() {
 
                             <section className={`${styles.card} ${styles.dangerCard}`}>
                                 <div><Trash2 aria-hidden="true" /><span><strong>Delete your account</strong><small>This permanently removes your profile and cannot be undone.</small></span></div>
-                                <button type="button">Delete account</button>
+                                <button type="button" onClick={() => setDeleteAccountOpen(true)}>Delete account</button>
                             </section>
                         </>
                     )}
@@ -322,6 +325,14 @@ function SettingsPage() {
                 <ChangePasswordDialog
                     onChanged={() => setPasswordChanged(true)}
                     onClose={() => setPasswordDialogOpen(false)}
+                />
+            )}
+
+            {deleteAccountOpen && (
+                <DeleteAccountDialog
+                    username={account.username}
+                    onClose={() => setDeleteAccountOpen(false)}
+                    onFinish={() => navigate({ to: "/" })}
                 />
             )}
         </div>

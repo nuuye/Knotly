@@ -37,6 +37,7 @@ import { EmojiPicker } from "../components/home/EmojiPicker";
 import { GroupAvatar } from "../components/home/GroupAvatar";
 import { HomeHeader } from "../components/home/HomeHeader";
 import { MessageActions } from "../components/home/MessageActions";
+import { MessageSearch } from "../components/home/MessageSearch";
 import { CategoryDialog } from "../components/home/dialogs/CategoryDialog";
 import { ChannelDialog } from "../components/home/dialogs/ChannelDialog";
 import { CommunityDialog } from "../components/home/dialogs/CommunityDialog";
@@ -71,6 +72,7 @@ import type {
     FriendFilter,
     JoinedVoiceRoom,
     MessageReaction,
+    MessageSearchResult,
     MessageView,
     MobilePanel,
     ModerationLogCategory,
@@ -131,6 +133,9 @@ function HomePage() {
     const [replyingTo, setReplyingTo] = useState<{ scope: "direct" | "room"; messageId: number } | null>(null);
     const [editingMessage, setEditingMessage] = useState<{ scope: "direct" | "room"; messageId: number } | null>(null);
     const [editDraft, setEditDraft] = useState("");
+    const [messageSearchOpen, setMessageSearchOpen] = useState(false);
+    const [messageSearchQuery, setMessageSearchQuery] = useState("");
+    const [highlightedMessage, setHighlightedMessage] = useState<string | null>(null);
     const [mobilePanel, setMobilePanel] = useState<MobilePanel>("list");
     const [messageView, setMessageView] = useState<MessageView>("chat");
     const [friendFilter, setFriendFilter] = useState<FriendFilter>("all");
@@ -215,6 +220,24 @@ function HomePage() {
     const activeRoomMessages = roomMessages[activeRoomKey] ?? [];
     const directReplyTarget = replyingTo?.scope === "direct" ? directMessages.find((message) => message.id === replyingTo.messageId) : undefined;
     const roomReplyTarget = replyingTo?.scope === "room" ? activeRoomMessages.find((message) => message.id === replyingTo.messageId) : undefined;
+    const normalizedMessageSearch = messageSearchQuery.trim().toLowerCase();
+    const messageSearchResults: MessageSearchResult[] = normalizedMessageSearch
+        ? activeSpace === "messages"
+            ? directMessages.filter((message) => message.text.toLowerCase().includes(normalizedMessageSearch)).map((message) => ({
+                author: message.author === "me" ? "You" : activeConversation.name,
+                id: message.id,
+                scope: "direct",
+                text: message.text,
+                time: message.time,
+            }))
+            : activeRoomMessages.filter((message) => message.text.toLowerCase().includes(normalizedMessageSearch)).map((message) => ({
+                author: message.authorName,
+                id: message.id,
+                scope: "room",
+                text: message.text,
+                time: message.time,
+            }))
+        : [];
     const localDisplayName = activeCommunity ? communityDisplayNames[activeCommunity.id]?.trim() : "";
     const currentCommunityDisplayName = localDisplayName || `@${DEMO_USER.username}`;
     const currentCommunityInitials = localDisplayName ? getInitials(localDisplayName, "U") : getUsernameMark(DEMO_USER.username);
@@ -270,6 +293,16 @@ function HomePage() {
         window.requestAnimationFrame(() => {
             if (messageAreaRef.current) messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
         });
+    };
+
+    // Move the active scroll area to a search result and briefly highlight it.
+    const openMessageSearchResult = (result: MessageSearchResult) => {
+        const messageKey = `${result.scope}-${result.id}`;
+        const target = messageAreaRef.current?.querySelector<HTMLElement>(`[data-message-key="${messageKey}"]`);
+        target?.scrollIntoView({ behavior: "smooth", block: "center" });
+        setHighlightedMessage(messageKey);
+        setMessageSearchOpen(false);
+        window.setTimeout(() => setHighlightedMessage((current) => current === messageKey ? null : current), 1800);
     };
 
     // Add one newest-first entry to the active community's local moderation history.
@@ -1195,6 +1228,15 @@ function HomePage() {
                             <div className={styles.chatActions}>
                                 <button type="button" aria-label="Start voice call"><Phone /></button>
                                 <button type="button" aria-label="Start video call"><Video /></button>
+                                <MessageSearch
+                                    contextLabel={activeConversation.name}
+                                    isOpen={messageSearchOpen}
+                                    query={messageSearchQuery}
+                                    results={messageSearchResults}
+                                    setIsOpen={setMessageSearchOpen}
+                                    setQuery={setMessageSearchQuery}
+                                    onSelect={openMessageSearchResult}
+                                />
                                 <div className={styles.conversationMenuWrap} ref={conversationMenuRef}>
                                     <button type="button" className={conversationMenuOpen ? styles.activeChatAction : ""} aria-label="Conversation options" aria-expanded={conversationMenuOpen} onClick={() => setConversationMenuOpen((open) => !open)}><MoreHorizontal /></button>
                                     {conversationMenuOpen && (
@@ -1228,7 +1270,7 @@ function HomePage() {
                                 const repliedMessage = message.replyToId ? directMessages.find((item) => item.id === message.replyToId) : undefined;
                                 const isEditing = editingMessage?.scope === "direct" && editingMessage.messageId === message.id;
                                 return (
-                                    <div key={message.id} className={`${styles.messageRow} ${message.author === "me" ? styles.myMessage : ""} ${grouped ? styles.groupedMessage : ""}`}>
+                                    <div data-message-key={`direct-${message.id}`} key={message.id} className={`${styles.messageRow} ${message.author === "me" ? styles.myMessage : ""} ${grouped ? styles.groupedMessage : ""} ${highlightedMessage === `direct-${message.id}` ? styles.highlightedMessage : ""}`}>
                                         {message.author === "them" && !grouped ? <span className={`${styles.messageAvatar} ${styles[activeConversation.tone]}`}>{activeConversation.initials}</span> : <span className={styles.avatarSpace} />}
                                         <div className={styles.messageBubble}>
                                             <MessageActions
@@ -1293,6 +1335,15 @@ function HomePage() {
                             <span className={styles.roomIcon}>{selectedRoomKind === "voice" ? <Headphones /> : <Hash />}</span>
                             <div><strong>{selectedRoom}</strong><span>{activeCommunity?.name} · {selectedCategory?.label}</span></div>
                             <div className={styles.chatActions}>
+                                {selectedRoomKind === "text" && <MessageSearch
+                                    contextLabel={`#${selectedRoom}`}
+                                    isOpen={messageSearchOpen}
+                                    query={messageSearchQuery}
+                                    results={messageSearchResults}
+                                    setIsOpen={setMessageSearchOpen}
+                                    setQuery={setMessageSearchQuery}
+                                    onSelect={openMessageSearchResult}
+                                />}
                                 <button type="button" className={membersPanelOpen ? styles.activeChatAction : ""} aria-label="Show room members" aria-expanded={membersPanelOpen} onClick={() => { setMembersPanelOpen((open) => !open); setRoomMenuOpen(false); }}><UsersRound /></button>
                                 <div className={styles.roomMenuWrap} ref={roomMenuRef}>
                                     <button type="button" className={roomMenuOpen ? styles.activeChatAction : ""} aria-label="Room options" aria-expanded={roomMenuOpen} onClick={() => { setRoomMenuOpen((open) => !open); setMembersPanelOpen(false); }}><MoreHorizontal /></button>
@@ -1346,7 +1397,7 @@ function HomePage() {
                                         const repliedMessage = message.replyToId ? activeRoomMessages.find((item) => item.id === message.replyToId) : undefined;
                                         const isEditing = editingMessage?.scope === "room" && editingMessage.messageId === message.id;
                                         return (
-                                            <div key={message.id} className={styles.communityMessage}>
+                                            <div data-message-key={`room-${message.id}`} key={message.id} className={`${styles.communityMessage} ${highlightedMessage === `room-${message.id}` ? styles.highlightedMessage : ""}`}>
                                                 <button type="button" className={`${styles.communityMessageAvatar} ${styles[message.tone]}`} onClick={() => setSelectedMemberId(message.authorId)} aria-label={`Open ${message.authorName}'s profile`}>{message.initials}</button>
                                                 <div>
                                                     <MessageActions
