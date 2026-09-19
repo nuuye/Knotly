@@ -1,12 +1,12 @@
-import { Check, Globe2, LockKeyhole, Plus, X } from "lucide-react";
+import { Check, ChevronRight, Globe2, LockKeyhole, Plus, ShieldCheck, X } from "lucide-react";
 import type { CommunityDialogProps, CommunityTone } from "../../../types/home";
 import { getInitials } from "../../../utils/text";
 import styles from "../../../routes/home.module.scss";
 
-const COMMUNITY_TONES: CommunityTone[] = ["coral", "amber", "rose", "brown"];
+const COMMUNITY_TONES: CommunityTone[] = ["coral", "amber", "rose", "brown", "sage", "plum", "ocean", "mint"];
 
 /** Shares the same form between community creation and community settings. */
-export function CommunityDialog({ communityName, draft, mode, username, setDraft, onClose, onSubmit }: CommunityDialogProps) {
+export function CommunityDialog({ communityName, draft, mode, username, onManageRoles, setDraft, onClose, onSubmit }: CommunityDialogProps) {
     const isCreating = mode === "create";
     const fallbackName = isCreating ? "Your community" : communityName ?? "Your community";
     const fallbackDescription = isCreating ? "A place with its own rhythm." : "Add a short community description.";
@@ -54,10 +54,17 @@ export function CommunityDialog({ communityName, draft, mode, username, setDraft
                         </div>
                     </div>
                     {!isCreating && (
-                        <button type="button" className={styles.switchRow} onClick={() => setDraft((current) => ({ ...current, allowInvites: !current.allowInvites }))}>
-                            <span><strong>Member invitations</strong><small>Let members invite people they know.</small></span>
-                            <i className={draft.allowInvites ? styles.switchActive : ""}><b /></i>
-                        </button>
+                        <>
+                            <button type="button" className={styles.roleManagerRow} onClick={onManageRoles}>
+                                <ShieldCheck />
+                                <span><strong>Roles & permissions</strong><small>Control what members can do here.</small></span>
+                                <ChevronRight />
+                            </button>
+                            <button type="button" className={styles.switchRow} onClick={() => setDraft((current) => ({ ...current, allowInvites: !current.allowInvites }))}>
+                                <span><strong>Member invitations</strong><small>Let members invite people they know.</small></span>
+                                <i className={draft.allowInvites ? styles.switchActive : ""}><b /></i>
+                            </button>
+                        </>
                     )}
                 </div>
                 <footer>

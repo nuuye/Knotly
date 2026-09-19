@@ -3,8 +3,10 @@ import type {
     Community,
     CommunitySettingsDraft,
     CommunityMember,
+    CommunityRole,
     Conversation,
     Friend,
+    RoomMessage,
     RoomCategory,
 } from "../types/home";
 
@@ -23,13 +25,29 @@ export const INITIAL_COMMUNITIES: Community[] = [
     { id: "film", name: "Film Club", initials: "FC", online: 3, tone: "brown", description: "Watchlists, screenings and very strong opinions.", visibility: "private", allowInvites: false, categories: createDefaultCategories(["after-credits"]) },
 ];
 
-export const COMMUNITY_MEMBERS: CommunityMember[] = [
-    { name: "@johndoe", initials: "JO", role: "Owner", status: "online", activity: "Reading this room", tone: "brown" },
-    { name: "Maya Chen", initials: "MC", role: "Host", status: "online", activity: "Around now", tone: "coral" },
-    { name: "Jules Martin", initials: "JM", role: "Member", status: "online", activity: "Listening nearby", tone: "amber" },
-    { name: "Lina Torres", initials: "LT", role: "Member", status: "online", activity: "Available", tone: "rose" },
-    { name: "Noah Williams", initials: "NW", role: "Member", status: "offline", activity: "Last seen yesterday", tone: "sage" },
+const DEFAULT_COMMUNITY_ROLES: CommunityRole[] = [
+    { id: "owner", name: "Owner", color: "#68402f", permissions: ["manageCommunity", "manageRooms", "manageRoles", "inviteMembers", "moderateMembers", "sendMessages", "joinVoice"], protected: true },
+    { id: "moderator", name: "Moderator", color: "#e85d04", permissions: ["manageRooms", "inviteMembers", "moderateMembers", "sendMessages", "joinVoice"], protected: false },
+    { id: "member", name: "Member", color: "#f6b64f", permissions: ["inviteMembers", "sendMessages", "joinVoice"], protected: true },
 ];
+
+const DEFAULT_COMMUNITY_MEMBERS: CommunityMember[] = [
+    { id: "current-user", username: "johndoe", name: "@johndoe", initials: "JO", bio: "Always up for a late-night voice chat.", joinedAt: "Created the community", roleIds: ["owner"], status: "online", activity: "Reading this room", tone: "brown" },
+    { id: "maya", username: "mayachen", name: "Maya Chen", initials: "MC", bio: "Plans picnics, brings too many snacks.", joinedAt: "Joined 8 months ago", roleIds: ["moderator", "member"], status: "online", activity: "Around now", tone: "coral" },
+    { id: "jules", username: "julesm", name: "Jules Martin", initials: "JM", bio: "Playlist curator and questionable transition specialist.", joinedAt: "Joined 7 months ago", roleIds: ["member"], status: "online", activity: "Listening nearby", tone: "amber" },
+    { id: "lina", username: "linat", name: "Lina Torres", initials: "LT", bio: "Makes shared lists for everything.", joinedAt: "Joined 5 months ago", roleIds: ["member"], status: "online", activity: "Available", tone: "rose" },
+    { id: "noah", username: "noahw", name: "Noah Williams", initials: "NW", bio: "Usually outside with a camera.", joinedAt: "Joined 3 months ago", roleIds: ["member"], status: "offline", activity: "Last seen yesterday", tone: "sage" },
+];
+
+/** Returns independent role records for one community. */
+export function createCommunityRoles() {
+    return DEFAULT_COMMUNITY_ROLES.map((role) => ({ ...role, permissions: [...role.permissions] }));
+}
+
+/** Returns independent member records for one community. */
+export function createCommunityMembers() {
+    return DEFAULT_COMMUNITY_MEMBERS.map((member) => ({ ...member, roleIds: [...member.roleIds] }));
+}
 
 export const INITIAL_CONVERSATIONS: Conversation[] = [
     { id: "maya", name: "Maya Chen", initials: "MC", preview: "You’re bringing the blanket, right?", time: "2m", status: "Online", unread: 2, tone: "coral" },
@@ -42,9 +60,9 @@ export const INITIAL_CONVERSATIONS: Conversation[] = [
         time: "1h",
         tone: "rose",
         members: [
-            { name: "Maya Chen", initials: "MC", tone: "coral" },
-            { name: "Lina Torres", initials: "LT", tone: "rose" },
-            { name: "Jules Martin", initials: "JM", tone: "amber" },
+            { id: "maya", name: "Maya Chen", initials: "MC", tone: "coral" },
+            { id: "lina", name: "Lina Torres", initials: "LT", tone: "rose" },
+            { id: "jules", name: "Jules Martin", initials: "JM", tone: "amber" },
         ],
     },
     { id: "noah", name: "Noah Williams", initials: "NW", preview: "Sent you a photo", time: "3h", status: "Away", tone: "sage" },
@@ -69,6 +87,15 @@ export const FRIENDS: Friend[] = [
     { id: "zoe", name: "Zoé Lambert", initials: "ZL", status: "offline", activity: "Last seen 3 days ago", tone: "amber" },
     { id: "hugo", name: "Hugo Morel", initials: "HM", status: "offline", activity: "Last seen last week", tone: "sage" },
     { id: "nora", name: "Nora Kim", initials: "NK", status: "offline", activity: "Last seen 2 weeks ago", tone: "rose" },
+];
+
+export const SUGGESTED_FRIENDS: Friend[] = [
+    { id: "avery", name: "Avery Stone", initials: "AS", status: "online", activity: "Exploring Film Club", tone: "plum" },
+    { id: "mina", name: "Mina Patel", initials: "MP", status: "online", activity: "Available", tone: "coral" },
+    { id: "camille", name: "Camille Dubois", initials: "CD", status: "offline", activity: "Last seen yesterday", tone: "amber" },
+    { id: "elias", name: "Elias Berg", initials: "EB", status: "online", activity: "Listening to music", tone: "sage" },
+    { id: "sofia", name: "Sofia Rossi", initials: "SR", status: "offline", activity: "Last seen Monday", tone: "rose" },
+    { id: "milo", name: "Milo Tan", initials: "MT", status: "online", activity: "In Study Hall", tone: "brown" },
 ];
 
 export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
@@ -96,6 +123,13 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
     amelie: [
         { id: 1, author: "me", text: "I think we got the difficult part done.", time: "Tuesday" },
         { id: 2, author: "them", text: "Agreed. Let’s finish this tomorrow.", time: "Tuesday" },
+    ],
+};
+
+export const INITIAL_ROOM_MESSAGES: Record<string, RoomMessage[]> = {
+    "saturday:text:general": [
+        { id: 1, authorId: "maya", authorName: "Maya Chen", initials: "MC", tone: "coral", text: "Morning! I left the weekend notes here so everyone can add to them.", time: "09:42", reactions: [{ emoji: "❤️", count: 2, reacted: false }] },
+        { id: 2, authorId: "jules", authorName: "Jules Martin", initials: "JM", tone: "amber", text: "Perfect. I’ll bring the playlist and absolutely no sensible song transitions.", time: "10:03", replyToId: 1 },
     ],
 };
 

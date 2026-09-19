@@ -104,34 +104,46 @@
 .coral.personAvatar,
 .coral.heroAvatar,
 .coral.messageAvatar,
+.coral.communityMessageAvatar,
 i.coral,
 .coral.communityMark { background: linear-gradient(145deg, #e85d04, #ff8b4c); }
 .amber > span,
 .amber.personAvatar,
 .amber.heroAvatar,
 .amber.messageAvatar,
+.amber.communityMessageAvatar,
 i.amber,
 .amber.communityMark { color: $foreground; background: linear-gradient(145deg, #f6b64f, #ffd386); }
 .rose > span,
 .rose.personAvatar,
 .rose.heroAvatar,
 .rose.messageAvatar,
+.rose.communityMessageAvatar,
 i.rose,
 .rose.communityMark { background: linear-gradient(145deg, #d97465, #f2a28f); }
 .brown > span,
 .brown.personAvatar,
 .brown.heroAvatar,
 .brown.messageAvatar,
+.brown.communityMessageAvatar,
 i.brown,
 .brown.communityMark { background: linear-gradient(145deg, #68402f, #9a6952); }
 .sage.personAvatar,
 .sage.heroAvatar,
 .sage.messageAvatar,
-i.sage { color: $foreground; background: linear-gradient(145deg, #a9bf86, #d1dda9); }
+i.sage,
+.sage.communityMark,
+.sage > span { color: $foreground; background: linear-gradient(145deg, #78937c, #b1c7a8); }
 .plum.personAvatar,
 .plum.heroAvatar,
 .plum.messageAvatar,
-i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
+i.plum,
+.plum.communityMark,
+.plum > span { background: linear-gradient(145deg, #8b668c, #bd8eae); }
+.ocean.communityMark,
+.ocean > span { background: linear-gradient(145deg, #3f7590, #72a8bb); }
+.mint.communityMark,
+.mint > span { color: $foreground; background: linear-gradient(145deg, #6f9f8a, #a9cfb9); }
 
 .addCommunity,
 .iconButton {
@@ -319,7 +331,8 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .roomNavigation section > div > button.joinedVoiceButton { color: $foreground; background: rgba(75, 173, 105, 0.1); box-shadow: inset 3px 0 0 #4bad69; }
 .roomNavigation section > div > button.joinedVoiceButton svg,
 .roomNavigation section > div > button.joinedVoiceButton small { color: #318b4e; }
-.voicePeople { display: flex; align-items: center; gap: 0.45rem; min-height: 34px; padding-left: 1.7rem; }
+.voicePeople { display: flex; align-items: center; gap: 0.45rem; width: 100%; min-height: 34px; padding-left: 1.7rem; border-radius: 9px; text-align: left; }
+.voicePeople:hover { background: rgba(255, 248, 242, 0.42); }
 .voicePeople > i { display: grid; place-items: center; width: 24px; height: 24px; color: #fff; border-radius: 8px; font-size: 0.45rem; font-style: normal; font-weight: 800; }
 .voicePeople > span { display: flex; align-items: center; gap: 0.45rem; color: $muted-foreground; font-size: 0.65rem; }
 .audioWave { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
@@ -360,14 +373,19 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .chatHeader > div:nth-of-type(1) > span { color: $muted-foreground; font-size: 0.64rem; }
 .chatActions { display: flex; align-items: center; gap: 0.35rem; margin-left: auto; }
 .chatActions > button,
-.roomMenuWrap > button { display: grid; place-items: center; width: 36px; height: 36px; color: $muted-foreground; border-radius: 11px; }
+.roomMenuWrap > button,
+.conversationMenuWrap > button { display: grid; place-items: center; width: 36px; height: 36px; color: $muted-foreground; border-radius: 11px; }
 .chatActions > button:hover,
 .roomMenuWrap > button:hover,
+.conversationMenuWrap > button:hover,
 .chatActions > button.activeChatAction,
-.roomMenuWrap > button.activeChatAction { color: $primary; background: rgba($primary, 0.09); }
+.roomMenuWrap > button.activeChatAction,
+.conversationMenuWrap > button.activeChatAction { color: $primary; background: rgba($primary, 0.09); }
 .chatActions > button svg,
-.roomMenuWrap > button svg { width: 17px; }
-.roomMenuWrap { position: relative; }
+.roomMenuWrap > button svg,
+.conversationMenuWrap > button svg { width: 17px; }
+.roomMenuWrap,
+.conversationMenuWrap { position: relative; }
 .roomOptionsMenu { position: absolute; z-index: 45; top: calc(100% + 0.55rem); right: 0; width: 220px; padding: 0.45rem; border: 1px solid rgba($foreground, 0.1); border-radius: 15px; background: #fff8f2; box-shadow: 0 18px 45px rgba(45, 24, 16, 0.18); animation: profileMenuIn 160ms ease-out; }
 .roomOptionsMenu > div { display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; margin-bottom: 0.3rem; padding: 0.55rem 0.65rem 0.65rem; border-bottom: 1px solid rgba($foreground, 0.07); }
 .roomOptionsMenu > div strong { overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
@@ -375,6 +393,15 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .roomOptionsMenu > button { display: flex; align-items: center; gap: 0.55rem; width: 100%; min-height: 38px; padding: 0 0.65rem; color: $muted-foreground; border-radius: 9px; font-size: 0.66rem; font-weight: 650; text-align: left; }
 .roomOptionsMenu > button:hover { color: $foreground; background: #f3dfd0; }
 .roomOptionsMenu > button svg { width: 15px; }
+.conversationOptionsMenu { position: absolute; z-index: 45; top: calc(100% + 0.55rem); right: 0; width: 235px; padding: 0.45rem; border: 1px solid rgba($foreground, 0.1); border-radius: 15px; background: #fff8f2; box-shadow: 0 18px 45px rgba(45, 24, 16, 0.18); animation: profileMenuIn 160ms ease-out; }
+.conversationOptionsMenu > div { display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; margin-bottom: 0.3rem; padding: 0.55rem 0.65rem 0.65rem; border-bottom: 1px solid rgba($foreground, 0.07); }
+.conversationOptionsMenu > div strong { overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.conversationOptionsMenu > div small { color: $muted-foreground; font-size: 0.57rem; }
+.conversationOptionsMenu > button { display: flex; align-items: center; gap: 0.55rem; width: 100%; min-height: 38px; padding: 0 0.65rem; color: $muted-foreground; border-radius: 9px; font-size: 0.66rem; font-weight: 650; text-align: left; }
+.conversationOptionsMenu > button:hover { color: $foreground; background: #f3dfd0; }
+.conversationOptionsMenu > button svg { width: 15px; }
+.conversationOptionsMenu > button.dangerMenuAction { color: #a84239; }
+.conversationOptionsMenu > button.dangerMenuAction:hover { background: rgba(179, 73, 63, 0.08); }
 .roomIcon { display: grid; place-items: center; width: 38px; height: 38px; color: $primary; border-radius: 12px; background: rgba($primary, 0.08); }
 .roomIcon svg { width: 18px; }
 .mobileBack { display: none; }
@@ -412,7 +439,7 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .membersPanel > section > button small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .membersPanel > section > button strong { font-size: 0.68rem; }
 .membersPanel > section > button small { color: $muted-foreground; font-size: 0.56rem; }
-.membersPanel > section > button em { padding: 0.24rem 0.38rem; color: $primary; border-radius: 6px; background: rgba($primary, 0.09); font-size: 0.48rem; font-style: normal; font-weight: 800; text-transform: uppercase; }
+.membersPanel > section > button em { padding: 0.24rem 0.38rem; color: $primary; border: 1px solid rgba($primary, 0.2); border-radius: 6px; background: rgba(255, 248, 242, 0.58); font-size: 0.48rem; font-style: normal; font-weight: 800; text-transform: uppercase; }
 
 .messageArea { min-height: 0; padding: 2rem clamp(1rem, 4vw, 3rem); overflow-y: auto; }
 .conversationIntro { display: flex; align-items: center; flex-direction: column; max-width: 520px; margin: 1.5rem auto 2rem; text-align: center; }
@@ -428,16 +455,58 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .messageRow.groupedMessage { margin-top: -0.45rem; }
 .messageAvatar { display: grid; place-items: center; width: 32px; height: 32px; color: #fff; border-radius: 10px; font-size: 0.48rem; font-weight: 850; }
 .avatarSpace { width: 32px; }
-.messageBubble { min-width: 0; }
+.messageBubble { position: relative; width: fit-content; max-width: 100%; min-width: 0; justify-self: start; }
 .messageBubble > span { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.28rem; }
 .messageBubble strong { font-size: 0.75rem; }
 .messageBubble time { color: rgba($muted-foreground, 0.62); font-size: 0.58rem; }
 .messageBubble p { display: inline-block; max-width: 100%; padding: 0.75rem 0.9rem; color: $foreground; border: 1px solid rgba($foreground, 0.07); border-radius: 7px 15px 15px 15px; background: #f5e6da; font-size: 0.81rem; line-height: 1.55; }
+.messageBubble p > small,
+.communityMessage p > small { margin-left: 0.45rem; color: inherit; font-size: 0.54rem; font-weight: 650; opacity: 0.58; }
 .myMessage .messageBubble { grid-column: 2; justify-self: end; text-align: right; }
 .myMessage .messageBubble > span { justify-content: flex-end; }
 .myMessage .messageBubble p { color: #fff; border-color: $primary; border-radius: 15px 7px 15px 15px; background: $primary; text-align: left; }
 
-.composer { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 0.25rem; min-height: 64px; margin: 0 1.2rem 1rem; padding: 0.45rem; border: 1px solid rgba($foreground, 0.1); border-radius: 17px; background: #f5e4d7; box-shadow: 0 12px 30px rgba(73, 34, 15, 0.055); }
+.messageActions { position: absolute; z-index: 8; top: -25px; right: 0; display: flex; align-items: center; padding: 0.2rem; border: 1px solid rgba($foreground, 0.1); border-radius: 11px; background: #fff8f2; box-shadow: 0 9px 24px rgba(73, 34, 15, 0.12); opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity $transition-base, transform $transition-base; }
+.messageRow:hover .messageActions,
+.messageBubble:focus-within .messageActions,
+.communityMessage:hover .messageActions,
+.communityMessage > div:focus-within .messageActions { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.messageActions > button,
+.messageActions > div > button { display: grid; place-items: center; width: 29px; height: 29px; color: $muted-foreground; border-radius: 8px; transition: color $transition-base, background $transition-base; }
+.messageActions > button:hover,
+.messageActions > div > button:hover,
+.messageActions .activeMessageAction { color: $primary; background: #f3dfd0; }
+.messageActions button svg { width: 13px; height: 13px; }
+.messageActions > div:not(.quickReactionPicker) { position: relative; }
+.messageActions > div > button.dangerMessageAction { color: #a84239; background: rgba(168, 66, 57, 0.1); }
+.quickReactionPicker { position: absolute; top: calc(100% + 0.3rem); right: 0; display: flex; gap: 0.1rem; padding: 0.35rem; border: 1px solid rgba($foreground, 0.1); border-radius: 12px; background: #fff8f2; box-shadow: 0 12px 30px rgba(73, 34, 15, 0.14); animation: profileMenuIn 160ms ease-out; }
+.quickReactionPicker > button { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 8px; font-size: 0.9rem; transition: background $transition-base, transform $transition-base; }
+.quickReactionPicker > button:hover { background: #f3dfd0; transform: translateY(-1px); }
+.messageDeleteConfirm { position: absolute; right: -3px; bottom: calc(100% + 0.55rem); display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0.35rem; width: max-content; padding: 0.42rem 0.48rem 0.42rem 0.65rem; border: 1px solid rgba(168, 66, 57, 0.18); border-radius: 11px; background: #fff8f2; box-shadow: 0 12px 30px rgba(73, 34, 15, 0.14); animation: profileMenuIn 160ms ease-out; }
+.communityMessage .messageDeleteConfirm { z-index: 12; top: calc(100% + 0.3rem); right: auto; bottom: auto; left: 0; }
+.messageDeleteConfirm > span { color: $foreground; font-size: 0.58rem; font-weight: 700; }
+.messageDeleteConfirm > button { width: auto; min-width: 27px; height: 27px; padding: 0 0.45rem; color: $muted-foreground; border-radius: 7px; font-size: 0.56rem; font-weight: 750; }
+.messageDeleteConfirm > button:last-child { color: #fff; background: #a84239; }
+.messageReplyPreview { display: grid; max-width: min(420px, 100%); margin: 0.22rem 0 0.32rem; padding-left: 0.65rem; color: $muted-foreground; border-left: 2px solid rgba($primary, 0.38); text-align: left; }
+.messageReplyPreview strong,
+.messageReplyPreview span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.messageReplyPreview strong { color: $primary; font-size: 0.57rem; }
+.messageReplyPreview span { max-width: 100%; font-size: 0.6rem; line-height: 1.4; }
+.myMessage .messageReplyPreview { margin-left: auto; text-align: right; border-right: 2px solid rgba($primary, 0.38); border-left: 0; padding-right: 0.65rem; padding-left: 0; }
+.messageEditForm { display: grid; grid-template-columns: minmax(170px, 1fr) auto auto; align-items: center; gap: 0.35rem; min-width: min(480px, 70vw); padding: 0.35rem; border: 1px solid rgba($primary, 0.28); border-radius: 12px; background: #fff8f2; box-shadow: 0 0 0 3px rgba($primary, 0.05); }
+.messageEditForm input { min-width: 0; height: 34px; padding: 0 0.55rem; border: 0; outline: 0; background: transparent; font-size: 0.75rem; }
+.messageEditForm button { min-height: 30px; padding: 0 0.55rem; color: $muted-foreground; border-radius: 8px; font-size: 0.56rem; font-weight: 750; }
+.messageEditForm button:last-child { color: #fff; background: $foreground; }
+.messageEditForm button:disabled { cursor: default; opacity: 0.38; }
+.messageReactions { display: flex; flex-wrap: wrap; gap: 0.28rem; margin-top: 0.35rem; }
+.myMessage .messageReactions { justify-content: flex-end; }
+.messageReactions > button { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 27px; padding: 0 0.48rem; color: $muted-foreground; border: 1px solid rgba($foreground, 0.09); border-radius: 9px; background: #f5e6da; transition: border-color $transition-base, background $transition-base, transform $transition-base; }
+.messageReactions > button:hover { transform: translateY(-1px); }
+.messageReactions > button.reacted { color: $primary; border-color: rgba($primary, 0.28); background: rgba($primary, 0.08); }
+.messageReactions span { font-size: 0.78rem; }
+.messageReactions small { font-size: 0.55rem; font-weight: 800; }
+
+.composer { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 0.25rem; min-height: 64px; margin: 0 1.2rem 1rem; padding: 0.45rem; border: 1px solid rgba($foreground, 0.1); border-radius: 17px; background: #f5e4d7; box-shadow: 0 12px 30px rgba(73, 34, 15, 0.055); }
 .composer input { min-width: 0; height: 42px; padding: 0 0.35rem; color: $foreground; border: 0; outline: 0; background: transparent; font-size: 0.81rem; }
 .composer input::placeholder { color: rgba($muted-foreground, 0.7); }
 .composer button { display: grid; place-items: center; width: 38px; height: 38px; color: $muted-foreground; border-radius: 11px; }
@@ -445,6 +514,18 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .composer button svg { width: 17px; }
 .composer button.sendButton { color: #fff; background: $foreground; }
 .composer button.sendButton:disabled { cursor: default; opacity: 0.35; }
+.composerContext { position: absolute; z-index: 5; right: 0.65rem; bottom: calc(100% - 1px); left: 0.65rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 49px; padding: 0.45rem 0.5rem 0.45rem 0.78rem; border: 1px solid rgba($foreground, 0.1); border-bottom: 0; border-radius: 13px 13px 0 0; background: #f5e4d7; box-shadow: 0 -8px 22px rgba(73, 34, 15, 0.045); animation: profileMenuIn 160ms ease-out; }
+.composerContext > span { display: flex; min-width: 0; flex-direction: column; gap: 0.08rem; color: $muted-foreground; font-size: 0.56rem; }
+.composerContext strong { color: $foreground; }
+.composerContext small { overflow: hidden; max-width: 62ch; color: $muted-foreground; font-size: 0.57rem; text-overflow: ellipsis; white-space: nowrap; }
+.composer .composerContext > button { flex: 0 0 auto; width: 31px; height: 31px; }
+.emojiPickerWrap { position: relative; display: grid; place-items: center; }
+.composer .emojiPickerWrap > button.activeEmojiButton { color: $primary; background: #fff8f2; }
+.emojiPicker { position: absolute; z-index: 60; right: 0; bottom: calc(100% + 0.75rem); width: 238px; padding: 0.65rem; border: 1px solid rgba($foreground, 0.1); border-radius: 16px; background: #fff8f2; box-shadow: 0 18px 45px rgba(45, 24, 16, 0.18); animation: profileMenuIn 160ms ease-out; }
+.emojiPicker > span { display: block; padding: 0 0.2rem 0.45rem; color: $muted-foreground; font-size: 0.55rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.emojiPicker > div { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; }
+.composer .emojiPicker button { display: grid; place-items: center; width: 39px; height: 36px; border-radius: 9px; background: transparent; font-size: 1rem; transition: background $transition-base, transform $transition-base; }
+.composer .emojiPicker button:hover { background: #f3dfd0; transform: translateY(-1px); }
 
 .communityRoom { display: flex; flex-direction: column; justify-content: flex-end; }
 .roomWelcome { margin-bottom: 2.5rem; }
@@ -453,10 +534,13 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .roomWelcome small { color: $primary; font-size: 0.59rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .roomWelcome h2 { margin: 0.25rem 0 0.5rem; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.055em; }
 .roomWelcome p { max-width: 580px; color: $muted-foreground; font-size: 0.82rem; line-height: 1.6; }
-.communityMessage { display: grid; grid-template-columns: auto 1fr; gap: 0.7rem; margin: 0.9rem 0; }
-.communityMessage > i { display: grid; place-items: center; width: 34px; height: 34px; color: #fff; border-radius: 11px; font-size: 0.5rem; font-style: normal; font-weight: 800; }
+.communityMessage { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem; margin: 0.9rem 0; }
+.communityMessage > div { position: relative; width: fit-content; max-width: min(680px, 100%); min-width: 0; justify-self: start; }
+.communityMessageAvatar { display: grid; place-items: center; width: 34px; height: 34px; color: #fff; border-radius: 11px; font-size: 0.5rem; font-weight: 800; transition: transform $transition-base, box-shadow $transition-base; }
+.communityMessageAvatar:hover { box-shadow: 0 7px 15px rgba(73, 34, 15, 0.14); transform: translateY(-1px); }
 .communityMessage > div > span { display: flex; align-items: baseline; gap: 0.5rem; }
-.communityMessage strong { font-size: 0.76rem; }
+.communityMemberName { font-size: 0.76rem; font-weight: 750; }
+.communityMemberName:hover { color: $primary; }
 .communityMessage time { color: rgba($muted-foreground, 0.65); font-size: 0.58rem; }
 .communityMessage p { margin-top: 0.25rem; color: $foreground; font-size: 0.8rem; line-height: 1.5; }
 .voiceRoomCard { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem; margin-top: 0.75rem; padding: 1rem; border: 1px solid rgba($foreground, 0.08); border-radius: 18px; background: #f5e6da; }
@@ -495,6 +579,22 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .friendRow > button { display: grid; place-items: center; width: 35px; height: 35px; color: $muted-foreground; border-radius: 10px; }
 .friendRow > button:hover { color: $foreground; background: #f3dfd0; }
 .friendRow > button svg { width: 16px; }
+.friendRowMenu { position: relative; }
+.friendRowMenu > button { display: grid; place-items: center; width: 35px; height: 35px; color: $muted-foreground; border-radius: 10px; }
+.friendRowMenu > button:hover,
+.friendRowMenu > button.activeFriendMenu { color: $foreground; background: #f3dfd0; }
+.friendRowMenu > button svg { width: 16px; }
+.friendActionsMenu { position: absolute; z-index: 48; top: calc(100% + 0.35rem); right: 0; width: 205px; padding: 0.4rem; border: 1px solid rgba($foreground, 0.1); border-radius: 14px; background: #fff8f2; box-shadow: 0 16px 38px rgba(45, 24, 16, 0.17); animation: profileMenuIn 160ms ease-out; }
+.friendActionsMenu > div { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; margin-bottom: 0.25rem; padding: 0.45rem 0.55rem 0.55rem; border-bottom: 1px solid rgba($foreground, 0.07); }
+.friendActionsMenu > div strong,
+.friendActionsMenu > div small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.friendActionsMenu > div strong { font-size: 0.66rem; }
+.friendActionsMenu > div small { color: $muted-foreground; font-size: 0.53rem; }
+.friendActionsMenu > button { display: flex; align-items: center; gap: 0.5rem; width: 100%; min-height: 36px; padding: 0 0.55rem; color: $muted-foreground; border-radius: 9px; font-size: 0.61rem; font-weight: 650; text-align: left; }
+.friendActionsMenu > button:hover { color: $foreground; background: #f3dfd0; }
+.friendActionsMenu > button svg { width: 14px; }
+.friendActionsMenu > button.dangerMenuAction { color: #a84239; }
+.friendActionsMenu > button.dangerMenuAction:hover { background: rgba(179, 73, 63, 0.08); }
 .personAvatar.offlineAvatar { filter: saturate(0.55); opacity: 0.72; }
 .personAvatar.offlineAvatar i { background: #a99485; }
 
@@ -590,6 +690,66 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .contactPicker small { overflow: hidden; color: $muted-foreground; font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
 .selectionMark { display: grid; place-items: center; width: 21px; height: 21px; color: #fff; border: 1px solid rgba($foreground, 0.14); border-radius: 7px; font-size: 0.62rem; font-style: normal; }
 .selectedContact .selectionMark { border-color: $primary; background: $primary; }
+.groupMembersModal { width: min(100%, 560px); }
+.groupMembersBody { display: grid; min-height: 0; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.2rem 1.5rem 1.4rem; overflow-y: auto; }
+.groupMembersBody > section { min-width: 0; padding: 0.65rem; border: 1px solid rgba($foreground, 0.08); border-radius: 15px; background: #f8e9de; }
+.groupMembersSectionTitle { display: flex; align-items: center; justify-content: space-between; padding: 0.2rem 0.25rem 0.55rem; color: $muted-foreground; }
+.groupMembersSectionTitle span { font-size: 0.56rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+.groupMembersSectionTitle small { display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 0.25rem; border-radius: 99px; background: #ead6c8; font-size: 0.51rem; font-weight: 800; }
+.groupMemberRow,
+.availableGroupMembers > button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.55rem; width: 100%; min-height: 52px; padding: 0.4rem 0.35rem; border-radius: 11px; text-align: left; }
+.groupMemberRow:hover,
+.availableGroupMembers > button:hover { background: #fff8f2; }
+.groupMemberRow .personAvatar,
+.availableGroupMembers .personAvatar { width: 34px; height: 34px; border-radius: 11px; font-size: 0.48rem; font-style: normal; }
+.groupMemberRow > span,
+.availableGroupMembers > button > span { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; }
+.groupMemberRow strong,
+.groupMemberRow small,
+.availableGroupMembers strong,
+.availableGroupMembers small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.groupMemberRow strong,
+.availableGroupMembers strong { font-size: 0.65rem; }
+.groupMemberRow small,
+.availableGroupMembers small { color: $muted-foreground; font-size: 0.53rem; }
+.groupMemberRow > button,
+.availableGroupMembers > button > b { display: grid; place-items: center; width: 31px; height: 31px; color: $muted-foreground; border-radius: 9px; }
+.groupMemberRow > button:hover { color: #a84239; background: rgba(179, 73, 63, 0.08); }
+.groupMemberRow > button svg,
+.availableGroupMembers > button > b svg { width: 14px; }
+.currentGroupMember > b { padding: 0.25rem 0.35rem; color: $primary; border-radius: 6px; background: rgba($primary, 0.08); font-size: 0.46rem; }
+.groupMemberSearch { display: flex; align-items: center; gap: 0.45rem; min-height: 39px; margin-bottom: 0.35rem; padding: 0 0.55rem; border: 1px solid rgba($foreground, 0.09); border-radius: 10px; background: #fff8f2; }
+.groupMemberSearch svg { flex: 0 0 auto; width: 14px; color: $muted-foreground; }
+.groupMemberSearch input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font-size: 0.62rem; }
+.availableGroupMembers { max-height: 290px; overflow-y: auto; }
+.availableGroupMembers > button > b { color: $primary; background: rgba($primary, 0.08); }
+.availableGroupMembers > p { padding: 1.4rem 0.5rem; color: $muted-foreground; font-size: 0.6rem; line-height: 1.45; text-align: center; }
+.addFriendModal { width: min(100%, 510px); }
+.addFriendBody { min-height: 0; padding: 0.2rem 1.5rem 1.4rem; }
+.addFriendBody > label { display: flex; align-items: center; gap: 0.5rem; min-height: 43px; margin-bottom: 0.65rem; padding: 0 0.7rem; border: 1px solid rgba($foreground, 0.09); border-radius: 11px; background: #f8e9de; }
+.addFriendBody > label svg { flex: 0 0 auto; width: 15px; color: $muted-foreground; }
+.addFriendBody > label input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font-size: 0.68rem; }
+.friendCandidateList { max-height: 360px; overflow-y: auto; }
+.friendCandidateList > button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.65rem; width: 100%; min-height: 58px; padding: 0.45rem 0.55rem; border-radius: 12px; text-align: left; }
+.friendCandidateList > button:hover { background: #f3dfd0; }
+.friendCandidateList .personAvatar { width: 36px; height: 36px; border-radius: 11px; font-size: 0.49rem; font-style: normal; }
+.friendCandidateList > button > span { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; }
+.friendCandidateList strong,
+.friendCandidateList small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.friendCandidateList strong { font-size: 0.69rem; }
+.friendCandidateList small { color: $muted-foreground; font-size: 0.55rem; }
+.friendCandidateList > button > b { display: grid; place-items: center; width: 31px; height: 31px; color: $primary; border-radius: 9px; background: rgba($primary, 0.08); }
+.friendCandidateList > button > b svg { width: 14px; }
+.friendCandidateList > p { padding: 2rem 1rem; color: $muted-foreground; font-size: 0.62rem; line-height: 1.5; text-align: center; }
+.removeFriendModal { width: min(100%, 450px); }
+.removeFriendBody { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.8rem; margin: 0.2rem 1.5rem 1.4rem; padding: 0.9rem; border-radius: 15px; background: #f3dfd0; }
+.removeFriendBody .personAvatar { font-style: normal; }
+.removeFriendBody > div { display: flex; min-width: 0; flex-direction: column; }
+.removeFriendBody strong { font-size: 0.75rem; }
+.removeFriendBody span { color: $muted-foreground; font-size: 0.59rem; }
+.removeFriendBody p { margin-top: 0.35rem; color: $muted-foreground; font-size: 0.57rem; line-height: 1.4; }
+.newMessageModal > footer > button.secondaryModalButton { color: $foreground; border: 1px solid rgba($foreground, 0.1); background: #f3dfd0; }
+.newMessageModal > footer > button.dangerModalButton { color: #fff; background: #a84239; }
 .newMessageModal > footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.5rem 1.3rem; border-top: 1px solid rgba($foreground, 0.08); }
 .newMessageModal > footer > span { color: $muted-foreground; font-size: 0.61rem; }
 .newMessageModal > footer > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 42px; padding: 0 0.9rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.69rem; font-weight: 750; }
@@ -619,13 +779,17 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .formField textarea:focus,
 .formField select:focus,
 .roomNameInput:focus-within { border-color: rgba($primary, 0.45); box-shadow: 0 0 0 3px rgba($primary, 0.08); }
-.tonePicker { display: flex; gap: 0.55rem; }
+.tonePicker { display: flex; flex-wrap: wrap; gap: 0.55rem; }
 .toneOption { position: relative; display: grid; place-items: center; width: 42px; height: 42px; border: 2px solid transparent; border-radius: 13px; background: #f3dfd0; }
 .toneOption > i { width: 27px; height: 27px; border-radius: 9px; }
 .toneOption.coral > i { background: linear-gradient(145deg, #e85d04, #ff8b4c); }
 .toneOption.amber > i { background: linear-gradient(145deg, #f6b64f, #ffd386); }
 .toneOption.rose > i { background: linear-gradient(145deg, #d97465, #f2a28f); }
 .toneOption.brown > i { background: linear-gradient(145deg, #68402f, #9a6952); }
+.toneOption.sage > i { background: linear-gradient(145deg, #78937c, #b1c7a8); }
+.toneOption.plum > i { background: linear-gradient(145deg, #8b668c, #bd8eae); }
+.toneOption.ocean > i { background: linear-gradient(145deg, #3f7590, #72a8bb); }
+.toneOption.mint > i { background: linear-gradient(145deg, #6f9f8a, #a9cfb9); }
 .toneOption > svg { position: absolute; right: -4px; bottom: -4px; width: 16px; height: 16px; padding: 3px; color: #fff; border: 2px solid #fff8f2; border-radius: 50%; background: $primary; }
 .toneOption.selectedTone { border-color: rgba($primary, 0.3); background: #fff8f2; box-shadow: 0 6px 15px rgba(73, 34, 15, 0.07); }
 .visibilityPicker { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
@@ -643,6 +807,13 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .switchRow > i b { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff8f2; box-shadow: 0 2px 5px rgba(45, 24, 16, 0.15); transition: transform $transition-base; }
 .switchRow > i.switchActive { background: $primary; }
 .switchRow > i.switchActive b { transform: translateX(16px); }
+.roleManagerRow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.7rem; width: 100%; padding: 0.85rem; border: 1px solid rgba($foreground, 0.08); border-radius: 14px; background: #f8e9de; text-align: left; }
+.roleManagerRow:hover { border-color: rgba($primary, 0.24); background: rgba($primary, 0.055); }
+.roleManagerRow > svg:first-child { width: 19px; color: $primary; }
+.roleManagerRow > svg:last-child { width: 15px; color: $muted-foreground; }
+.roleManagerRow > span { display: flex; flex-direction: column; gap: 0.18rem; }
+.roleManagerRow strong { font-size: 0.69rem; }
+.roleManagerRow small { color: $muted-foreground; font-size: 0.59rem; }
 .channelModal { width: min(100%, 520px); }
 .roomNameInput { display: flex; align-items: center; gap: 0.45rem; min-height: 44px; padding: 0 0.72rem; }
 .roomNameInput > svg { width: 16px; flex: 0 0 auto; color: $primary; }
@@ -658,6 +829,151 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
 .categoryPreview > div svg { width: 13px; }
 .categoryPreview p { display: flex; align-items: center; gap: 0.45rem; min-height: 34px; padding: 0 0.35rem; color: $muted-foreground; font-size: 0.65rem; }
 .categoryPreview p svg { width: 14px; color: $primary; }
+
+.rolesModal { width: min(100%, 820px); height: min(720px, calc(100svh - 2rem)); }
+.rolesDialogTitle { display: flex; align-items: center; gap: 0.7rem; }
+.rolesDialogTitle > button { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; color: $muted-foreground; border-radius: 10px; background: #f3dfd0; }
+.rolesDialogTitle > button:hover { color: $foreground; }
+.rolesDialogTitle > button svg { width: 16px; }
+.rolesDialogTitle > div > span { color: $primary; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.rolesWorkspace { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: 0; flex: 1; border-top: 1px solid rgba($foreground, 0.08); }
+.rolesList { padding: 1rem 0.7rem; overflow-y: auto; border-right: 1px solid rgba($foreground, 0.08); background: #f3dfd0; }
+.rolesList > div { display: flex; align-items: center; justify-content: space-between; padding: 0 0.35rem 0.65rem; color: $muted-foreground; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.rolesList > div button { display: grid; place-items: center; width: 27px; height: 27px; color: $primary; border-radius: 8px; background: rgba(255, 248, 242, 0.68); }
+.rolesList > div button svg { width: 14px; }
+.rolesList > button { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.6rem; width: 100%; min-height: 50px; padding: 0.45rem 0.55rem; border: 1px solid transparent; border-radius: 12px; text-align: left; }
+.rolesList > button:hover,
+.rolesList > button.selectedRole { border-color: rgba($primary, 0.12); background: #fff8f2; }
+.rolesList > button > i { width: 14px; height: 14px; border-radius: 50%; background: $primary; box-shadow: inset 0 0 0 1px rgba(45, 24, 16, 0.1); }
+.rolesList > button > span { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; }
+.rolesList strong { overflow: hidden; font-size: 0.69rem; text-overflow: ellipsis; white-space: nowrap; }
+.rolesList small { color: $muted-foreground; font-size: 0.54rem; }
+.roleEditor { min-height: 0; padding: 1.1rem 1.25rem 1.4rem; overflow-y: auto; }
+.roleIdentity { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; padding-bottom: 1.1rem; border-bottom: 1px solid rgba($foreground, 0.08); }
+.roleIdentity > div { display: flex; flex-direction: column; gap: 0.42rem; }
+.roleIdentity span { font-size: 0.63rem; font-weight: 750; }
+.roleDetailsFields > label { display: flex; flex-direction: column; gap: 0.42rem; }
+.roleDetailsFields > label input { min-height: 43px; padding: 0 0.75rem; border: 1px solid rgba($foreground, 0.1); border-radius: 11px; outline: 0; background: #f8e9de; font-size: 0.72rem; }
+.roleTonePicker { display: flex; gap: 0.35rem; }
+.roleTonePicker button,
+.customRoleColor { position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 39px; height: 43px; border: 1px solid transparent; border-radius: 12px; background: #f8e9de; cursor: pointer; transition: border-color $transition-base, background $transition-base, transform $transition-base; }
+.roleTonePicker button:hover,
+.customRoleColor:hover { background: #fff8f2; transform: translateY(-1px); }
+.roleTonePicker button i { width: 21px; height: 21px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(45, 24, 16, 0.08); }
+.roleTonePicker > button > svg,
+.customRoleColor > svg { position: absolute; right: 1px; bottom: 1px; box-sizing: border-box; width: 16px; height: 16px; padding: 3px; color: #fff; border: 2px solid #fff8f2; border-radius: 50%; background: $foreground; box-shadow: 0 2px 5px rgba(45, 24, 16, 0.2); }
+.roleTonePicker button.activeRoleTone,
+.customRoleColor.activeRoleTone { border-color: rgba($primary, 0.3); background: #fff8f2; box-shadow: 0 5px 14px rgba(73, 34, 15, 0.07); }
+.customRoleColor input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.customRoleColor > i { display: grid; place-items: center; width: 23px; height: 23px; color: #fff; border: 2px solid #fff8f2; border-radius: 50%; box-shadow: 0 2px 7px rgba(45, 24, 16, 0.18); }
+.customRoleColor > i svg { width: 12px; height: 12px; filter: drop-shadow(0 1px 1px rgba(45, 24, 16, 0.35)); }
+.customRoleColor:focus-within { outline: 2px solid rgba($primary, 0.35); outline-offset: 2px; }
+.permissionHeading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.15rem 0 0.75rem; }
+.permissionHeading > div { display: flex; align-items: center; gap: 0.6rem; }
+.permissionHeading svg { width: 19px; color: $primary; }
+.permissionHeading span { display: flex; flex-direction: column; gap: 0.12rem; }
+.permissionHeading strong { font-size: 0.72rem; }
+.permissionHeading small { color: $muted-foreground; font-size: 0.57rem; }
+.permissionHeading > b { color: $primary; font-size: 0.62rem; }
+.permissionList { display: flex; flex-direction: column; gap: 0.35rem; }
+.permissionList > button { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 56px; padding: 0.65rem 0.75rem; border: 1px solid rgba($foreground, 0.08); border-radius: 12px; background: #f8e9de; text-align: left; }
+.permissionList > button > span { display: flex; flex-direction: column; gap: 0.12rem; }
+.permissionList strong { font-size: 0.67rem; }
+.permissionList small { color: $muted-foreground; font-size: 0.56rem; line-height: 1.35; }
+.permissionList > button > i { position: relative; flex: 0 0 auto; width: 35px; height: 20px; border-radius: 99px; background: #cfbbaa; }
+.permissionList > button > i b { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff8f2; transition: transform $transition-base; }
+.permissionList > button.permissionEnabled > i { background: $primary; }
+.permissionList > button.permissionEnabled > i b { transform: translateX(15px); }
+.permissionList > button:disabled { cursor: default; opacity: 0.74; }
+.protectedRoleNote { margin-top: 0.8rem; color: $muted-foreground; font-size: 0.59rem; }
+.deleteRoleButton,
+.removeMemberButton { display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 0.9rem; padding: 0.55rem 0.7rem; color: #a84239; border-radius: 9px; background: rgba(179, 73, 63, 0.08); font-size: 0.62rem; font-weight: 750; }
+.deleteRoleButton svg,
+.removeMemberButton svg { width: 14px; }
+
+.memberProfileModal { width: min(100%, 510px); }
+.memberProfileBody { min-height: 0; padding: 0.2rem 1.5rem 1.4rem; overflow-y: auto; }
+.memberProfileHero { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; padding: 0.9rem; border-radius: 16px; background: #f3dfd0; }
+.memberProfileAvatar { position: relative; display: grid; place-items: center; width: 54px; height: 54px; color: #fff; border-radius: 17px; background: $primary; font-size: 0.7rem; font-style: normal; font-weight: 850; }
+.memberProfileAvatar.coral { background: linear-gradient(145deg, #e85d04, #ff8b4c); }
+.memberProfileAvatar.amber { color: $foreground; background: linear-gradient(145deg, #f6b64f, #ffd386); }
+.memberProfileAvatar.rose { background: linear-gradient(145deg, #d97465, #f2a28f); }
+.memberProfileAvatar.brown { background: linear-gradient(145deg, #68402f, #9a6952); }
+.memberProfileAvatar.sage { background: linear-gradient(145deg, #78937c, #9db5a0); }
+.memberProfileAvatar.plum { background: linear-gradient(145deg, #8b668c, #ad89ae); }
+.memberProfileHero > div { display: flex; min-width: 0; flex-direction: column; }
+.memberProfileHero h3 { overflow: hidden; font-size: 1rem; text-overflow: ellipsis; white-space: nowrap; }
+.memberProfileHero > div > span { color: $muted-foreground; font-size: 0.65rem; }
+.memberProfileHero > div.memberProfileRoles { align-items: flex-end; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem; }
+.memberProfileRoles em { padding: 0.32rem 0.42rem; border: 1px solid rgba($primary, 0.2); border-radius: 8px; background: rgba(255, 248, 242, 0.66); font-size: 0.5rem; font-style: normal; font-weight: 800; text-transform: uppercase; }
+.memberProfileRoles small { display: grid; place-items: center; min-width: 25px; min-height: 25px; color: $muted-foreground; border-radius: 8px; background: rgba(255, 248, 242, 0.66); font-size: 0.5rem; font-weight: 800; }
+.memberBio { margin: 1rem 0; color: $foreground; font-size: 0.72rem; line-height: 1.55; }
+.memberFacts { display: grid; grid-template-columns: 1fr; gap: 0.55rem; }
+.memberFacts > div { display: flex; flex-direction: column; gap: 0.18rem; padding: 0.7rem; border: 1px solid rgba($foreground, 0.08); border-radius: 12px; background: #f8e9de; }
+.memberFacts span { color: $muted-foreground; font-size: 0.54rem; font-weight: 750; text-transform: uppercase; }
+.memberFacts strong { font-size: 0.63rem; }
+.memberActions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-top: 0.8rem; }
+.memberActions button { display: flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 42px; color: $foreground; border: 1px solid rgba($foreground, 0.09); border-radius: 11px; background: #fff8f2; font-size: 0.64rem; font-weight: 750; }
+.memberActions button:first-child { color: #fff; border-color: $foreground; background: $foreground; }
+.memberActions svg { width: 15px; }
+.memberRoleSelect { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 1rem; }
+.memberRoleSelect > span { display: flex; align-items: center; gap: 0.4rem; font-size: 0.65rem; font-weight: 750; }
+.memberRoleSelect > span svg { width: 16px; color: $primary; }
+.memberRoleSelect small { color: $muted-foreground; font-size: 0.56rem; }
+.memberRolePicker { position: relative; }
+.memberRoleTrigger { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.65rem; width: 100%; min-height: 52px; padding: 0.5rem 0.65rem; border: 1px solid rgba($foreground, 0.1); border-radius: 12px; background: #f8e9de; text-align: left; }
+.memberRoleTrigger:hover,
+.memberRoleTrigger[aria-expanded="true"] { border-color: rgba($primary, 0.28); background: #fff8f2; }
+.memberRoleTrigger > span:nth-child(2) { display: flex; min-width: 0; flex-direction: column; gap: 0.1rem; }
+.memberRoleTrigger strong,
+.memberRoleTrigger small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.memberRoleTrigger strong { font-size: 0.66rem; }
+.memberRoleTrigger > svg { width: 15px; color: $muted-foreground; transition: transform $transition-base; }
+.memberRoleTrigger[aria-expanded="true"] > svg { transform: rotate(180deg); }
+.roleColourStack { display: flex; align-items: center; min-width: 34px; padding-left: 8px; }
+.roleColourStack i { width: 16px; height: 16px; margin-left: -8px; border: 2px solid #f8e9de; border-radius: 50%; }
+.memberRoleTrigger:hover .roleColourStack i,
+.memberRoleTrigger[aria-expanded="true"] .roleColourStack i { border-color: #fff8f2; }
+.roleColourStack b { display: grid; place-items: center; min-width: 21px; height: 21px; margin-left: -5px; padding: 0 0.2rem; color: $muted-foreground; border: 2px solid #f8e9de; border-radius: 99px; background: #ead6c8; font-size: 0.46rem; }
+.memberRoleDropdown { position: relative; max-height: 0; overflow: hidden; margin-top: 0; visibility: hidden; opacity: 0; border: 1px solid transparent; border-radius: 14px; background: #fff8f2; box-shadow: 0 12px 30px rgba(45, 24, 16, 0); transform: translateY(-7px); pointer-events: none; transition: max-height 320ms cubic-bezier(0.22, 1, 0.36, 1), margin 260ms ease, opacity 190ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1), border-color 190ms ease, box-shadow 260ms ease, visibility 0s linear 320ms; }
+.memberRoleDropdown.memberRoleDropdownOpen { max-height: 340px; margin-top: 0.45rem; visibility: visible; opacity: 1; border-color: rgba($foreground, 0.11); box-shadow: 0 12px 30px rgba(45, 24, 16, 0.13); transform: translateY(0); pointer-events: auto; transition-delay: 0s; }
+.memberRoleDropdown > label { display: flex; align-items: center; gap: 0.45rem; margin: 0.6rem; padding: 0 0.6rem; border: 1px solid rgba($foreground, 0.09); border-radius: 10px; background: #f8e9de; }
+.memberRoleDropdown > label svg { flex: 0 0 auto; width: 14px; color: $muted-foreground; }
+.memberRoleDropdown > label input { min-width: 0; height: 38px; flex: 1; border: 0; outline: 0; background: transparent; font-size: 0.64rem; }
+.memberRoleDropdownList { max-height: 220px; padding: 0 0.4rem 0.4rem; overflow-y: auto; }
+.memberRoleDropdownList > button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.55rem; width: 100%; min-height: 45px; padding: 0.4rem 0.5rem; border-radius: 10px; text-align: left; }
+.memberRoleDropdownList > button:hover,
+.memberRoleDropdownList > button.selectedMemberRole { background: #f3dfd0; }
+.memberRoleDropdownList > button:disabled { cursor: default; opacity: 0.6; }
+.memberRoleDropdownList > button > i { width: 11px; height: 11px; border-radius: 50%; }
+.memberRoleDropdownList > button > span { display: flex; min-width: 0; flex-direction: column; gap: 0.08rem; }
+.memberRoleDropdownList strong { overflow: hidden; font-size: 0.63rem; text-overflow: ellipsis; white-space: nowrap; }
+.memberRoleDropdownList small { font-size: 0.5rem; }
+.memberRoleDropdownList > button > b { display: grid; place-items: center; box-sizing: border-box; width: 18px; height: 18px; padding: 0; color: #fff; border: 1px solid rgba($foreground, 0.14); border-radius: 6px; line-height: 0; }
+.memberRoleDropdownList > button > b svg { display: block; width: 11px; height: 11px; }
+.memberRoleDropdownList > button.selectedMemberRole > b { border-color: $primary; background: $primary; }
+.memberRoleDropdownList > p { padding: 1.2rem 0.6rem; color: $muted-foreground; font-size: 0.62rem; text-align: center; }
+.memberRoleDropdown > footer { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.65rem; border-top: 1px solid rgba($foreground, 0.08); background: #f8e9de; }
+.memberRoleDropdown > footer span { color: $muted-foreground; font-size: 0.54rem; }
+.memberRoleDropdown > footer small { display: flex; align-items: center; gap: 0.3rem; color: #378a50; font-size: 0.52rem; font-weight: 700; }
+.memberRoleDropdown > footer small svg { width: 12px; height: 12px; }
+.memberNote { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 1rem; }
+.memberNote > span { display: flex; align-items: center; gap: 0.4rem; font-size: 0.65rem; font-weight: 750; }
+.memberNote > span svg { width: 16px; color: $primary; }
+.memberNote textarea { min-height: 78px; padding: 0.7rem; resize: vertical; color: $foreground; border: 1px solid rgba($foreground, 0.1); border-radius: 11px; outline: 0; background: #f8e9de; font: inherit; font-size: 0.68rem; line-height: 1.45; }
+.memberNote textarea:focus { border-color: rgba($primary, 0.42); box-shadow: 0 0 0 3px rgba($primary, 0.07); }
+.memberNote textarea::placeholder { color: rgba($muted-foreground, 0.72); }
+.memberNote > small { align-self: flex-end; color: $muted-foreground; font-size: 0.53rem; }
+.removeMemberConfirm { margin-top: 0.9rem; padding: 0.75rem; border: 1px solid rgba(179, 73, 63, 0.16); border-radius: 13px; background: rgba(179, 73, 63, 0.055); }
+.removeMemberConfirm > div:first-child { display: flex; align-items: flex-start; gap: 0.55rem; }
+.removeMemberConfirm > div:first-child > svg { flex: 0 0 auto; width: 16px; color: #a84239; }
+.removeMemberConfirm > div:first-child span { display: flex; flex-direction: column; gap: 0.15rem; }
+.removeMemberConfirm strong { font-size: 0.66rem; }
+.removeMemberConfirm small { color: $muted-foreground; font-size: 0.56rem; }
+.removeMemberConfirm > div:last-child { display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.7rem; }
+.removeMemberConfirm > div:last-child button { min-height: 34px; padding: 0 0.65rem; border-radius: 9px; font-size: 0.59rem; font-weight: 750; }
+.removeMemberConfirm > div:last-child button:first-child { color: $muted-foreground; background: #fff8f2; }
+.removeMemberConfirm > div:last-child button:last-child { color: #fff; background: #a84239; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
@@ -688,9 +1004,18 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
     .mobileBack { display: grid; place-items: center; flex: 0 0 auto; width: 35px; height: 35px; color: $muted-foreground; border-radius: 10px; }
     .mobileBack svg { width: 18px; }
     .messageArea { padding: 1.5rem 1rem; }
+    .rolesWorkspace { grid-template-columns: 1fr; overflow-y: auto; }
+    .rolesList { display: flex; gap: 0.4rem; padding: 0.7rem; overflow-x: auto; border-right: 0; border-bottom: 1px solid rgba($foreground, 0.08); }
+    .rolesList > div { flex: 0 0 auto; }
+    .rolesList > div > span { display: none; }
+    .rolesList > button { flex: 0 0 145px; }
+    .roleIdentity { grid-template-columns: 1fr; }
+    .memberProfileHero { grid-template-columns: auto minmax(0, 1fr); }
+    .memberProfileHero > div.memberProfileRoles { grid-column: 1 / -1; align-items: flex-start; justify-content: flex-start; }
+    .groupMembersBody { grid-template-columns: 1fr; }
+    .availableGroupMembers { max-height: 220px; }
     .composer { margin-right: 0.7rem; margin-left: 0.7rem; }
-    .composer > button:nth-of-type(2),
-    .composer > button:nth-of-type(3) { display: none; }
+    .composer > button.mobileOptionalAction { display: none; }
     .friendsHeading { align-items: flex-start; flex-direction: column; gap: 1rem; }
     .friendFilters { width: 100%; }
     .friendFilters button { flex: 1; }
@@ -718,6 +1043,13 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
     .membersPanel { grid-column: 1; width: 100%; border-right: 0; box-shadow: none; }
 }
 
+@media (hover: none) {
+    .messageActions { position: relative; width: max-content; margin: 0 0 0.3rem auto; opacity: 1; pointer-events: auto; transform: none; }
+    .messageDeleteConfirm,
+    .quickReactionPicker { top: calc(100% + 0.45rem); right: 0; bottom: auto; }
+    .communityMessage .messageDeleteConfirm { right: 0; left: auto; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .messageSpace,
     .communityButton,
@@ -735,5 +1067,10 @@ i.plum { background: linear-gradient(145deg, #8f5c68, #bd8290); }
     .newMessageModal,
     .membersPanel { animation: none; }
     .communityChatPanel,
-    .membersPanel { transition: none; }
+    .membersPanel,
+    .messageActions,
+    .messageReactions > button { transition: none; }
+    .quickReactionPicker,
+    .messageDeleteConfirm,
+    .composerContext { animation: none; }
 }
