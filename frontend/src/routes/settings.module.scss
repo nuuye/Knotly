@@ -416,6 +416,72 @@
 .range { width: 100%; accent-color: $primary; }
 .rangeLabels { display: flex; justify-content: space-between; margin-top: 0.55rem; color: $muted-foreground; font-size: 0.6rem; }
 
+.passwordBackdrop {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(45, 24, 16, 0.42);
+    backdrop-filter: blur(6px);
+    animation: passwordBackdropIn 160ms ease-out;
+}
+
+.passwordDialog {
+    width: min(100%, 520px);
+    max-height: calc(100svh - 2rem);
+    overflow-y: auto;
+    border: 1px solid rgba($foreground, 0.1);
+    border-radius: 24px;
+    background: #fff8f2;
+    box-shadow: 0 30px 90px rgba(45, 24, 16, 0.28);
+    animation: passwordDialogIn 190ms ease-out;
+}
+
+.passwordDialog > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.4rem 1.5rem 1rem; }
+.passwordDialog > header > div > span { color: $primary; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.passwordDialog > header h2 { margin-top: 0.15rem; font-size: 1.55rem; letter-spacing: -0.04em; }
+.passwordDialog > header > button { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; color: $muted-foreground; border-radius: 10px; background: #f3dfd0; }
+.passwordDialog > header > button:hover { color: $foreground; }
+.passwordDialog > header > button svg { width: 16px; }
+.passwordDialog > form { padding: 0.2rem 1.5rem 1.5rem; }
+.passwordFields { display: flex; flex-direction: column; gap: 0.85rem; }
+.passwordField { display: flex; flex-direction: column; gap: 0.4rem; }
+.passwordField > span { color: $foreground; font-size: 0.67rem; font-weight: 750; }
+.passwordField > div { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; min-height: 46px; padding: 0 0.45rem 0 0.75rem; border: 1px solid rgba($foreground, 0.1); border-radius: 12px; background: #f8e9de; transition: border-color $transition-base, box-shadow $transition-base, background $transition-base; }
+.passwordField > div:focus-within { border-color: rgba($primary, 0.5); background: #fffaf6; box-shadow: 0 0 0 3px rgba($primary, 0.08); }
+.passwordField > div > svg { width: 15px; color: $primary; }
+.passwordField input { min-width: 0; height: 44px; border: 0; outline: 0; background: transparent; font-size: 0.73rem; }
+.passwordField button { display: grid; place-items: center; width: 33px; height: 33px; color: $muted-foreground; border-radius: 9px; }
+.passwordField button:hover { color: $foreground; background: #f3dfd0; }
+.passwordField button svg { width: 15px; }
+.passwordRules { margin-top: 1rem; padding: 0.8rem; border-radius: 14px; background: #f3dfd0; }
+.passwordRules > span { display: block; margin-bottom: 0.5rem; color: $foreground; font-size: 0.61rem; font-weight: 800; }
+.passwordRules p { display: flex; align-items: center; gap: 0.45rem; min-height: 25px; color: $muted-foreground; font-size: 0.58rem; }
+.passwordRules p > i { display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid rgba($foreground, 0.14); border-radius: 50%; font-style: normal; }
+.passwordRules p > i svg { width: 10px; }
+.passwordRules p.validPasswordRule { color: #477858; }
+.passwordRules p.validPasswordRule > i { color: #fff; border-color: #4c805e; background: #4c805e; }
+.passwordRules p.invalidPasswordRule { color: #a84239; }
+.passwordRules p.invalidPasswordRule > i { border-color: rgba(168, 66, 57, 0.3); background: rgba(168, 66, 57, 0.08); }
+.passwordDialog form > footer { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba($foreground, 0.08); }
+.passwordDialog form > footer button { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 40px; padding: 0 0.8rem; border-radius: 11px; font-size: 0.64rem; font-weight: 750; }
+.passwordDialog form > footer button:first-child { color: $muted-foreground; background: #f3dfd0; }
+.passwordDialog form > footer button:last-child { color: #fff; background: $foreground; }
+.passwordDialog form > footer button:last-child svg { width: 14px; }
+.passwordDialog form > footer button:disabled { cursor: default; opacity: 0.36; }
+.passwordSuccess { display: flex; align-items: center; flex-direction: column; padding: 1.2rem 1.5rem 1.6rem; text-align: center; }
+.passwordSuccess > i { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: 0.9rem; color: #fff; border-radius: 20px; background: #4c805e; box-shadow: 0 13px 28px rgba(76, 128, 94, 0.2); }
+.passwordSuccess > i svg { width: 29px; }
+.passwordSuccess > strong { font-size: 0.9rem; }
+.passwordSuccess > p { margin-top: 0.25rem; color: $muted-foreground; font-size: 0.67rem; }
+.passwordSuccess > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 40px; margin-top: 1.2rem; padding: 0 1rem; color: #fff; border-radius: 11px; background: $foreground; font-size: 0.65rem; font-weight: 750; }
+.passwordSuccess > button svg { width: 14px; }
+
+@keyframes passwordBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes passwordDialogIn { from { opacity: 0; transform: translateY(9px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
 .mobileHeader,
 .mobileTabs { display: none; }
 
@@ -459,6 +525,11 @@
     .dangerCard button { width: 100%; }
     .saveBar { align-items: flex-start; flex-direction: column; padding: 0.85rem; }
     .saveBar button { width: 100%; justify-content: center; }
+    .passwordDialog { border-radius: 20px; }
+    .passwordDialog > header,
+    .passwordDialog > form { padding-right: 1rem; padding-left: 1rem; }
+    .passwordDialog form > footer { align-items: stretch; flex-direction: column-reverse; }
+    .passwordDialog form > footer button { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -474,7 +545,9 @@
     .toggleTrack,
     .toggleTrack::after,
     .themeGrid > button { transition: none; }
-    .saveBar { animation: none; }
+    .saveBar,
+    .passwordBackdrop,
+    .passwordDialog { animation: none; }
     .backLink:hover,
     .themeGrid > button:hover { transform: none; }
 }

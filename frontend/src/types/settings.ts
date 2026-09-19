@@ -35,3 +35,16 @@ export interface ToggleSettingProps {
     label: string;
     onChange: (checked: boolean) => void;
 }
+
+export interface ChangePasswordDialogProps {
+    onChanged: () => void;
+    onClose: () => void;
+}
+
+export interface SettingsPasswordInputProps {
+    autoComplete: "current-password" | "new-password";
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+}

@@ -21,6 +21,7 @@ import {
     Volume2,
 } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
+import { ChangePasswordDialog } from "../components/settings/ChangePasswordDialog";
 import { ToggleSetting } from "../components/settings/ToggleSetting";
 import {
     INITIAL_NOTIFICATIONS,
@@ -47,6 +48,8 @@ function SettingsPage() {
     const [savedAccount, setSavedAccount] = useState(DEMO_USER_PROFILE);
     const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
     const [privacy, setPrivacy] = useState(INITIAL_PRIVACY);
+    const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+    const [passwordChanged, setPasswordChanged] = useState(false);
 
     const sectionCopy = SETTINGS_COPY[activeSection];
     // Compare the draft with the last saved copy before showing the save bar.
@@ -187,8 +190,8 @@ function SettingsPage() {
                                     <LockKeyhole aria-hidden="true" />
                                 </div>
                                 <div className={styles.actionRows}>
-                                    <button type="button">
-                                        <span><strong>Password</strong><small>Last changed 3 months ago</small></span>
+                                    <button type="button" onClick={() => setPasswordDialogOpen(true)}>
+                                        <span><strong>Password</strong><small>{passwordChanged ? "Changed just now" : "Last changed 3 months ago"}</small></span>
                                         <span>Change <ChevronRight /></span>
                                     </button>
                                     <button type="button">
@@ -314,6 +317,13 @@ function SettingsPage() {
                     )}
                 </div>
             </main>
+
+            {passwordDialogOpen && (
+                <ChangePasswordDialog
+                    onChanged={() => setPasswordChanged(true)}
+                    onClose={() => setPasswordDialogOpen(false)}
+                />
+            )}
         </div>
     );
 }
