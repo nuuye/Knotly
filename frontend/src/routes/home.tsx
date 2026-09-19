@@ -42,6 +42,7 @@ import { ChannelDialog } from "../components/home/dialogs/ChannelDialog";
 import { CommunityDialog } from "../components/home/dialogs/CommunityDialog";
 import { AddFriendDialog, RemoveFriendDialog } from "../components/home/dialogs/FriendDialogs";
 import { GroupMembersDialog } from "../components/home/dialogs/GroupMembersDialog";
+import { InviteMembersDialog } from "../components/home/dialogs/InviteMembersDialog";
 import { MemberProfileDialog } from "../components/home/dialogs/MemberProfileDialog";
 import { NewMessageDialog } from "../components/home/dialogs/NewMessageDialog";
 import { RolesPermissionsDialog } from "../components/home/dialogs/RolesPermissionsDialog";
@@ -92,6 +93,11 @@ function withToggledReaction<T extends { reactions?: MessageReaction[] }>(messag
     return { ...message, reactions };
 }
 
+/** Creates a short readable code for a frontend-only community invite. */
+function createInviteCode(communityId: string) {
+    return `${communityId}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 /** Runs the signed-in app demo with messages, communities, rooms, and voice state. */
 function HomePage() {
     // Main navigation and community data.
@@ -133,6 +139,13 @@ function HomePage() {
     const [communityDraft, setCommunityDraft] = useState(EMPTY_COMMUNITY_DRAFT);
     const [communitySettingsOpen, setCommunitySettingsOpen] = useState(false);
     const [rolesDialogOpen, setRolesDialogOpen] = useState(false);
+    const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+    const [inviteQuery, setInviteQuery] = useState("");
+    const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
+    const [communityInviteCodes, setCommunityInviteCodes] = useState<Record<string, string>>(() => Object.fromEntries(
+        INITIAL_COMMUNITIES.map((community) => [community.id, `${community.id}-welcome`]),
+    ));
+    const [communityInvitations, setCommunityInvitations] = useState<Record<string, string[]>>({});
     const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
     const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
     const [groupMembersOpen, setGroupMembersOpen] = useState(false);
@@ -199,6 +212,17 @@ function HomePage() {
     const currentCommunityInitials = localDisplayName ? getInitials(localDisplayName, "U") : getUsernameMark(DEMO_USER.username);
     const activeRoles = activeCommunity ? communityRoles[activeCommunity.id] ?? [] : [];
     const activeCommunityMembers = activeCommunity ? communityMembers[activeCommunity.id] ?? [] : [];
+    const currentCommunityMember = activeCommunityMembers.find((member) => member.id === "current-user");
+    const currentCommunityPermissions = activeRoles.filter((role) => currentCommunityMember?.roleIds.includes(role.id)).flatMap((role) => role.permissions);
+    const canInviteToCommunity = Boolean(activeCommunity && (
+        currentCommunityPermissions.includes("manageCommunity")
+        || (activeCommunity.allowInvites && currentCommunityPermissions.includes("inviteMembers"))
+    ));
+    const activeInvitedFriendIds = activeCommunity ? communityInvitations[activeCommunity.id] ?? [] : [];
+    const activeMemberIds = new Set(activeCommunityMembers.map((member) => member.id));
+    const inviteCandidates = friends.filter((friend) => !activeMemberIds.has(friend.id) && friend.name.toLowerCase().includes(inviteQuery.trim().toLowerCase()));
+    const activeInviteCode = activeCommunity ? communityInviteCodes[activeCommunity.id] ?? `${activeCommunity.id}-welcome` : "";
+    const activeInviteUrl = activeInviteCode ? `${window.location.origin}/invite/${activeInviteCode}` : "";
     const visibleCommunityMembers = activeCommunityMembers.map((member) => member.id === "current-user"
         ? { ...member, name: currentCommunityDisplayName, initials: currentCommunityInitials }
         : member);
@@ -241,6 +265,7 @@ function HomePage() {
         setMembersPanelOpen(false);
         setRoomMenuOpen(false);
         setRolesDialogOpen(false);
+        setInviteDialogOpen(false);
         setSelectedMemberId(null);
         setEmojiPickerOpen(false);
         setConversationMenuOpen(false);
@@ -257,6 +282,7 @@ function HomePage() {
         setMembersPanelOpen(false);
         setRoomMenuOpen(false);
         setRolesDialogOpen(false);
+        setInviteDialogOpen(false);
         setSelectedMemberId(null);
         setEmojiPickerOpen(false);
         setConversationMenuOpen(false);
@@ -292,6 +318,7 @@ function HomePage() {
         setCommunities((current) => [...current, newCommunity]);
         setCommunityRoles((current) => ({ ...current, [id]: createCommunityRoles() }));
         setCommunityMembers((current) => ({ ...current, [id]: createCommunityMembers().slice(0, 1) }));
+        setCommunityInviteCodes((current) => ({ ...current, [id]: `${id}-welcome` }));
         setActiveSpace(id);
         setSelectedRoom("general");
         setSelectedRoomKind("text");
@@ -338,6 +365,50 @@ function HomePage() {
             return next;
         });
         setCommunitySettingsOpen(false);
+    };
+
+    // Open the invite flow with a fresh search and copy state.
+    const openInviteDialog = () => {
+        if (!activeCommunity || !canInviteToCommunity) return;
+        if (!communityInviteCodes[activeCommunity.id]) {
+            setCommunityInviteCodes((current) => ({ ...current, [activeCommunity.id]: createInviteCode(activeCommunity.id) }));
+        }
+        setInviteQuery("");
+        setInviteLinkCopied(false);
+        setInviteDialogOpen(true);
+    };
+
+    // Copy the current community invite link and show a short confirmation.
+    const copyInviteLink = async () => {
+        if (!activeInviteUrl) return;
+        try {
+            await navigator.clipboard.writeText(activeInviteUrl);
+        } catch {
+            // Clipboard access can be blocked in previews; the visible state still demonstrates the flow.
+        }
+        setInviteLinkCopied(true);
+        window.setTimeout(() => setInviteLinkCopied(false), 1800);
+    };
+
+    // Replace the old link so the previous code is no longer shown in this demo.
+    const regenerateInviteLink = () => {
+        if (!activeCommunity) return;
+        setCommunityInviteCodes((current) => ({ ...current, [activeCommunity.id]: createInviteCode(activeCommunity.id) }));
+        setInviteLinkCopied(false);
+    };
+
+    // Clicking an invited friend again cancels that pending invitation.
+    const toggleCommunityInvitation = (friendId: string) => {
+        if (!activeCommunity) return;
+        setCommunityInvitations((current) => {
+            const invitations = current[activeCommunity.id] ?? [];
+            return {
+                ...current,
+                [activeCommunity.id]: invitations.includes(friendId)
+                    ? invitations.filter((id) => id !== friendId)
+                    : [...invitations, friendId],
+            };
+        });
     };
 
     // Open role management from community settings without stacking dialogs.
@@ -883,7 +954,10 @@ function HomePage() {
                             <div className={styles.communityHeader}>
                                 <div className={`${styles.communityMark} ${styles[activeCommunity?.tone ?? "coral"]}`}>{activeCommunity?.initials}</div>
                                 <div><span>Community</span><h1>{activeCommunity?.name}</h1><small><i /> {activeCommunity?.online} online</small></div>
-                                <button type="button" aria-label="Community settings" onClick={openCommunitySettings}><MoreHorizontal /></button>
+                                <div className={styles.communityHeaderActions}>
+                                    {canInviteToCommunity && <button type="button" className={styles.communityInviteButton} aria-label={`Invite people to ${activeCommunity?.name}`} onClick={openInviteDialog}><UserPlus /></button>}
+                                    <button type="button" aria-label="Community settings" onClick={openCommunitySettings}><MoreHorizontal /></button>
+                                </div>
                             </div>
 
                             <div className={styles.roomNavigation}>
@@ -1280,6 +1354,22 @@ function HomePage() {
                     setDraft={setCommunityDraft}
                     onClose={() => setCreateCommunityOpen(false)}
                     onSubmit={createCommunity}
+                />
+            )}
+
+            {inviteDialogOpen && activeCommunity && (
+                <InviteMembersDialog
+                    community={activeCommunity}
+                    friends={inviteCandidates}
+                    invitedFriendIds={activeInvitedFriendIds}
+                    inviteUrl={activeInviteUrl}
+                    isLinkCopied={inviteLinkCopied}
+                    query={inviteQuery}
+                    setQuery={setInviteQuery}
+                    onClose={() => setInviteDialogOpen(false)}
+                    onCopyLink={copyInviteLink}
+                    onRegenerateLink={regenerateInviteLink}
+                    onToggleInvite={toggleCommunityInvitation}
                 />
             )}
 

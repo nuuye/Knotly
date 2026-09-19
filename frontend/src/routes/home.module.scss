@@ -226,7 +226,7 @@ i.plum,
 .listHeader h1,
 .communityHeader h1 { margin-top: 0.15rem; font-size: 1.45rem; font-weight: 770; letter-spacing: -0.04em; }
 .listHeader > button,
-.communityHeader > button { display: grid; place-items: center; width: 35px; height: 35px; color: $muted-foreground; border-radius: 11px; background: rgba(255, 248, 242, 0.65); }
+.communityHeaderActions > button { display: grid; place-items: center; width: 35px; height: 35px; color: $muted-foreground; border-radius: 11px; background: rgba(255, 248, 242, 0.65); }
 .listHeader button svg,
 .communityHeader button svg { width: 16px; }
 
@@ -306,6 +306,10 @@ i.plum,
 .communityHeader h1 { overflow: hidden; font-size: 1.15rem; text-overflow: ellipsis; white-space: nowrap; }
 .communityHeader small { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.15rem; color: $muted-foreground; font-size: 0.57rem; }
 .communityHeader small i { width: 6px; height: 6px; border-radius: 50%; background: #48a868; }
+.communityHeaderActions { display: flex; align-items: center; gap: 0.35rem; }
+.communityHeaderActions > button:hover { color: $foreground; background: #fff8f2; }
+.communityHeaderActions > button.communityInviteButton { color: #fff; background: $primary; box-shadow: 0 7px 16px rgba($primary, 0.2); }
+.communityHeaderActions > button.communityInviteButton:hover { color: #fff; background: $primary; transform: translateY(-1px); }
 
 .roomNavigation { padding: 1rem 0.75rem 2rem; }
 .roomNavigation section { margin-bottom: 1.2rem; }
@@ -690,6 +694,47 @@ i.plum,
 .contactPicker small { overflow: hidden; color: $muted-foreground; font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
 .selectionMark { display: grid; place-items: center; width: 21px; height: 21px; color: #fff; border: 1px solid rgba($foreground, 0.14); border-radius: 7px; font-size: 0.62rem; font-style: normal; }
 .selectedContact .selectionMark { border-color: $primary; background: $primary; }
+.inviteDialog { width: min(100%, 590px); }
+.inviteCommunityPreview { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.75rem; margin: 0 1.5rem 1rem; padding: 0.75rem; border: 1px solid rgba($foreground, 0.08); border-radius: 15px; background: #f3dfd0; }
+.inviteCommunityPreview .communityMark { width: 43px; height: 43px; font-style: normal; }
+.inviteCommunityPreview > span { display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; }
+.inviteCommunityPreview strong { overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.inviteCommunityPreview small { color: $muted-foreground; font-size: 0.59rem; }
+.inviteLinkBlock { margin: 0 1.5rem 1rem; }
+.inviteSectionHeading,
+.invitePeopleHeading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.45rem; }
+.inviteSectionHeading > span { display: flex; align-items: center; gap: 0.38rem; color: $foreground; font-size: 0.64rem; font-weight: 800; }
+.inviteSectionHeading > span svg { width: 14px; color: $primary; }
+.inviteSectionHeading > small { display: flex; align-items: center; gap: 0.3rem; color: $muted-foreground; font-size: 0.54rem; }
+.inviteSectionHeading > small svg { width: 12px; }
+.inviteLinkRow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 0.35rem; min-height: 48px; padding: 0.3rem; border: 1px solid rgba($foreground, 0.1); border-radius: 13px; background: #f8e9de; }
+.inviteLinkRow > span { overflow: hidden; padding-left: 0.45rem; color: $muted-foreground; font-size: 0.61rem; text-overflow: ellipsis; white-space: nowrap; }
+.inviteLinkRow > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; min-height: 35px; padding: 0 0.65rem; color: #fff; border-radius: 9px; background: $foreground; font-size: 0.59rem; font-weight: 750; }
+.inviteLinkRow > button svg { width: 13px; }
+.inviteLinkRow > button.copiedInviteLink { background: #4c805e; }
+.inviteLinkRow > button.regenerateInviteLink { width: 35px; padding: 0; color: $muted-foreground; background: #ead6c8; }
+.inviteLinkRow > button.regenerateInviteLink:hover svg { transform: rotate(35deg); }
+.inviteLinkRow > button.regenerateInviteLink svg { transition: transform $transition-base; }
+.invitePeopleHeading { margin: 0 1.5rem 0.45rem; }
+.invitePeopleHeading > span { font-size: 0.64rem; font-weight: 800; }
+.invitePeopleHeading > small { padding: 0.2rem 0.4rem; color: $primary; border-radius: 99px; background: rgba($primary, 0.08); font-size: 0.52rem; font-weight: 800; }
+.inviteFriendList { min-height: 200px; padding: 0 0.8rem 0.65rem; overflow-y: auto; }
+.inviteFriendRow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.7rem; min-height: 58px; padding: 0.42rem 0.7rem; border-radius: 13px; }
+.inviteFriendRow:hover { background: #f8e9de; }
+.inviteFriendRow .personAvatar { width: 36px; height: 36px; border-radius: 11px; }
+.inviteFriendRow > span:nth-child(2) { display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; }
+.inviteFriendRow strong,
+.inviteFriendRow small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inviteFriendRow strong { font-size: 0.7rem; }
+.inviteFriendRow small { color: $muted-foreground; font-size: 0.58rem; }
+.inviteFriendRow > button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; min-width: 78px; min-height: 34px; padding: 0 0.65rem; color: #fff; border-radius: 10px; background: $primary; font-size: 0.59rem; font-weight: 750; transition: color $transition-base, background $transition-base, transform $transition-base; }
+.inviteFriendRow > button:hover { transform: translateY(-1px); }
+.inviteFriendRow > button svg { width: 13px; }
+.inviteFriendRow > button.invitedFriendButton { color: #4c805e; border: 1px solid rgba(76, 128, 94, 0.18); background: rgba(76, 128, 94, 0.1); }
+.inviteEmpty { display: flex; align-items: center; min-height: 180px; flex-direction: column; justify-content: center; color: $muted-foreground; text-align: center; }
+.inviteEmpty svg { width: 22px; margin-bottom: 0.55rem; color: rgba($muted-foreground, 0.65); }
+.inviteEmpty strong { color: $foreground; font-size: 0.7rem; }
+.inviteEmpty span { margin-top: 0.12rem; font-size: 0.58rem; }
 .groupMembersModal { width: min(100%, 560px); }
 .groupMembersBody { display: grid; min-height: 0; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.2rem 1.5rem 1.4rem; overflow-y: auto; }
 .groupMembersBody > section { min-width: 0; padding: 0.65rem; border: 1px solid rgba($foreground, 0.08); border-radius: 15px; background: #f8e9de; }

@@ -177,6 +177,20 @@ export interface RemoveFriendDialogProps {
     onConfirm: () => void;
 }
 
+export interface InviteMembersDialogProps {
+    community: Pick<Community, "initials" | "name" | "tone">;
+    friends: Friend[];
+    invitedFriendIds: string[];
+    inviteUrl: string;
+    isLinkCopied: boolean;
+    query: string;
+    setQuery: StateSetter<string>;
+    onClose: () => void;
+    onCopyLink: () => void;
+    onRegenerateLink: () => void;
+    onToggleInvite: (friendId: string) => void;
+}
+
 export interface HomeHeaderProps {
     activeSpace: string;
     communities: Community[];
