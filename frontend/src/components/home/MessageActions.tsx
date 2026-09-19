@@ -7,7 +7,7 @@ import styles from "../../routes/home.module.scss";
 const QUICK_REACTIONS = ["❤️", "👍", "😂", "🔥", "👏", "✨"];
 
 /** Keeps message actions compact until the message is hovered or focused. */
-export function MessageActions({ canManage, onDelete, onEdit, onReact, onReply }: MessageActionsProps) {
+export function MessageActions({ canInteract = true, canManage, onDelete, onEdit, onReact, onReply }: MessageActionsProps) {
     const [reactionOpen, setReactionOpen] = useState(false);
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const actionsRef = useRef<HTMLDivElement>(null);
@@ -17,9 +17,9 @@ export function MessageActions({ canManage, onDelete, onEdit, onReact, onReply }
 
     return (
         <div className={styles.messageActions} ref={actionsRef}>
-            <button type="button" onClick={() => { setReactionOpen(false); setConfirmingDelete(false); onReply(); }} aria-label="Reply to message"><Reply /></button>
-            <button type="button" className={reactionOpen ? styles.activeMessageAction : ""} onClick={() => { setReactionOpen((open) => !open); setConfirmingDelete(false); }} aria-label="React to message" aria-expanded={reactionOpen}><SmilePlus /></button>
-            {reactionOpen && (
+            {canInteract && <button type="button" onClick={() => { setReactionOpen(false); setConfirmingDelete(false); onReply(); }} aria-label="Reply to message"><Reply /></button>}
+            {canInteract && <button type="button" className={reactionOpen ? styles.activeMessageAction : ""} onClick={() => { setReactionOpen((open) => !open); setConfirmingDelete(false); }} aria-label="React to message" aria-expanded={reactionOpen}><SmilePlus /></button>}
+            {canInteract && reactionOpen && (
                 <div className={styles.quickReactionPicker}>
                     {QUICK_REACTIONS.map((emoji) => <button key={emoji} type="button" onClick={() => { onReact(emoji); setReactionOpen(false); }} aria-label={`React with ${emoji}`}>{emoji}</button>)}
                 </div>

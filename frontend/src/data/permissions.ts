@@ -6,6 +6,7 @@ export const COMMUNITY_PERMISSIONS: PermissionDefinition[] = [
     { id: "manageRoles", label: "Manage roles", description: "Create roles and change their permissions." },
     { id: "inviteMembers", label: "Invite members", description: "Create and share invitations." },
     { id: "moderateMembers", label: "Moderate members", description: "Assign roles and remove members." },
+    { id: "viewModerationLog", label: "View moderation log", description: "Review administrative and moderation actions." },
     { id: "sendMessages", label: "Send messages", description: "Write in text rooms." },
     { id: "joinVoice", label: "Join voice rooms", description: "Enter and speak in voice rooms." },
 ];

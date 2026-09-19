@@ -16,8 +16,10 @@ export type PermissionKey =
     | "manageRoles"
     | "inviteMembers"
     | "moderateMembers"
+    | "viewModerationLog"
     | "sendMessages"
     | "joinVoice";
+export type ModerationLogCategory = "community" | "invites" | "members" | "roles" | "rooms";
 export type StateSetter<T> = Dispatch<SetStateAction<T>>;
 
 export interface RoomCategory {
@@ -120,6 +122,15 @@ export interface PermissionDefinition {
     description: string;
 }
 
+export interface ModerationLogEntry {
+    id: string;
+    action: string;
+    actor: string;
+    category: ModerationLogCategory;
+    detail: string;
+    time: string;
+}
+
 export interface CommunityDraft {
     name: string;
     description: string;
@@ -150,6 +161,7 @@ export interface EmojiPickerProps {
 
 export interface MessageActionsProps {
     canManage: boolean;
+    canInteract?: boolean;
     onDelete: () => void;
     onEdit: () => void;
     onReact: (emoji: string) => void;
@@ -218,11 +230,15 @@ export interface NewMessageDialogProps {
 }
 
 export interface CommunityDialogProps {
+    canManageCommunity?: boolean;
+    canManageRoles?: boolean;
+    canViewModerationLog?: boolean;
     communityName?: string;
     draft: CommunitySettingsDraft;
     mode: "create" | "edit";
     username?: string;
     onManageRoles?: () => void;
+    onOpenModerationLog?: () => void;
     setDraft: StateSetter<CommunitySettingsDraft>;
     onClose: () => void;
     onSubmit: (event: FormEvent) => void;
@@ -239,6 +255,7 @@ export interface RolesPermissionsDialogProps {
 }
 
 export interface MemberProfileDialogProps {
+    canModerate: boolean;
     displayName: string;
     isCurrentUser: boolean;
     member: CommunityMember;
@@ -250,6 +267,13 @@ export interface MemberProfileDialogProps {
     onMessage: () => void;
     onNoteChange: (note: string) => void;
     onRemove: () => void;
+}
+
+export interface ModerationLogDialogProps {
+    communityName: string;
+    entries: ModerationLogEntry[];
+    onBack: () => void;
+    onClose: () => void;
 }
 
 export interface ChannelDialogProps {

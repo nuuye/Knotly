@@ -44,6 +44,7 @@ import { AddFriendDialog, RemoveFriendDialog } from "../components/home/dialogs/
 import { GroupMembersDialog } from "../components/home/dialogs/GroupMembersDialog";
 import { InviteMembersDialog } from "../components/home/dialogs/InviteMembersDialog";
 import { MemberProfileDialog } from "../components/home/dialogs/MemberProfileDialog";
+import { ModerationLogDialog } from "../components/home/dialogs/ModerationLogDialog";
 import { NewMessageDialog } from "../components/home/dialogs/NewMessageDialog";
 import { RolesPermissionsDialog } from "../components/home/dialogs/RolesPermissionsDialog";
 import { RoomSettingsDialog } from "../components/home/dialogs/RoomSettingsDialog";
@@ -53,6 +54,7 @@ import {
     INITIAL_COMMUNITIES,
     INITIAL_CONVERSATIONS,
     INITIAL_MESSAGES,
+    INITIAL_MODERATION_LOGS,
     INITIAL_ROOM_MESSAGES,
     SUGGESTED_FRIENDS,
     createCommunityMembers,
@@ -71,6 +73,8 @@ import type {
     MessageReaction,
     MessageView,
     MobilePanel,
+    ModerationLogCategory,
+    ModerationLogEntry,
     NewMessageMode,
     RoomKind,
 } from "../types/home";
@@ -108,7 +112,9 @@ function HomePage() {
         INITIAL_COMMUNITIES.map((community) => [community.id, createCommunityRoles()]),
     ));
     const [communityMembers, setCommunityMembers] = useState<Record<string, CommunityMember[]>>(() => Object.fromEntries(
-        INITIAL_COMMUNITIES.map((community) => [community.id, createCommunityMembers()]),
+        INITIAL_COMMUNITIES.map((community) => [community.id, createCommunityMembers(
+            community.id === "saturday" ? ["owner"] : community.id === "studio" ? ["moderator", "member"] : ["member"],
+        )]),
     ));
     const [friends, setFriends] = useState(FRIENDS);
     const [communityMemberNotes, setCommunityMemberNotes] = useState<Record<string, Record<string, string>>>({});
@@ -139,6 +145,8 @@ function HomePage() {
     const [communityDraft, setCommunityDraft] = useState(EMPTY_COMMUNITY_DRAFT);
     const [communitySettingsOpen, setCommunitySettingsOpen] = useState(false);
     const [rolesDialogOpen, setRolesDialogOpen] = useState(false);
+    const [moderationLogOpen, setModerationLogOpen] = useState(false);
+    const [moderationLogs, setModerationLogs] = useState<Record<string, ModerationLogEntry[]>>(INITIAL_MODERATION_LOGS);
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
     const [inviteQuery, setInviteQuery] = useState("");
     const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
@@ -213,11 +221,18 @@ function HomePage() {
     const activeRoles = activeCommunity ? communityRoles[activeCommunity.id] ?? [] : [];
     const activeCommunityMembers = activeCommunity ? communityMembers[activeCommunity.id] ?? [] : [];
     const currentCommunityMember = activeCommunityMembers.find((member) => member.id === "current-user");
-    const currentCommunityPermissions = activeRoles.filter((role) => currentCommunityMember?.roleIds.includes(role.id)).flatMap((role) => role.permissions);
+    const currentCommunityPermissions = new Set(activeRoles.filter((role) => currentCommunityMember?.roleIds.includes(role.id)).flatMap((role) => role.permissions));
+    const canManageCommunity = currentCommunityPermissions.has("manageCommunity");
+    const canManageRooms = currentCommunityPermissions.has("manageRooms");
+    const canManageRoles = currentCommunityPermissions.has("manageRoles");
+    const canModerateMembers = currentCommunityPermissions.has("moderateMembers");
+    const canViewModerationLog = currentCommunityPermissions.has("viewModerationLog");
+    const canSendRoomMessages = currentCommunityPermissions.has("sendMessages");
+    const canJoinVoice = currentCommunityPermissions.has("joinVoice");
     const canInviteToCommunity = Boolean(activeCommunity && (
-        currentCommunityPermissions.includes("manageCommunity")
-        || (activeCommunity.allowInvites && currentCommunityPermissions.includes("inviteMembers"))
+        canManageCommunity || (activeCommunity.allowInvites && currentCommunityPermissions.has("inviteMembers"))
     ));
+    const activeModerationLogs = activeCommunity ? moderationLogs[activeCommunity.id] ?? [] : [];
     const activeInvitedFriendIds = activeCommunity ? communityInvitations[activeCommunity.id] ?? [] : [];
     const activeMemberIds = new Set(activeCommunityMembers.map((member) => member.id));
     const inviteCandidates = friends.filter((friend) => !activeMemberIds.has(friend.id) && friend.name.toLowerCase().includes(inviteQuery.trim().toLowerCase()));
@@ -257,6 +272,23 @@ function HomePage() {
         });
     };
 
+    // Add one newest-first entry to the active community's local moderation history.
+    const addModerationLog = (category: ModerationLogCategory, action: string, detail: string) => {
+        if (!activeCommunity) return;
+        setModerationLogs((current) => {
+            const entries = current[activeCommunity.id] ?? [];
+            const entry: ModerationLogEntry = {
+                id: `${activeCommunity.id}-log-${entries.length + 1}`,
+                action,
+                actor: currentCommunityDisplayName,
+                category,
+                detail,
+                time: "Today · now",
+            };
+            return { ...current, [activeCommunity.id]: [entry, ...entries] };
+        });
+    };
+
     // Return to private messages and reset community-only panels.
     const openMessages = () => {
         setActiveSpace("messages");
@@ -265,6 +297,7 @@ function HomePage() {
         setMembersPanelOpen(false);
         setRoomMenuOpen(false);
         setRolesDialogOpen(false);
+        setModerationLogOpen(false);
         setInviteDialogOpen(false);
         setSelectedMemberId(null);
         setEmojiPickerOpen(false);
@@ -282,6 +315,7 @@ function HomePage() {
         setMembersPanelOpen(false);
         setRoomMenuOpen(false);
         setRolesDialogOpen(false);
+        setModerationLogOpen(false);
         setInviteDialogOpen(false);
         setSelectedMemberId(null);
         setEmojiPickerOpen(false);
@@ -319,6 +353,10 @@ function HomePage() {
         setCommunityRoles((current) => ({ ...current, [id]: createCommunityRoles() }));
         setCommunityMembers((current) => ({ ...current, [id]: createCommunityMembers().slice(0, 1) }));
         setCommunityInviteCodes((current) => ({ ...current, [id]: `${id}-welcome` }));
+        setModerationLogs((current) => ({
+            ...current,
+            [id]: [{ id: `${Date.now()}-created`, action: "Community created", actor: `@${DEMO_USER.username}`, category: "community", detail: `${name} was created.`, time: "Today · now" }],
+        }));
         setActiveSpace(id);
         setSelectedRoom("general");
         setSelectedRoomKind("text");
@@ -344,19 +382,27 @@ function HomePage() {
     const saveCommunitySettings = (event: React.FormEvent) => {
         event.preventDefault();
         const name = settingsDraft.name.trim();
-        if (!activeCommunity || !name) return;
+        if (!activeCommunity || (canManageCommunity && !name)) return;
 
-        setCommunities((current) => current.map((community) => community.id === activeCommunity.id
-            ? {
-                ...community,
-                name,
-                initials: getInitials(name),
-                description: settingsDraft.description.trim(),
-                tone: settingsDraft.tone,
-                visibility: settingsDraft.visibility,
-                allowInvites: settingsDraft.allowInvites,
-            }
-            : community));
+        if (canManageCommunity) {
+            const communityChanged = name !== activeCommunity.name
+                || settingsDraft.description.trim() !== activeCommunity.description
+                || settingsDraft.tone !== activeCommunity.tone
+                || settingsDraft.visibility !== activeCommunity.visibility
+                || settingsDraft.allowInvites !== activeCommunity.allowInvites;
+            setCommunities((current) => current.map((community) => community.id === activeCommunity.id
+                ? {
+                    ...community,
+                    name,
+                    initials: getInitials(name),
+                    description: settingsDraft.description.trim(),
+                    tone: settingsDraft.tone,
+                    visibility: settingsDraft.visibility,
+                    allowInvites: settingsDraft.allowInvites,
+                }
+                : community));
+            if (communityChanged) addModerationLog("community", "Community settings updated", "Name, visibility, appearance, or invitation settings were changed.");
+        }
         setCommunityDisplayNames((current) => {
             const next = { ...current };
             const localName = settingsDraft.localDisplayName.trim();
@@ -380,7 +426,7 @@ function HomePage() {
 
     // Copy the current community invite link and show a short confirmation.
     const copyInviteLink = async () => {
-        if (!activeInviteUrl) return;
+        if (!activeInviteUrl || !canInviteToCommunity) return;
         try {
             await navigator.clipboard.writeText(activeInviteUrl);
         } catch {
@@ -392,14 +438,17 @@ function HomePage() {
 
     // Replace the old link so the previous code is no longer shown in this demo.
     const regenerateInviteLink = () => {
-        if (!activeCommunity) return;
+        if (!activeCommunity || !canInviteToCommunity) return;
         setCommunityInviteCodes((current) => ({ ...current, [activeCommunity.id]: createInviteCode(activeCommunity.id) }));
         setInviteLinkCopied(false);
+        addModerationLog("invites", "Invite link regenerated", "The previous community invite link was replaced.");
     };
 
     // Clicking an invited friend again cancels that pending invitation.
     const toggleCommunityInvitation = (friendId: string) => {
-        if (!activeCommunity) return;
+        if (!activeCommunity || !canInviteToCommunity) return;
+        const friend = friends.find((item) => item.id === friendId);
+        const wasInvited = activeInvitedFriendIds.includes(friendId);
         setCommunityInvitations((current) => {
             const invitations = current[activeCommunity.id] ?? [];
             return {
@@ -409,18 +458,29 @@ function HomePage() {
                     : [...invitations, friendId],
             };
         });
+        if (friend) addModerationLog("invites", wasInvited ? "Invitation cancelled" : "Invitation sent", `${friend.name}'s invitation was ${wasInvited ? "cancelled" : "sent"}.`);
     };
 
     // Open role management from community settings without stacking dialogs.
     const openRolesManager = () => {
+        if (!canManageRoles) return;
         setCommunitySettingsOpen(false);
         setRolesDialogOpen(true);
     };
 
+    // Open the protected moderation history from community settings.
+    const openModerationLog = () => {
+        if (!canViewModerationLog) return;
+        setCommunitySettingsOpen(false);
+        setModerationLogOpen(true);
+    };
+
     // Create an editable role in the active community and return its ID for selection.
     const createCommunityRole = () => {
-        if (!activeCommunity) return "";
-        const roleId = `role-${Date.now()}`;
+        if (!activeCommunity || !canManageRoles) return "";
+        let roleNumber = activeRoles.length + 1;
+        while (activeRoles.some((role) => role.id === `role-${roleNumber}`)) roleNumber += 1;
+        const roleId = `role-${roleNumber}`;
         const newRole: CommunityRole = {
             id: roleId,
             name: "New role",
@@ -432,21 +492,26 @@ function HomePage() {
             ...current,
             [activeCommunity.id]: [...(current[activeCommunity.id] ?? []), newRole],
         }));
+        addModerationLog("roles", "Role created", "Created the New role role with basic room permissions.");
         return roleId;
     };
 
     // Update one role while keeping roles from every other community untouched.
     const updateCommunityRole = (roleId: string, changes: Partial<Pick<CommunityRole, "name" | "color" | "permissions">>) => {
-        if (!activeCommunity) return;
+        if (!activeCommunity || !canManageRoles) return;
+        const role = activeRoles.find((item) => item.id === roleId);
         setCommunityRoles((current) => ({
             ...current,
             [activeCommunity.id]: (current[activeCommunity.id] ?? []).map((role) => role.id === roleId ? { ...role, ...changes } : role),
         }));
+        if (changes.permissions && role) addModerationLog("roles", "Role permissions updated", `${role.name} now has ${changes.permissions.length} permissions.`);
     };
 
     // Delete a custom role and move its members back to the default member role.
     const deleteCommunityRole = (roleId: string) => {
-        if (!activeCommunity) return;
+        if (!activeCommunity || !canManageRoles) return;
+        const role = activeRoles.find((item) => item.id === roleId);
+        if (!role || role.protected) return;
         setCommunityRoles((current) => ({
             ...current,
             [activeCommunity.id]: (current[activeCommunity.id] ?? []).filter((role) => role.id !== roleId || role.protected),
@@ -458,11 +523,15 @@ function HomePage() {
                 return { ...member, roleIds: roleIds.length > 0 ? roleIds : ["member"] };
             }),
         }));
+        addModerationLog("roles", "Role deleted", `${role.name} was deleted and affected members were returned to the default role.`);
     };
 
     // Add or remove one role without replacing the member's other roles.
     const toggleMemberRole = (memberId: string, roleId: string) => {
-        if (!activeCommunity || roleId === "owner") return;
+        if (!activeCommunity || !canModerateMembers || roleId === "owner") return;
+        const member = activeCommunityMembers.find((item) => item.id === memberId);
+        const role = activeRoles.find((item) => item.id === roleId);
+        const wasAssigned = member?.roleIds.includes(roleId) ?? false;
         setCommunityMembers((current) => ({
             ...current,
             [activeCommunity.id]: (current[activeCommunity.id] ?? []).map((member) => member.id === memberId
@@ -474,6 +543,7 @@ function HomePage() {
                 }
                 : member),
         }));
+        if (member && role) addModerationLog("members", wasAssigned ? "Role removed from member" : "Role assigned to member", `${role.name} was ${wasAssigned ? "removed from" : "assigned to"} ${member.name}.`);
     };
 
     // Open the emoji panel for the matching message field.
@@ -576,11 +646,13 @@ function HomePage() {
 
     // Remove a member from this frontend-only community list.
     const removeCommunityMember = (memberId: string) => {
-        if (!activeCommunity || memberId === "current-user") return;
+        if (!activeCommunity || !canModerateMembers || memberId === "current-user") return;
+        const member = activeCommunityMembers.find((item) => item.id === memberId);
         setCommunityMembers((current) => ({
             ...current,
             [activeCommunity.id]: (current[activeCommunity.id] ?? []).filter((member) => member.id !== memberId),
         }));
+        if (member) addModerationLog("members", "Member removed", `${member.name} was removed from the community.`);
         setSelectedMemberId(null);
     };
 
@@ -621,6 +693,7 @@ function HomePage() {
 
     // Open the room form with the type and category chosen by the clicked button.
     const openChannelCreator = (type: "text" | "voice", categoryId = activeCommunity?.categories[0]?.id ?? "start-here") => {
+        if (!canManageRooms) return;
         setChannelType(type);
         setChannelCategory(categoryId);
         setChannelName("");
@@ -630,9 +703,12 @@ function HomePage() {
     // Add a text or voice room without changing the original nested arrays.
     const createChannel = (event: React.FormEvent) => {
         event.preventDefault();
-        if (!activeCommunity) return;
+        if (!activeCommunity || !canManageRooms) return;
         const roomName = toSlug(channelName);
         if (!roomName) return;
+        const targetCategory = activeCommunity.categories.find((category) => category.id === channelCategory);
+        const targetRooms = channelType === "voice" ? targetCategory?.voiceRooms : targetCategory?.textRooms;
+        if (targetRooms?.includes(roomName)) return;
 
         setCommunities((current) => current.map((community) => {
             if (community.id !== activeCommunity.id) return community;
@@ -648,26 +724,27 @@ function HomePage() {
             };
         }));
         // Voice rooms are joined directly; text rooms open in the main panel.
-        if (channelType === "voice") {
+        if (channelType === "voice" && canJoinVoice) {
             setJoinedVoiceRoom({ communityId: activeCommunity.id, room: roomName });
             setMicrophoneMuted(false);
             setVoiceSoundMuted(false);
             setMobilePanel("list");
-        } else {
+        } else if (channelType === "text") {
             setSelectedRoom(roomName);
             setSelectedRoomKind("text");
             setMobilePanel("chat");
         }
+        addModerationLog("rooms", `${channelType === "voice" ? "Voice" : "Text"} room created`, `Created ${channelType === "text" ? "#" : ""}${roomName}.`);
         setChannelCreatorOpen(false);
     };
 
     // Add an empty category that can later hold both text and voice rooms.
     const createCategory = (event: React.FormEvent) => {
         event.preventDefault();
-        if (!activeCommunity) return;
+        if (!activeCommunity || !canManageRooms) return;
         const label = categoryName.trim();
         const id = toSlug(label);
-        if (!label || !id) return;
+        if (!label || !id || activeCommunity.categories.some((category) => category.id === id)) return;
 
         setCommunities((current) => current.map((community) => community.id === activeCommunity.id && !community.categories.some((category) => category.id === id)
             ? { ...community, categories: [...community.categories, { id, label, textRooms: [], voiceRooms: [] }] }
@@ -675,10 +752,12 @@ function HomePage() {
         setChannelCategory(id);
         setCategoryCreatorOpen(false);
         setCategoryName("");
+        addModerationLog("rooms", "Category created", `Created the ${label} category.`);
     };
 
     // Fill the edit form with the room and category currently on screen.
     const openRoomSettings = () => {
+        if (!canManageRooms) return;
         setRoomSettingsName(selectedRoom);
         setRoomSettingsCategory(selectedCategory?.id ?? activeCommunity?.categories[0]?.id ?? "");
         setRoomMenuOpen(false);
@@ -688,7 +767,7 @@ function HomePage() {
     // Rename or move a room by removing it first, then adding it to its target category.
     const saveRoomSettings = (event: React.FormEvent) => {
         event.preventDefault();
-        if (!activeCommunity || !selectedCategory) return;
+        if (!activeCommunity || !selectedCategory || !canManageRooms) return;
         const nextName = toSlug(roomSettingsName);
         if (!nextName || !roomSettingsCategory) return;
 
@@ -710,6 +789,7 @@ function HomePage() {
         }));
         setSelectedRoom(nextName);
         setRoomSettingsOpen(false);
+        addModerationLog("rooms", "Room updated", `${selectedRoom} was renamed or moved to another category as ${nextName}.`);
     };
 
     // A full key keeps same-named rooms in different communities independent.
@@ -752,7 +832,7 @@ function HomePage() {
     const sendRoomMessage = (event: React.FormEvent) => {
         event.preventDefault();
         const text = roomDraft.trim();
-        if (!text || selectedRoomKind !== "text") return;
+        if (!text || selectedRoomKind !== "text" || !canSendRoomMessages) return;
         setRoomMessages((current) => ({
             ...current,
             [activeRoomKey]: [...(current[activeRoomKey] ?? []), {
@@ -810,6 +890,7 @@ function HomePage() {
 
     // Add or remove the current user's reaction on one message.
     const toggleMessageReaction = (scope: "direct" | "room", messageId: number, emoji: string) => {
+        if (scope === "room" && !canSendRoomMessages) return;
         if (scope === "direct") {
             setMessages((current) => ({
                 ...current,
@@ -963,7 +1044,7 @@ function HomePage() {
                             <div className={styles.roomNavigation}>
                                 {activeCommunity?.categories.map((category) => (
                                     <section key={category.id}>
-                                        <span>{category.label}<button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("text", category.id)} aria-label={`Add a room to ${category.label}`}><Plus /></button></span>
+                                        <span>{category.label}{canManageRooms && <button type="button" className={styles.sectionAdd} onClick={() => openChannelCreator("text", category.id)} aria-label={`Add a room to ${category.label}`}><Plus /></button>}</span>
                                         {category.textRooms.map((room) => (
                                             <button
                                                 key={room}
@@ -987,14 +1068,16 @@ function HomePage() {
                                                 type="button"
                                                 className={joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? styles.joinedVoiceButton : ""}
                                                 onClick={() => {
+                                                    if (!canJoinVoice) return;
                                                     setJoinedVoiceRoom({ communityId: activeCommunity.id, room });
                                                     setMicrophoneMuted(false);
                                                     setVoiceSoundMuted(false);
                                                     setRoomMenuOpen(false);
                                                 }}
                                                 aria-label={`Join ${room}`}
+                                                disabled={!canJoinVoice}
                                             >
-                                                <Headphones /> {room}<small>{joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? "Joined" : "Join"}</small>
+                                                <Headphones /> {room}<small>{!canJoinVoice ? "No access" : joinedVoiceRoom?.communityId === activeCommunity.id && joinedVoiceRoom.room === room ? "Joined" : "Join"}</small>
                                             </button>
                                             {room === "cozy-corner" && activeCommunity?.id === "saturday" && (
                                                 <>
@@ -1009,7 +1092,7 @@ function HomePage() {
                                         ))}
                                     </section>
                                 ))}
-                                <button type="button" className={styles.addCategoryButton} onClick={() => { setCategoryName(""); setCategoryCreatorOpen(true); }}><FolderPlus /> New category</button>
+                                {canManageRooms && <button type="button" className={styles.addCategoryButton} onClick={() => { setCategoryName(""); setCategoryCreatorOpen(true); }}><FolderPlus /> New category</button>}
                                 {joinedVoiceRoom && (
                                     <div className={styles.voiceConnection}>
                                         <i>{microphoneMuted ? <MicOff /> : <AudioWave />}</i>
@@ -1216,7 +1299,7 @@ function HomePage() {
                                     {roomMenuOpen && (
                                         <div className={styles.roomOptionsMenu}>
                                             <div><strong>{selectedRoomKind === "text" ? "#" : ""}{selectedRoom}</strong><small>{selectedCategory?.label}</small></div>
-                                            <button type="button" onClick={openRoomSettings}><Pencil /> Edit room</button>
+                                            {canManageRooms && <button type="button" onClick={openRoomSettings}><Pencil /> Edit room</button>}
                                             <button type="button" onClick={toggleRoomMuted}>{roomIsMuted ? <Bell /> : <BellOff />} {roomIsMuted ? "Unmute room" : "Mute room"}</button>
                                             <button type="button" onClick={copyRoomLink}><Clipboard /> {roomLinkCopied ? "Link copied" : "Copy room link"}</button>
                                         </div>
@@ -1267,6 +1350,7 @@ function HomePage() {
                                                 <button type="button" className={`${styles.communityMessageAvatar} ${styles[message.tone]}`} onClick={() => setSelectedMemberId(message.authorId)} aria-label={`Open ${message.authorName}'s profile`}>{message.initials}</button>
                                                 <div>
                                                     <MessageActions
+                                                        canInteract={canSendRoomMessages}
                                                         canManage={message.authorId === "current-user"}
                                                         onDelete={() => deleteMessage("room", message.id)}
                                                         onEdit={() => startEditingMessage("room", message.id, message.text)}
@@ -1275,7 +1359,7 @@ function HomePage() {
                                                     />
                                                     <span><button type="button" className={styles.communityMemberName} onClick={() => setSelectedMemberId(message.authorId)}>{message.authorName}</button><time>{message.time}</time></span>
                                                     {message.replyToId && (
-                                                        <button type="button" className={styles.messageReplyPreview} onClick={() => setReplyingTo({ scope: "room", messageId: message.replyToId! })}>
+                                                        <button type="button" className={styles.messageReplyPreview} onClick={() => setReplyingTo({ scope: "room", messageId: message.replyToId! })} disabled={!canSendRoomMessages}>
                                                             <strong>{repliedMessage?.authorName ?? "Original message removed"}</strong>
                                                             {repliedMessage && <span>{repliedMessage.text}</span>}
                                                         </button>
@@ -1292,7 +1376,7 @@ function HomePage() {
                                                     {!!message.reactions?.length && (
                                                         <div className={styles.messageReactions}>
                                                             {message.reactions.map((reaction) => (
-                                                                <button key={reaction.emoji} type="button" className={reaction.reacted ? styles.reacted : ""} onClick={() => toggleMessageReaction("room", message.id, reaction.emoji)} aria-label={`${reaction.reacted ? "Remove" : "Add"} ${reaction.emoji} reaction`}>
+                                                                <button key={reaction.emoji} type="button" className={reaction.reacted ? styles.reacted : ""} onClick={() => toggleMessageReaction("room", message.id, reaction.emoji)} aria-label={`${reaction.reacted ? "Remove" : "Add"} ${reaction.emoji} reaction`} disabled={!canSendRoomMessages}>
                                                                     <span>{reaction.emoji}</span><small>{reaction.count}</small>
                                                                 </button>
                                                             ))}
@@ -1307,24 +1391,29 @@ function HomePage() {
                                 <div className={styles.voiceRoomCard}>
                                     <div><span className={`${styles.personAvatar} ${styles.coral}`}>MC<i /></span><span className={`${styles.personAvatar} ${styles.amber}`}>JM<i /></span></div>
                                     <div><strong>A quiet room for an easy conversation.</strong><small>Join whenever you’re ready — no call needed.</small></div>
-                                    <button type="button"><Headphones /> Join room</button>
+                                    <button type="button" disabled={!canJoinVoice} onClick={() => {
+                                        if (!activeCommunity || !canJoinVoice) return;
+                                        setJoinedVoiceRoom({ communityId: activeCommunity.id, room: selectedRoom });
+                                        setMicrophoneMuted(false);
+                                        setVoiceSoundMuted(false);
+                                    }}><Headphones /> {canJoinVoice ? "Join room" : "No access"}</button>
                                 </div>
                             )}
                         </div>
-                        <form className={styles.composer} onSubmit={sendRoomMessage}>
+                        <form className={`${styles.composer} ${!canSendRoomMessages ? styles.composerDenied : ""}`} onSubmit={sendRoomMessage}>
                             {roomReplyTarget && (
                                 <div className={styles.composerContext}>
                                     <span>Replying to <strong>{roomReplyTarget.authorName}</strong><small>{roomReplyTarget.text}</small></span>
                                     <button type="button" onClick={() => setReplyingTo(null)} aria-label="Cancel reply"><X /></button>
                                 </div>
                             )}
-                            <button type="button" aria-label="Attach a file"><Paperclip /></button>
-                            <input value={roomDraft} onChange={(event) => setRoomDraft(event.target.value)} placeholder={`Message #${selectedRoom}`} />
+                            <button type="button" aria-label="Attach a file" disabled={!canSendRoomMessages}><Paperclip /></button>
+                            <input value={roomDraft} onChange={(event) => setRoomDraft(event.target.value)} placeholder={canSendRoomMessages ? `Message #${selectedRoom}` : "You do not have permission to send messages here"} disabled={!canSendRoomMessages} />
                             <div className={styles.emojiPickerWrap} ref={emojiTarget === "room" ? emojiPickerRef : undefined}>
-                                <button type="button" className={emojiPickerOpen && emojiTarget === "room" ? styles.activeEmojiButton : ""} aria-label="Add emoji" aria-expanded={emojiPickerOpen && emojiTarget === "room"} onClick={() => toggleEmojiPicker("room")}><Smile /></button>
+                                <button type="button" className={emojiPickerOpen && emojiTarget === "room" ? styles.activeEmojiButton : ""} aria-label="Add emoji" aria-expanded={emojiPickerOpen && emojiTarget === "room"} onClick={() => toggleEmojiPicker("room")} disabled={!canSendRoomMessages}><Smile /></button>
                                 {emojiPickerOpen && emojiTarget === "room" && <EmojiPicker onSelect={insertTextEmoji} />}
                             </div>
-                            <button type="submit" className={styles.sendButton} aria-label="Send message" disabled={!roomDraft.trim()}><Send /></button>
+                            <button type="submit" className={styles.sendButton} aria-label="Send message" disabled={!canSendRoomMessages || !roomDraft.trim()}><Send /></button>
                         </form>
                     </section>
                 )}
@@ -1375,18 +1464,22 @@ function HomePage() {
 
             {communitySettingsOpen && activeCommunity && (
                 <CommunityDialog
+                    canManageCommunity={canManageCommunity}
+                    canManageRoles={canManageRoles}
+                    canViewModerationLog={canViewModerationLog}
                     communityName={activeCommunity.name}
                     draft={settingsDraft}
                     mode="edit"
                     username={DEMO_USER.username}
                     onManageRoles={openRolesManager}
+                    onOpenModerationLog={openModerationLog}
                     setDraft={setSettingsDraft}
                     onClose={() => setCommunitySettingsOpen(false)}
                     onSubmit={saveCommunitySettings}
                 />
             )}
 
-            {rolesDialogOpen && activeCommunity && (
+            {rolesDialogOpen && activeCommunity && canManageRoles && (
                 <RolesPermissionsDialog
                     communityName={activeCommunity.name}
                     roles={activeRoles}
@@ -1398,8 +1491,18 @@ function HomePage() {
                 />
             )}
 
+            {moderationLogOpen && activeCommunity && canViewModerationLog && (
+                <ModerationLogDialog
+                    communityName={activeCommunity.name}
+                    entries={activeModerationLogs}
+                    onBack={() => { setModerationLogOpen(false); setCommunitySettingsOpen(true); }}
+                    onClose={() => setModerationLogOpen(false)}
+                />
+            )}
+
             {selectedMember && (
                 <MemberProfileDialog
+                    canModerate={canModerateMembers}
                     displayName={selectedMember.name}
                     isCurrentUser={selectedMember.id === "current-user"}
                     member={selectedMember}
@@ -1441,7 +1544,7 @@ function HomePage() {
                 />
             )}
 
-            {channelCreatorOpen && activeCommunity && (
+            {channelCreatorOpen && activeCommunity && canManageRooms && (
                 <ChannelDialog
                     categories={activeCommunity.categories}
                     categoryId={channelCategory}
@@ -1456,7 +1559,7 @@ function HomePage() {
                 />
             )}
 
-            {categoryCreatorOpen && activeCommunity && (
+            {categoryCreatorOpen && activeCommunity && canManageRooms && (
                 <CategoryDialog
                     communityName={activeCommunity.name}
                     name={categoryName}
@@ -1466,7 +1569,7 @@ function HomePage() {
                 />
             )}
 
-            {roomSettingsOpen && activeCommunity && (
+            {roomSettingsOpen && activeCommunity && canManageRooms && (
                 <RoomSettingsDialog
                     categories={activeCommunity.categories}
                     communityName={activeCommunity.name}

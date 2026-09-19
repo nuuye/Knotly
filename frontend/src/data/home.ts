@@ -6,6 +6,7 @@ import type {
     CommunityRole,
     Conversation,
     Friend,
+    ModerationLogEntry,
     RoomMessage,
     RoomCategory,
 } from "../types/home";
@@ -26,8 +27,8 @@ export const INITIAL_COMMUNITIES: Community[] = [
 ];
 
 const DEFAULT_COMMUNITY_ROLES: CommunityRole[] = [
-    { id: "owner", name: "Owner", color: "#68402f", permissions: ["manageCommunity", "manageRooms", "manageRoles", "inviteMembers", "moderateMembers", "sendMessages", "joinVoice"], protected: true },
-    { id: "moderator", name: "Moderator", color: "#e85d04", permissions: ["manageRooms", "inviteMembers", "moderateMembers", "sendMessages", "joinVoice"], protected: false },
+    { id: "owner", name: "Owner", color: "#68402f", permissions: ["manageCommunity", "manageRooms", "manageRoles", "inviteMembers", "moderateMembers", "viewModerationLog", "sendMessages", "joinVoice"], protected: true },
+    { id: "moderator", name: "Moderator", color: "#e85d04", permissions: ["manageRooms", "inviteMembers", "moderateMembers", "viewModerationLog", "sendMessages", "joinVoice"], protected: false },
     { id: "member", name: "Member", color: "#f6b64f", permissions: ["inviteMembers", "sendMessages", "joinVoice"], protected: true },
 ];
 
@@ -45,9 +46,23 @@ export function createCommunityRoles() {
 }
 
 /** Returns independent member records for one community. */
-export function createCommunityMembers() {
-    return DEFAULT_COMMUNITY_MEMBERS.map((member) => ({ ...member, roleIds: [...member.roleIds] }));
+export function createCommunityMembers(currentUserRoleIds: string[] = ["owner"]) {
+    return DEFAULT_COMMUNITY_MEMBERS.map((member) => ({
+        ...member,
+        roleIds: member.id === "current-user" ? [...currentUserRoleIds] : [...member.roleIds],
+        joinedAt: member.id === "current-user" && !currentUserRoleIds.includes("owner") ? "Joined 6 months ago" : member.joinedAt,
+    }));
 }
+
+export const INITIAL_MODERATION_LOGS: Record<string, ModerationLogEntry[]> = {
+    saturday: [
+        { id: "sat-role-1", action: "Moderator permissions updated", actor: "@johndoe", category: "roles", detail: "Room management and moderation access were reviewed.", time: "Today · 09:24" },
+        { id: "sat-member-1", action: "Role assigned to Noah", actor: "@johndoe", category: "members", detail: "Noah Williams received the Member role.", time: "Yesterday · 18:10" },
+    ],
+    studio: [
+        { id: "studio-room-1", action: "Room created", actor: "Maya Chen", category: "rooms", detail: "Created #share-your-work in Make things.", time: "Thursday · 16:42" },
+    ],
+};
 
 export const INITIAL_CONVERSATIONS: Conversation[] = [
     { id: "maya", name: "Maya Chen", initials: "MC", preview: "You’re bringing the blanket, right?", time: "2m", status: "Online", unread: 2, tone: "coral" },

@@ -5,7 +5,7 @@ import type { MemberProfileDialogProps } from "../../../types/home";
 import styles from "../../../routes/home.module.scss";
 
 /** Shows community-specific member details and moderation actions. */
-export function MemberProfileDialog({ displayName, isCurrentUser, member, memberRoles, note, roles, onClose, onMessage, onNoteChange, onRemove, onToggleRole }: MemberProfileDialogProps) {
+export function MemberProfileDialog({ canModerate, displayName, isCurrentUser, member, memberRoles, note, roles, onClose, onMessage, onNoteChange, onRemove, onToggleRole }: MemberProfileDialogProps) {
     const [copied, setCopied] = useState(false);
     const [confirmingRemoval, setConfirmingRemoval] = useState(false);
     const [rolePickerOpen, setRolePickerOpen] = useState(false);
@@ -56,12 +56,12 @@ export function MemberProfileDialog({ displayName, isCurrentUser, member, member
                     <div className={styles.memberRoleSelect}>
                         <span><ShieldCheck /> Community roles</span>
                         <div className={styles.memberRolePicker} ref={rolePickerRef}>
-                            <button type="button" className={styles.memberRoleTrigger} onClick={() => setRolePickerOpen((open) => !open)} aria-expanded={rolePickerOpen} aria-haspopup="dialog">
+                            <button type="button" className={styles.memberRoleTrigger} onClick={() => setRolePickerOpen((open) => !open)} aria-expanded={rolePickerOpen} aria-haspopup="dialog" disabled={!canModerate}>
                                 <span className={styles.roleColourStack}>
                                     {memberRoles.slice(0, 3).map((item) => <i key={item.id} style={{ backgroundColor: item.color }} />)}
                                     {memberRoles.length > 3 && <b>+{memberRoles.length - 3}</b>}
                                 </span>
-                                <span><strong>{memberRoles.length === 0 ? "No role assigned" : memberRoles.length === 1 ? memberRoles[0].name : `${memberRoles.length} roles assigned`}</strong><small>{memberRoles.length > 1 ? memberRoles.map((item) => item.name).join(", ") : "Choose one or several roles"}</small></span>
+                                <span><strong>{memberRoles.length === 0 ? "No role assigned" : memberRoles.length === 1 ? memberRoles[0].name : `${memberRoles.length} roles assigned`}</strong><small>{canModerate ? (memberRoles.length > 1 ? memberRoles.map((item) => item.name).join(", ") : "Choose one or several roles") : "You cannot change roles"}</small></span>
                                 <ChevronDown />
                             </button>
 
@@ -91,7 +91,7 @@ export function MemberProfileDialog({ displayName, isCurrentUser, member, member
                         <small>Only visible to you · {note.length}/240</small>
                     </label>
 
-                    {!isCurrentUser && (
+                    {!isCurrentUser && canModerate && (
                         confirmingRemoval ? (
                             <div className={styles.removeMemberConfirm}>
                                 <div><Trash2 /><span><strong>Remove {displayName}?</strong><small>They will lose access to this community.</small></span></div>
