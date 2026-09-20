@@ -37,7 +37,9 @@ function ExplorePage() {
 
             <main className={styles.main}>
                 <section className={styles.hero}>
-                    <div className={styles.heroOrb} aria-hidden="true" />
+                    <div className={styles.heroSonar} aria-hidden="true">
+                        <span />
+                    </div>
                     <div className={styles.heroCopy}>
                         <span className={styles.eyebrow}>Explore Knotly</span>
                         <h1>Find a place that<br /><em>feels like yours.</em></h1>

@@ -32,16 +32,53 @@
     box-shadow: 0 25px 65px rgba(67, 31, 14, 0.16);
 }
 
-.heroOrb {
+.heroSonar {
     position: absolute;
-    top: -11rem;
-    right: -3rem;
-    width: 28rem;
-    height: 28rem;
+    top: 50%;
+    right: clamp(-8rem, -5vw, -2rem);
+    width: clamp(24rem, 42vw, 36rem);
+    aspect-ratio: 1;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #ffb06f, $primary 55%, rgba($primary, 0.2) 70%);
-    box-shadow: 0 0 0 4rem rgba(255, 165, 89, 0.05);
-    opacity: 0.86;
+    background: repeating-radial-gradient(
+        circle,
+        transparent 0 3.2rem,
+        rgba(255, 176, 111, 0.17) 3.25rem 3.35rem,
+        transparent 3.4rem 5.6rem
+    );
+    opacity: 0.82;
+    pointer-events: none;
+    transform: translateY(-50%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 36%, #000 100%);
+}
+
+.heroSonar::before {
+    position: absolute;
+    inset: 9%;
+    border: 1px solid rgba(255, 176, 111, 0.08);
+    border-radius: 50%;
+    content: "";
+    background: radial-gradient(circle, rgba(232, 93, 4, 0.14), transparent 64%);
+}
+
+.heroSonar::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ffb06f;
+    border-radius: 50%;
+    content: "";
+    background: $primary;
+    box-shadow: 0 0 0 9px rgba(255, 176, 111, 0.09), 0 0 28px rgba(232, 93, 4, 0.35);
+    transform: translate(-50%, -50%);
+}
+
+.heroSonar span {
+    position: absolute;
+    inset: 37%;
+    border: 1px solid rgba(255, 176, 111, 0.15);
+    border-radius: 50%;
 }
 
 .heroCopy,
@@ -255,7 +292,7 @@
 @media (max-width: 650px) {
     .main { padding: 1.5rem 1rem 5rem; }
     .hero { min-height: 430px; padding: 1.5rem; border-radius: 25px; }
-    .heroOrb { top: -8rem; right: -9rem; width: 23rem; height: 23rem; opacity: 0.65; }
+    .heroSonar { top: 30%; right: -12rem; width: 27rem; opacity: 0.58; }
     .hero h1 { font-size: clamp(2.8rem, 14vw, 4.2rem); }
     .heroActions { width: 100%; max-width: none; }
     .discovery { padding: 0.8rem; border-radius: 20px; }
