@@ -1,53 +1,129 @@
+name: knotly
+
 services:
     postgres:
-        image: postgres:15
+        # Keep the existing major version so current local volumes remain compatible.
+        image: postgres:15-alpine
+        restart: unless-stopped
         environment:
-            POSTGRES_USER: ${DB_USER}
-            POSTGRES_PASSWORD: ${DB_PASSWORD}
-            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_DB: ${DB_NAME:-knotly}
+            POSTGRES_USER: ${DB_USER:-knotly}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:-knotly_dev_password}
         ports:
-            - "5432:5432"
+            - "${POSTGRES_PORT:-5432}:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        networks:
+            - backend
 
-    pgadmin:
-        image: dpage/pgadmin4
-        container_name: knotly_pgadmin
+    kafka:
+        image: apache/kafka:4.1.2
+        restart: unless-stopped
         environment:
-            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+            # A single combined broker/controller is enough for local development.
+            KAFKA_NODE_ID: 1
+            KAFKA_PROCESS_ROLES: broker,controller
+            KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+            # Containers use kafka:29092, while host applications use localhost:9092.
+            KAFKA_LISTENERS: PLAINTEXT://:29092,CONTROLLER://:29093,PLAINTEXT_HOST://:9092
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:${KAFKA_PORT:-9092}
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+            # Replication factor one is valid only for this single-node development cluster.
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+            CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
         ports:
-            - "5050:80"
-        depends_on:
-            - postgres
-    frontend:
-        build:
-            context: ./frontend
-            dockerfile: Dockerfile
-        ports:
-            - "5173:5173" # Expose Vite port
+            - "${KAFKA_PORT:-9092}:9092"
         volumes:
-            - ./frontend:/app
-            - /app/node_modules
-        environment:
-            - KAFKA_BROKER=kafka:29092
-        depends_on:
-            - postgres
-            - kafka
+            - kafka_data:/var/lib/kafka/data
+        healthcheck:
+            test:
+                ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+            interval: 10s
+            timeout: 10s
+            retries: 12
+            start_period: 20s
+        networks:
+            - backend
 
     backend:
         build:
             context: ./backend
             dockerfile: Dockerfile
-        ports:
-            - "8080:8080"
+        restart: unless-stopped
+        profiles: ["backend"]
         environment:
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${DB_NAME}
-            - SPRING_DATASOURCE_USERNAME=${DB_USER}
-            - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-            - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+            SPRING_PROFILES_ACTIVE: dev
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-knotly}
+            SPRING_DATASOURCE_USERNAME: ${DB_USER:-knotly}
+            SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-knotly_dev_password}
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+            MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+            JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--XX:MaxRAMPercentage=75.0}
+        ports:
+            - "${BACKEND_PORT:-8080}:8080"
         depends_on:
-            - postgres
-            - kafka
+            postgres:
+                condition: service_healthy
+            kafka:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD-SHELL", "curl --fail --silent http://localhost:8080/actuator/health/readiness >/dev/null"]
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 40s
+        networks:
+            - backend
+
+    pgadmin:
+        image: dpage/pgadmin4:9.8
+        container_name: knotly_pgadmin
+        restart: unless-stopped
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@knotly.local}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin_dev_password}
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        depends_on:
+            postgres:
+                condition: service_healthy
+        volumes:
+            - pgadmin_data:/var/lib/pgadmin
+        networks:
+            - backend
+
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            - "${FRONTEND_PORT:-5173}:5173"
+        volumes:
+            - ./frontend:/app
+            - frontend_node_modules:/app/node_modules
+        networks:
+            - backend
+
 volumes:
     postgres_data:
+    kafka_data:
+    pgadmin_data:
+    frontend_node_modules:
+
+networks:
+    backend:
+        driver: bridge

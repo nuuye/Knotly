@@ -22,6 +22,8 @@ export type PermissionKey =
     | "sendMessages"
     | "joinVoice";
 export type ModerationLogCategory = "community" | "invites" | "members" | "roles" | "rooms";
+export type NotificationKind = "message" | "mention" | "friend" | "community";
+export type NotificationFilter = "all" | "unread";
 export type StateSetter<T> = Dispatch<SetStateAction<T>>;
 
 export interface RoomCategory {
@@ -105,6 +107,23 @@ export interface FriendRequest {
     direction: FriendRequestDirection;
     person: Friend;
     sentAt: string;
+}
+
+export type NotificationTarget =
+    | { type: "conversation"; conversationId: string }
+    | { type: "friendRequests" }
+    | { type: "room"; communityId: string; room: string };
+
+export interface AppNotification {
+    id: string;
+    kind: NotificationKind;
+    title: string;
+    description: string;
+    time: string;
+    read: boolean;
+    initials: string;
+    tone: string;
+    target: NotificationTarget;
 }
 
 export interface CommunityMember extends PersonSummary {
@@ -216,6 +235,28 @@ export interface RemoveFriendDialogProps {
     onConfirm: () => void;
 }
 
+export interface FriendsPanelProps {
+    blockedUsers: Friend[];
+    friendFilter: FriendFilter;
+    friendMenuId: string | null;
+    friendMenuOpen: boolean;
+    friendMenuRef: RefObject<HTMLDivElement | null>;
+    friendRequests: FriendRequest[];
+    friends: Friend[];
+    friendsView: FriendsView;
+    onAcceptRequest: (requestId: string) => void;
+    onAddFriend: () => void;
+    onBlockRequest: (requestId: string) => void;
+    onChangeFilter: (filter: FriendFilter) => void;
+    onChangeView: (view: FriendsView) => void;
+    onMessageFriend: (friend: Friend) => void;
+    onMobileBack: () => void;
+    onOpenRemoveFriend: (friendId: string) => void;
+    onRemoveRequest: (requestId: string, direction: FriendRequestDirection) => void;
+    onToggleFriendMenu: (friendId: string) => void;
+    onUnblock: (friendId: string) => void;
+}
+
 export interface InviteMembersDialogProps {
     community: Pick<Community, "initials" | "name" | "tone">;
     friends: Friend[];
@@ -233,13 +274,25 @@ export interface InviteMembersDialogProps {
 export interface HomeHeaderProps {
     activeSpace: string;
     communities: Community[];
+    isNotificationsOpen: boolean;
     isProfileMenuOpen: boolean;
+    notifications: AppNotification[];
+    notificationsRef: RefObject<HTMLDivElement | null>;
     profileMenuRef: RefObject<HTMLDivElement | null>;
     user: UserAccount;
     onCreateCommunity: () => void;
     onOpenCommunity: (communityId: string) => void;
     onOpenMessages: () => void;
+    onMarkAllNotificationsRead: () => void;
+    onOpenNotification: (notification: AppNotification) => void;
+    onToggleNotifications: () => void;
     onToggleProfileMenu: () => void;
+}
+
+export interface NotificationCenterProps {
+    notifications: AppNotification[];
+    onMarkAllRead: () => void;
+    onOpenNotification: (notification: AppNotification) => void;
 }
 
 export interface NewMessageDialogProps {

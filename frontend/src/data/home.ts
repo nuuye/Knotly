@@ -1,4 +1,5 @@
 import type {
+    AppNotification,
     ChatMessage,
     Community,
     CommunitySettingsDraft,
@@ -11,6 +12,14 @@ import type {
     RoomMessage,
     RoomCategory,
 } from "../types/home";
+
+export const INITIAL_NOTIFICATIONS: AppNotification[] = [
+    { id: "notification-maya", kind: "message", title: "Maya sent you a message", description: "You’re bringing the blanket, right?", time: "2m", read: false, initials: "MC", tone: "coral", target: { type: "conversation", conversationId: "maya" } },
+    { id: "notification-avery", kind: "friend", title: "Avery sent a friend request", description: "You can accept or decline it from your requests.", time: "24m", read: false, initials: "AS", tone: "plum", target: { type: "friendRequests" } },
+    { id: "notification-lina", kind: "mention", title: "Lina mentioned you", description: "Can you add the final details to weekend-plans?", time: "1h", read: false, initials: "LT", tone: "rose", target: { type: "room", communityId: "saturday", room: "weekend-plans" } },
+    { id: "notification-weekend", kind: "message", title: "New message in Weekend crew", description: "Jules shared a new meeting point.", time: "3h", read: true, initials: "4", tone: "amber", target: { type: "conversation", conversationId: "weekend" } },
+    { id: "notification-studio", kind: "community", title: "New room in Work in Progress", description: "Maya created share-your-work.", time: "Yesterday", read: true, initials: "WP", tone: "amber", target: { type: "room", communityId: "studio", room: "share-your-work" } },
+];
 
 /** Builds a new category list so communities never share mutable arrays. */
 function createDefaultCategories(voiceRooms: string[]): RoomCategory[] {

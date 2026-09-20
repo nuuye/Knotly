@@ -1,5 +1,9 @@
 # envs
 .env*
+!.env.example
+
+# Java build output
+backend/target/
 
 # Logs
 logs

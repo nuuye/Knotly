@@ -1,11 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
     ArrowLeft,
-    Ban,
     Bell,
     BellOff,
     ChevronDown,
-    Check,
     Clipboard,
     FolderPlus,
     Hash,
@@ -13,7 +11,6 @@ import {
     ImagePlus,
     LogOut,
     MailOpen,
-    MessageCircleMore,
     MoreHorizontal,
     Paperclip,
     Pencil,
@@ -27,8 +24,6 @@ import {
     Mic,
     MicOff,
     UserPlus,
-    UserMinus,
-    UserX,
     UsersRound,
     Video,
     Volume2,
@@ -38,6 +33,7 @@ import {
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AudioWave } from "../components/home/AudioWave";
 import { EmojiPicker } from "../components/home/EmojiPicker";
+import { FriendsPanel } from "../components/home/FriendsPanel";
 import { GroupAvatar } from "../components/home/GroupAvatar";
 import { HomeHeader } from "../components/home/HomeHeader";
 import { MessageActions } from "../components/home/MessageActions";
@@ -62,6 +58,7 @@ import {
     INITIAL_FRIEND_REQUESTS,
     INITIAL_MESSAGES,
     INITIAL_MODERATION_LOGS,
+    INITIAL_NOTIFICATIONS,
     INITIAL_ROOM_MESSAGES,
     SUGGESTED_FRIENDS,
     createCommunityMembers,
@@ -70,6 +67,7 @@ import {
 import { useDismissableLayer } from "../hooks/useDismissableLayer";
 import { DEMO_USER } from "../data/user";
 import type {
+    AppNotification,
     Community,
     CommunityMember,
     CommunityRole,
@@ -129,6 +127,7 @@ function HomePage() {
     const [friends, setFriends] = useState(FRIENDS);
     const [friendRequests, setFriendRequests] = useState(INITIAL_FRIEND_REQUESTS);
     const [blockedUsers, setBlockedUsers] = useState<Friend[]>([]);
+    const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
     const [communityMemberNotes, setCommunityMemberNotes] = useState<Record<string, Record<string, string>>>({});
     const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
     const [selectedConversation, setSelectedConversation] = useState("maya");
@@ -152,6 +151,7 @@ function HomePage() {
     const [friendsView, setFriendsView] = useState<FriendsView>("friends");
     // Dialogs and small menus.
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [newMessageOpen, setNewMessageOpen] = useState(false);
     const [newMessageMode, setNewMessageMode] = useState<NewMessageMode>("direct");
     const [newMessageQuery, setNewMessageQuery] = useState("");
@@ -200,6 +200,7 @@ function HomePage() {
     const [microphoneMuted, setMicrophoneMuted] = useState(false);
     const [voiceSoundMuted, setVoiceSoundMuted] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
+    const notificationsRef = useRef<HTMLDivElement>(null);
     const roomMenuRef = useRef<HTMLDivElement>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
     const emojiPickerRef = useRef<HTMLDivElement>(null);
@@ -217,10 +218,8 @@ function HomePage() {
         if (!normalizedQuery) return conversations;
         return conversations.filter((conversation) => conversation.name.toLowerCase().includes(normalizedQuery));
     }, [conversations, query]);
-    const filteredFriends = friends.filter((friend) => friendFilter === "all" || friend.status === friendFilter);
     const newMessageFriends = friends.filter((friend) => friend.name.toLowerCase().includes(newMessageQuery.trim().toLowerCase()));
     const receivedFriendRequests = friendRequests.filter((request) => request.direction === "received");
-    const sentFriendRequests = friendRequests.filter((request) => request.direction === "sent");
     const unavailableFriendIds = new Set([
         ...friends.map((friend) => friend.id),
         ...friendRequests.map((request) => request.person.id),
@@ -298,6 +297,7 @@ function HomePage() {
     const activeConversationIsMuted = mutedConversations.includes(activeConversation.id);
 
     useDismissableLayer(profileMenuOpen, profileMenuRef, setProfileMenuOpen);
+    useDismissableLayer(notificationsOpen, notificationsRef, setNotificationsOpen);
     useDismissableLayer(roomMenuOpen, roomMenuRef, setRoomMenuOpen);
     useDismissableLayer(emojiPickerOpen, emojiPickerRef, setEmojiPickerOpen);
     useDismissableLayer(conversationMenuOpen, conversationMenuRef, setConversationMenuOpen);
@@ -345,6 +345,12 @@ function HomePage() {
         });
     };
 
+    // Clear temporary reply and edit state before changing the visible conversation.
+    const clearMessageSelectionState = () => {
+        setReplyingTo(null);
+        setEditingMessage(null);
+    };
+
     // Return to private messages and reset community-only panels.
     const openMessages = () => {
         setActiveSpace("messages");
@@ -358,8 +364,8 @@ function HomePage() {
         setSelectedMemberId(null);
         setEmojiPickerOpen(false);
         setConversationMenuOpen(false);
-        setReplyingTo(null);
-        setEditingMessage(null);
+        clearMessageSelectionState();
+        setNotificationsOpen(false);
     };
 
     // Open a community on its default text room.
@@ -376,8 +382,51 @@ function HomePage() {
         setSelectedMemberId(null);
         setEmojiPickerOpen(false);
         setConversationMenuOpen(false);
-        setReplyingTo(null);
-        setEditingMessage(null);
+        clearMessageSelectionState();
+        setNotificationsOpen(false);
+    };
+
+    // Open the destination attached to a notification and mark that item as read.
+    const openNotification = (notification: AppNotification) => {
+        setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, read: true } : item));
+        setNotificationsOpen(false);
+        setProfileMenuOpen(false);
+        clearMessageSelectionState();
+
+        if (notification.target.type === "friendRequests") {
+            setActiveSpace("messages");
+            setMessageView("friends");
+            setFriendsView("requests");
+            setMobilePanel("chat");
+            return;
+        }
+
+        if (notification.target.type === "conversation") {
+            const conversationId = notification.target.conversationId;
+            setActiveSpace("messages");
+            setSelectedConversation(conversationId);
+            setConversations((current) => current.map((conversation) => conversation.id === conversationId
+                ? { ...conversation, unread: undefined }
+                : conversation));
+            setMessageView("chat");
+            setMobilePanel("chat");
+            scrollMessagesToBottom();
+            return;
+        }
+
+        setActiveSpace(notification.target.communityId);
+        setSelectedRoom(notification.target.room);
+        setSelectedRoomKind("text");
+        setMessageView("chat");
+        setMobilePanel("chat");
+        setMembersPanelOpen(false);
+        setRoomMenuOpen(false);
+        scrollMessagesToBottom();
+    };
+
+    // Clear the unread counter without removing notification history.
+    const markAllNotificationsRead = () => {
+        setNotifications((current) => current.map((notification) => notification.read ? notification : { ...notification, read: true }));
     };
 
     // Start every new community form with a clean draft.
@@ -681,8 +730,17 @@ function HomePage() {
         setMessageView("chat");
         setMobilePanel("chat");
         setFriendMenuOpen(false);
-        setReplyingTo(null);
-        setEditingMessage(null);
+        clearMessageSelectionState();
+    };
+
+    // Keep only one friend action menu open at a time.
+    const toggleFriendMenu = (friendId: string) => {
+        if (friendMenuId === friendId) {
+            setFriendMenuOpen((open) => !open);
+            return;
+        }
+        setFriendMenuId(friendId);
+        setFriendMenuOpen(true);
     };
 
     // Create an outgoing request instead of adding someone before they accept it.
@@ -778,8 +836,7 @@ function HomePage() {
         setMobilePanel("chat");
         setMembersPanelOpen(false);
         setSelectedMemberId(null);
-        setReplyingTo(null);
-        setEditingMessage(null);
+        clearMessageSelectionState();
     };
 
     // Open the room form with the type and category chosen by the clicked button.
@@ -1103,8 +1160,7 @@ function HomePage() {
         setMessageView("chat");
         setMobilePanel("chat");
         setNewMessageOpen(false);
-        setReplyingTo(null);
-        setEditingMessage(null);
+        clearMessageSelectionState();
     };
 
     return (
@@ -1112,13 +1168,25 @@ function HomePage() {
             <HomeHeader
                 activeSpace={activeSpace}
                 communities={communities}
+                isNotificationsOpen={notificationsOpen}
                 isProfileMenuOpen={profileMenuOpen}
+                notifications={notifications}
+                notificationsRef={notificationsRef}
                 profileMenuRef={profileMenuRef}
                 user={DEMO_USER}
                 onCreateCommunity={openCommunityCreator}
+                onMarkAllNotificationsRead={markAllNotificationsRead}
                 onOpenCommunity={openCommunity}
                 onOpenMessages={openMessages}
-                onToggleProfileMenu={() => setProfileMenuOpen((open) => !open)}
+                onOpenNotification={openNotification}
+                onToggleNotifications={() => {
+                    setNotificationsOpen((open) => !open);
+                    setProfileMenuOpen(false);
+                }}
+                onToggleProfileMenu={() => {
+                    setProfileMenuOpen((open) => !open);
+                    setNotificationsOpen(false);
+                }}
             />
 
             {/* The left panel lists conversations or rooms; the right panel shows their content. */}
@@ -1162,8 +1230,7 @@ function HomePage() {
                                                 setMessageView("chat");
                                                 setMobilePanel("chat");
                                                 setConversationMenuOpen(false);
-                                                setReplyingTo(null);
-                                                setEditingMessage(null);
+                                                clearMessageSelectionState();
                                                 scrollMessagesToBottom();
                                             }}
                                         >
@@ -1209,8 +1276,7 @@ function HomePage() {
                                                         setSelectedRoom(room);
                                                         setSelectedRoomKind("text");
                                                         setMobilePanel("chat");
-                                                        setReplyingTo(null);
-                                                        setEditingMessage(null);
+                                                        clearMessageSelectionState();
                                                         scrollMessagesToBottom();
                                                     }}
                                                 >
@@ -1270,112 +1336,30 @@ function HomePage() {
                 </aside>
 
                 {activeSpace === "messages" && messageView === "friends" ? (
-                    <section className={`${styles.chatPanel} ${styles.friendsPanel}`}>
-                        <header className={styles.chatHeader}>
-                            <button type="button" className={styles.mobileBack} onClick={() => setMobilePanel("list")} aria-label="Back to conversations"><ArrowLeft /></button>
-                            <span className={styles.roomIcon}><UsersRound /></span>
-                            <div><strong>{friendsView === "friends" ? "Friends" : "Friend requests"}</strong><span>{friendsView === "friends" ? "People you’ve added on Knotly" : "Received, sent, and blocked profiles"}</span></div>
-                            <button type="button" className={styles.addFriendButton} onClick={() => setAddFriendOpen(true)}><UserPlus /> Add friend</button>
-                        </header>
-
-                        <div className={styles.friendsContent}>
-                            <div className={styles.friendsToolbar}>
-                                <div className={styles.friendsViewTabs}>
-                                    <button type="button" className={friendsView === "friends" ? styles.activeFriendsView : ""} onClick={() => setFriendsView("friends")}><UsersRound /> Friends <small>{friends.length}</small></button>
-                                    <button type="button" className={friendsView === "requests" ? styles.activeFriendsView : ""} onClick={() => setFriendsView("requests")}><MailOpen /> Requests {receivedFriendRequests.length > 0 && <small>{receivedFriendRequests.length}</small>}</button>
-                                </div>
-                                {friendsView === "friends" && <div className={styles.friendFilters}>
-                                    {(["all", "online", "offline"] as const).map((filter) => (
-                                        <button key={filter} type="button" className={friendFilter === filter ? styles.activeFilter : ""} onClick={() => setFriendFilter(filter)}>
-                                            {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                                        </button>
-                                    ))}
-                                </div>}
-                            </div>
-
-                            {friendsView === "friends" ? (
-                                <div className={styles.friendGroups} key={friendFilter}>
-                                        {(["online", "offline"] as const).map((status) => {
-                                            const group = filteredFriends.filter((friend) => friend.status === status);
-                                            if (group.length === 0) return null;
-
-                                            return (
-                                                <section key={status}>
-                                                    <div className={styles.friendGroupLabel}><span>{status}</span><small>{group.length}</small></div>
-                                                    <div className={styles.friendList}>
-                                                        {group.map((friend) => (
-                                                            <div key={friend.id} className={styles.friendRow}>
-                                                                <span className={`${styles.personAvatar} ${styles[friend.tone]} ${friend.status === "offline" ? styles.offlineAvatar : ""}`}>{friend.initials}<i /></span>
-                                                                <div><strong>{friend.name}</strong><span>{friend.activity}</span></div>
-                                                                <button type="button" aria-label={`Message ${friend.name}`} onClick={() => openFriendConversation(friend)}><MessageCircleMore /></button>
-                                                                <div className={styles.friendRowMenu} ref={friendMenuOpen && friendMenuId === friend.id ? friendMenuRef : undefined}>
-                                                                    <button type="button" className={friendMenuOpen && friendMenuId === friend.id ? styles.activeFriendMenu : ""} aria-label={`More options for ${friend.name}`} aria-expanded={friendMenuOpen && friendMenuId === friend.id} onClick={() => {
-                                                                        if (friendMenuId === friend.id) setFriendMenuOpen((open) => !open);
-                                                                        else {
-                                                                            setFriendMenuId(friend.id);
-                                                                            setFriendMenuOpen(true);
-                                                                        }
-                                                                    }}><MoreHorizontal /></button>
-                                                                    {friendMenuOpen && friendMenuId === friend.id && (
-                                                                        <div className={styles.friendActionsMenu}>
-                                                                            <div><strong>{friend.name}</strong><small>@{friend.id}</small></div>
-                                                                            <button type="button" onClick={() => openFriendConversation(friend)}><MessageCircleMore /> Message</button>
-                                                                            <button type="button" className={styles.dangerMenuAction} onClick={() => { setFriendMenuOpen(false); setFriendRemovalId(friend.id); }}><UserMinus /> Remove friend</button>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </section>
-                                            );
-                                        })}
-                                </div>
-                            ) : (
-                                <div className={styles.friendRequestGroups}>
-                                    <section>
-                                        <div className={styles.friendGroupLabel}><span>Received</span><small>{receivedFriendRequests.length}</small></div>
-                                        {receivedFriendRequests.length ? receivedFriendRequests.map((request) => (
-                                            <div className={styles.friendRequestRow} key={request.id}>
-                                                <span className={`${styles.personAvatar} ${styles[request.person.tone]}`}>{request.person.initials}<i /></span>
-                                                <div><strong>{request.person.name}</strong><span>@{request.person.id} · {request.sentAt}</span></div>
-                                                <div className={styles.friendRequestActions}>
-                                                    <button type="button" className={styles.acceptRequest} onClick={() => acceptFriendRequest(request.id)} aria-label={`Accept ${request.person.name}`}><Check /><span>Accept</span></button>
-                                                    <button type="button" onClick={() => removeFriendRequest(request.id, "received")} aria-label={`Decline ${request.person.name}`}><UserX /><span>Decline</span></button>
-                                                    <button type="button" className={styles.blockRequest} onClick={() => blockUser(request.id)} aria-label={`Block ${request.person.name}`}><Ban /></button>
-                                                </div>
-                                            </div>
-                                        )) : <p className={styles.friendRequestEmpty}>No received requests right now.</p>}
-                                    </section>
-
-                                    <section>
-                                        <div className={styles.friendGroupLabel}><span>Sent</span><small>{sentFriendRequests.length}</small></div>
-                                        {sentFriendRequests.length ? sentFriendRequests.map((request) => (
-                                            <div className={styles.friendRequestRow} key={request.id}>
-                                                <span className={`${styles.personAvatar} ${styles[request.person.tone]}`}>{request.person.initials}</span>
-                                                <div><strong>{request.person.name}</strong><span>Pending · {request.sentAt}</span></div>
-                                                <div className={styles.friendRequestActions}>
-                                                    <button type="button" onClick={() => removeFriendRequest(request.id, "sent")}><X /><span>Cancel</span></button>
-                                                    <button type="button" className={styles.blockRequest} onClick={() => blockUser(request.id)} aria-label={`Block ${request.person.name}`}><Ban /></button>
-                                                </div>
-                                            </div>
-                                        )) : <p className={styles.friendRequestEmpty}>No sent requests are waiting.</p>}
-                                    </section>
-
-                                    {blockedUsers.length > 0 && <section>
-                                        <div className={styles.friendGroupLabel}><span>Blocked</span><small>{blockedUsers.length}</small></div>
-                                        {blockedUsers.map((friend) => (
-                                            <div className={`${styles.friendRequestRow} ${styles.blockedFriendRow}`} key={friend.id}>
-                                                <span className={`${styles.personAvatar} ${styles[friend.tone]} ${styles.offlineAvatar}`}>{friend.initials}</span>
-                                                <div><strong>{friend.name}</strong><span>@{friend.id}</span></div>
-                                                <div className={styles.friendRequestActions}><button type="button" onClick={() => unblockUser(friend.id)}><Ban /><span>Unblock</span></button></div>
-                                            </div>
-                                        ))}
-                                    </section>}
-                                </div>
-                            )}
-                        </div>
-                    </section>
+                    <FriendsPanel
+                        blockedUsers={blockedUsers}
+                        friendFilter={friendFilter}
+                        friendMenuId={friendMenuId}
+                        friendMenuOpen={friendMenuOpen}
+                        friendMenuRef={friendMenuRef}
+                        friendRequests={friendRequests}
+                        friends={friends}
+                        friendsView={friendsView}
+                        onAcceptRequest={acceptFriendRequest}
+                        onAddFriend={() => setAddFriendOpen(true)}
+                        onBlockRequest={blockUser}
+                        onChangeFilter={setFriendFilter}
+                        onChangeView={setFriendsView}
+                        onMessageFriend={openFriendConversation}
+                        onMobileBack={() => setMobilePanel("list")}
+                        onOpenRemoveFriend={(friendId) => {
+                            setFriendMenuOpen(false);
+                            setFriendRemovalId(friendId);
+                        }}
+                        onRemoveRequest={removeFriendRequest}
+                        onToggleFriendMenu={toggleFriendMenu}
+                        onUnblock={unblockUser}
+                    />
                 ) : activeSpace === "messages" ? (
                     <section className={styles.chatPanel}>
                         <header className={styles.chatHeader}>

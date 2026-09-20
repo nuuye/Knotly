@@ -4,20 +4,28 @@ import knotlyLogo from "../../assets/knotly.png";
 import type { HomeHeaderProps } from "../../types/home";
 import { getUsernameMark } from "../../utils/text";
 import styles from "../../routes/home.module.scss";
+import { NotificationCenter } from "./NotificationCenter";
 
 /** Displays the main space switcher, account actions, and profile menu. */
 export function HomeHeader({
     activeSpace,
     communities,
+    isNotificationsOpen,
     isProfileMenuOpen,
+    notifications,
+    notificationsRef,
     profileMenuRef,
     user,
     onCreateCommunity,
     onOpenCommunity,
     onOpenMessages,
+    onMarkAllNotificationsRead,
+    onOpenNotification,
+    onToggleNotifications,
     onToggleProfileMenu,
 }: HomeHeaderProps) {
     const userMark = getUsernameMark(user.username);
+    const unreadNotificationCount = notifications.filter((notification) => !notification.read).length;
 
     return (
         <header className={styles.spaceBar}>
@@ -48,7 +56,13 @@ export function HomeHeader({
             </nav>
 
             <div className={styles.userActions}>
-                <button type="button" aria-label="Notifications" className={styles.iconButton}><Bell /><i /></button>
+                <div className={styles.notificationMenuWrap} ref={notificationsRef}>
+                    <button type="button" aria-label={`${unreadNotificationCount} unread notifications`} aria-expanded={isNotificationsOpen} className={`${styles.iconButton} ${isNotificationsOpen ? styles.activeIconButton : ""}`} onClick={onToggleNotifications}>
+                        <Bell />
+                        {unreadNotificationCount > 0 && <b className={styles.notificationBadge}>{unreadNotificationCount}</b>}
+                    </button>
+                    {isNotificationsOpen && <NotificationCenter notifications={notifications} onMarkAllRead={onMarkAllNotificationsRead} onOpenNotification={onOpenNotification} />}
+                </div>
                 <Link to="/settings" aria-label="Settings" className={styles.iconButton}><Settings /></Link>
                 <div className={styles.profileMenuWrap} ref={profileMenuRef}>
                     <button type="button" className={styles.userMenu} onClick={onToggleProfileMenu} aria-expanded={isProfileMenuOpen}>

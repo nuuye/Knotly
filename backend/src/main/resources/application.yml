@@ -12,3 +12,14 @@ spring:
   # Run versioned database migrations when the application starts.
   flyway:
     enabled: true
+
+# Only health information is exposed; all other actuator endpoints stay private.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true

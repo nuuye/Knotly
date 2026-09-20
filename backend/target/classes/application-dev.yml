@@ -1,5 +1,8 @@
+# Local database settings come from environment variables, not source control.
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+  kafka:
+    bootstrap-servers: localhost:${KAFKA_PORT:9092}
