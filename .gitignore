@@ -4,6 +4,7 @@
 
 # Java build output
 backend/target/
+*.class
 
 # Logs
 logs

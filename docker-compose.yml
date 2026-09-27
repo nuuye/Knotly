@@ -73,6 +73,7 @@ services:
             SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
             MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
             JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--XX:MaxRAMPercentage=75.0}
+            JWT_SECRET: ${JWT_SECRET}
         ports:
             - "${BACKEND_PORT:-8080}:8080"
         depends_on:
