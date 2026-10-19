@@ -10,7 +10,10 @@ import com.knotly.app.identity.model.database.User;
 // <Type of Data, Primary key>
 public interface UserRepository extends JpaRepository<User, UUID>{
     
-    Optional<User> findByEmailIgnoreCase(String email);
+    Optional<User> findByEmailNormalized(String email);
 
-    boolean existsByEmailIgnoreCase(String email);
+    boolean existsByUsernameNormalized(String username);
+
+    boolean existsByEmailNormalized(String email);
+
 }

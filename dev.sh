@@ -9,11 +9,18 @@ WATCHER_PID=""
 
 cd "${ROOT_DIR}"
 
-# Export local overrides when a .env file exists.
+# Export shared local overrides, then backend-specific ones.
 if [[ -f .env ]]; then
   set -a
   # shellcheck disable=SC1091
   source .env
+  set +a
+fi
+
+if [[ -f "${BACKEND_DIR}/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${BACKEND_DIR}/.env"
   set +a
 fi
 

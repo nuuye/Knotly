@@ -2,6 +2,7 @@ package com.knotly.app.identity.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -32,5 +33,16 @@ public class JwtService {
 
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+    }
+
+    public UUID extractUserId(String token) {
+        String subject = Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    
+        return UUID.fromString(subject);
     }
 }

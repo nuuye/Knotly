@@ -30,6 +30,9 @@ public class User {
     @Column(nullable = false, unique = true, length = 320)
     private String email;
 
+    @Column(name = "email_normalized", nullable = false, length = 320)
+    private String emailNormalized;
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -64,10 +67,20 @@ public class User {
     // Constructors
     public User(String username, String email, String passwordHash) {
         this.username = username;
-        this.usernameNormalized = username.toLowerCase(Locale.ROOT);
         this.email = email;
+        this.usernameNormalized = normalizeField(username);
+        this.emailNormalized = normalizeField(email);
         this.passwordHash = passwordHash;
         this.platformRole = PlatformRole.USER;
+    }
+
+    public static String normalizeField(String field) {
+        return field.trim().toLowerCase(Locale.ROOT);
+    }
+
+    public void changeUsername(String username) {
+        this.username = username.trim();
+        this.usernameNormalized = normalizeField(username);
     }
 
 }

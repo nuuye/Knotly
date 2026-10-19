@@ -3,7 +3,7 @@ package com.knotly.app.identity.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.knotly.app.identity.exception.BadRequestException;
+import com.knotly.app.identity.exception.ConflictException;
 import com.knotly.app.identity.exception.UnauthorizedException;
 import com.knotly.app.identity.model.database.User;
 import com.knotly.app.identity.repository.UserRepository;
@@ -20,11 +20,16 @@ public class AuthService {
 
     public void register(String username, String email, String password) {
 
-        if (userRepository.existsByEmailIgnoreCase(email)) {
-            throw new BadRequestException("Email already exists");
+        String normalizedUsername = User.normalizeField(username);
+        String normalizedEmail = User.normalizeField(email);
+
+        if (userRepository.existsByEmailNormalized(normalizedEmail)) {
+            throw new ConflictException("Email already exists");
         }
 
-        
+        if (userRepository.existsByUsernameNormalized(normalizedUsername)) {
+            throw new ConflictException("username already exists");
+        }
 
         User user = new User(
             username,
@@ -37,7 +42,9 @@ public class AuthService {
 
     public String login(String email, String password) {
         
-        User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+        String normalizedEmail = User.normalizeField(email);
+
+        User user = userRepository.findByEmailNormalized(normalizedEmail).orElse(null);
 
         if(user == null){
             throw new UnauthorizedException("Invalid credentials");
