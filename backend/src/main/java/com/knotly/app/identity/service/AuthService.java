@@ -44,7 +44,7 @@ public class AuthService {
         
         String normalizedEmail = User.normalizeField(email);
 
-        User user = userRepository.findByEmailNormalized(normalizedEmail).orElse(null);
+        User user = userRepository.findByEmailNormalizedAndDeletedAtIsNull(normalizedEmail).orElse(null);
 
         if(user == null){
             throw new UnauthorizedException("Invalid credentials");

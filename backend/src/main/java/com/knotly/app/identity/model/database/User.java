@@ -83,5 +83,13 @@ public class User {
         this.usernameNormalized = normalizeField(username);
     }
 
+    public void updatePassword(String newPasswordHash) {
+        this.passwordHash = newPasswordHash;
+    }
+
+    public void markDeleted() {
+        this.deletedAt = Instant.now();
+    }
+
 }
 
