@@ -1,4 +1,4 @@
-package com.knotly.app.identity.config.security;
+package com.knotly.app.security;
 
 import java.io.IOException;
 import java.util.List;

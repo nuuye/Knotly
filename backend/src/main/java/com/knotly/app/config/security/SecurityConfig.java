@@ -1,4 +1,4 @@
-package com.knotly.app.identity.config.security;
+package com.knotly.app.config.security;
 
 import java.util.List;
 
@@ -14,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.knotly.app.security.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {

@@ -3,10 +3,10 @@ package com.knotly.app.identity.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.knotly.app.identity.exception.ConflictException;
-import com.knotly.app.identity.exception.UnauthorizedException;
 import com.knotly.app.identity.model.database.User;
 import com.knotly.app.identity.repository.UserRepository;
+import com.knotly.app.shared.exception.ConflictException;
+import com.knotly.app.shared.exception.UnauthorizedException;
 
 import lombok.AllArgsConstructor;
 

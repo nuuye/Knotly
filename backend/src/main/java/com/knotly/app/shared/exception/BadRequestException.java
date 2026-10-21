@@ -1,4 +1,4 @@
-package com.knotly.app.identity.exception;
+package com.knotly.app.shared.exception;
 
 public class BadRequestException extends RuntimeException {
 

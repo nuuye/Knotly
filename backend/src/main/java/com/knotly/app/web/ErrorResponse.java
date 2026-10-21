@@ -1,4 +1,4 @@
-package com.knotly.app.identity.controller.dto.response;
+package com.knotly.app.web;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

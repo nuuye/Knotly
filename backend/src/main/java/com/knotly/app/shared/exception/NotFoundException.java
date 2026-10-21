@@ -1,4 +1,4 @@
-package com.knotly.app.identity.exception;
+package com.knotly.app.shared.exception;
 
 public class NotFoundException extends RuntimeException {
 

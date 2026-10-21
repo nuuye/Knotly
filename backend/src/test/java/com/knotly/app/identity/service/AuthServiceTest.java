@@ -15,10 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.knotly.app.identity.exception.ConflictException;
-import com.knotly.app.identity.exception.UnauthorizedException;
 import com.knotly.app.identity.model.database.User;
 import com.knotly.app.identity.repository.UserRepository;
+import com.knotly.app.shared.exception.ConflictException;
+import com.knotly.app.shared.exception.UnauthorizedException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
